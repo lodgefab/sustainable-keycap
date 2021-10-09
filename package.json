@@ -8,7 +8,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier --write \"./**/*.{js,jsx,ts,tsx}\""
+    "format": "prettier --write \"./**/*.{js,jsx,ts,tsx}\"",
+    "deploy:dev": "vercel",
+    "deploy:prod": "vercel --prod"
   },
   "dependencies": {
     "next": "11.1.2",
