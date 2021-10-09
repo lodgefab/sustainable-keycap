@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "prepare": "husky install",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format": "prettier --write \"./**/*.{js,jsx,ts,tsx}\""
   },
   "dependencies": {
     "next": "11.1.2",
@@ -18,6 +20,12 @@
     "@types/react": "^17.0.27",
     "eslint": "7.32.0",
     "eslint-config-next": "11.1.0",
+    "husky": "^7.0.2",
+    "lint-staged": "^11.2.1",
+    "prettier": "2.4.1",
     "typescript": "^4.4.3"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
   }
 }
