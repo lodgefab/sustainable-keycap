@@ -2,10 +2,27 @@ import Head from 'next/head'
 import Link from 'next/link'
 import { GetStaticProps, InferGetStaticPropsType, NextPage } from 'next'
 import * as contentful from 'contentful'
+import { getSampleMaterialData } from '../lib/helper'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 
 export const getStaticProps: GetStaticProps<{ materials: Material[] }> = async (_) => {
+  let materials: Material[]
+  if (process.env.KEYCAP_NO_CONTENTFUL && process.env.NODE_ENV !== 'production') {
+    materials = getSampleMaterialData()
+  } else {
+    materials = await fetchMaterialData()
+  }
+
+  return {
+    props: {
+      materials: materials,
+    },
+    revalidate: 30,
+  }
+}
+
+const fetchMaterialData = async () => {
   if (!(process.env.KEYCAP_CONTENTFUL_SPACE_ID && process.env.KEYCAP_CONTENTFUL_ACCESS_TOKEN)) {
     throw new Error('ContentfulのSpace ID・アクセストークンを環境変数で設定してください')
   }
@@ -15,7 +32,6 @@ export const getStaticProps: GetStaticProps<{ materials: Material[] }> = async (
     accessToken: process.env.KEYCAP_CONTENTFUL_ACCESS_TOKEN,
   })
 
-  let materials: Material[] = []
   try {
     const response = await contentfulClient.getEntries<ContentfulMaterialFields>({
       content_type: 'keycap-material',
@@ -28,7 +44,7 @@ export const getStaticProps: GetStaticProps<{ materials: Material[] }> = async (
       `Fetched ${response.items.length} items from Contentful (Last update = ${lastUpdate})`
     )
 
-    materials = response.items
+    return response.items
       .sort((a, b) => +new Date(a.sys.updatedAt) - +new Date(b.sys.updatedAt))
       .map((item) => ({
         id: item.sys.id,
@@ -41,13 +57,6 @@ export const getStaticProps: GetStaticProps<{ materials: Material[] }> = async (
       }))
   } catch (e) {
     throw new Error(`素材リストの取得に失敗しました: ${e.stackTrace}`)
-  }
-
-  return {
-    props: {
-      materials: materials,
-    },
-    revalidate: 30,
   }
 }
 

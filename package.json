@@ -5,6 +5,8 @@
   "scripts": {
     "prepare": "husky install",
     "dev": "next dev",
+    "dev:no-contentful": "KEYCAP_NO_CONTENTFUL=true next dev",
+    "dev:vercel": "vercel dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
