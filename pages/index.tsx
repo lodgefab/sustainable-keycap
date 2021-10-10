@@ -1,58 +1,57 @@
 import Head from 'next/head'
-import Image from 'next/image'
 import Link from 'next/link'
-import styles from '../styles/Home.module.css'
+import { GetStaticProps, InferGetStaticPropsType, NextPage } from 'next'
+import * as contentful from 'contentful'
 
-interface Material {
-  id: number
-  title: string
-  colorHex: string
-  colorType: 'red' | 'blue' | 'green' | 'black' | 'white'
-  goodCount: number
-  iconUrl: string
-  bgImageUrl: string
+type Props = InferGetStaticPropsType<typeof getStaticProps>
+
+export const getStaticProps: GetStaticProps<{ materials: Material[] }> = async (_) => {
+  if (!(process.env.KEYCAP_CONTENTFUL_SPACE_ID && process.env.KEYCAP_CONTENTFUL_ACCESS_TOKEN)) {
+    throw new Error('ContentfulのSpace ID・アクセストークンを環境変数で設定してください')
+  }
+
+  const contentfulClient = contentful.createClient({
+    space: process.env.KEYCAP_CONTENTFUL_SPACE_ID,
+    accessToken: process.env.KEYCAP_CONTENTFUL_ACCESS_TOKEN,
+  })
+
+  let materials: Material[] = []
+  try {
+    const response = await contentfulClient.getEntries<ContentfulMaterialFields>({
+      content_type: 'keycap-material',
+    })
+
+    const lastUpdate = response.items.reduce((a, b) =>
+      new Date(a.sys.updatedAt) > new Date(b.sys.updatedAt) ? a : b
+    ).sys.updatedAt
+    console.log(
+      `Fetched ${response.items.length} items from Contentful (Last update = ${lastUpdate})`
+    )
+
+    materials = response.items
+      .sort((a, b) => +new Date(a.sys.updatedAt) - +new Date(b.sys.updatedAt))
+      .map((item) => ({
+        id: item.sys.id,
+        title: item.fields.title,
+        colorHex: item.fields.colorHex,
+        colorType: item.fields.colorType,
+        goodCount: item.fields.goodCount,
+        iconUrl: item.fields.iconUrl || '/sample/icon-sample.jpg',
+        bgImageUrl: item.fields.bgImageUrl || '/sample/bg-sample1.jpg',
+      }))
+  } catch (e) {
+    throw new Error(`素材リストの取得に失敗しました: ${e.stackTrace}`)
+  }
+
+  return {
+    props: {
+      materials: materials,
+    },
+    revalidate: 30,
+  }
 }
 
-const materials: Material[] = [
-  {
-    id: 1,
-    title: 'Cocacola Red',
-    colorHex: '#E33535',
-    colorType: 'red',
-    goodCount: 12,
-    iconUrl: '/sample/icon-sample.jpg',
-    bgImageUrl: '/sample/bg-sample1.jpg',
-  },
-  {
-    id: 2,
-    title: 'Tide レッド',
-    colorHex: '#E33535',
-    colorType: 'red',
-    goodCount: 12,
-    iconUrl: '/sample/icon-sample.jpg',
-    bgImageUrl: '/sample/bg-sample2.jpg',
-  },
-  {
-    id: 3,
-    title: 'Cocacola Red 2',
-    colorHex: '#E33535',
-    colorType: 'red',
-    goodCount: 12,
-    iconUrl: '/sample/icon-sample.jpg',
-    bgImageUrl: '/sample/bg-sample1.jpg',
-  },
-  {
-    id: 4,
-    title: 'Cocacola Red 3',
-    colorHex: '#E33535',
-    colorType: 'red',
-    goodCount: 12,
-    iconUrl: '/sample/icon-sample.jpg',
-    bgImageUrl: '/sample/bg-sample1.jpg',
-  },
-]
-
-export default function Home() {
+export const Home: NextPage<Props> = (props) => {
   return (
     <>
       <Head>
@@ -103,7 +102,7 @@ export default function Home() {
             <li>White</li>
           </ul>
 
-          {materials.map((material) => (
+          {props.materials.map((material) => (
             <div className='material' key={`material-${material.id}`}>
               <p>{material.title}</p>
               <p>{material.colorHex}</p>
@@ -121,3 +120,5 @@ export default function Home() {
     </>
   )
 }
+
+export default Home
