@@ -1,7 +1,8 @@
 import React from 'react'
 import styled from '@emotion/styled'
-import logo from '../images/logo.png'
+import LogoImg from '../images/logo.png'
 import { color, font, media } from '../../styles'
+import Image from 'next/image'
 
 type Props = {}
 
@@ -10,7 +11,7 @@ export const Header: React.VFC<Props> = ({}) => {
     <Wrap>
       <Container>
         <Logo>
-          <img src={logo} alt='logo' />
+          <Image src={LogoImg} alt='logo' />
         </Logo>
         This is Header
       </Container>

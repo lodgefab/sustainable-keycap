@@ -1,4 +1,4 @@
-import css from '@emotion/css'
+import { css } from '@emotion/css'
 
 export const color = {
   primary: '#294446',
