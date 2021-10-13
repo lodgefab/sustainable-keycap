@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from '@emotion/styled'
-import LogoImg from '../images/logo.png'
+// import LogoImg from '../../images/logo.png'
 import { color, font, media } from '../../styles'
 import Image from 'next/image'
 
@@ -10,9 +10,7 @@ export const Header: React.VFC<Props> = ({}) => {
   return (
     <Wrap>
       <Container>
-        <Logo>
-          <Image src={LogoImg} alt='logo' />
-        </Logo>
+        <Logo>{/* <Image src={LogoImg} alt='logo' /> */}</Logo>
         This is Header
       </Container>
     </Wrap>
