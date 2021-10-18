@@ -9,7 +9,7 @@ import dayjs from 'dayjs'
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 
 export const getStaticProps: GetStaticProps<{ materials: Material[] }> = async (_) => {
-  let materials: Material[]
+  let materials: Material[] = []
 
   try {
     if (process.env.KEYCAP_NO_FIREBASE && process.env.NODE_ENV !== 'production') {
