@@ -1,18 +1,24 @@
 import Head from 'next/head'
 import { GetStaticProps, InferGetStaticPropsType, NextPage } from 'next'
-import * as contentful from 'contentful'
 import { getSampleMaterialData } from '../lib/helper'
 import { Home } from '../components/organisms/Home'
 import React, { createContext } from 'react'
+import * as admin from 'firebase-admin'
+import dayjs from 'dayjs'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 
 export const getStaticProps: GetStaticProps<{ materials: Material[] }> = async (_) => {
   let materials: Material[]
-  if (process.env.KEYCAP_NO_CONTENTFUL && process.env.NODE_ENV !== 'production') {
-    materials = getSampleMaterialData()
-  } else {
-    materials = await fetchMaterialData()
+
+  try {
+    if (process.env.KEYCAP_NO_FIREBASE && process.env.NODE_ENV !== 'production') {
+      materials = getSampleMaterialData()
+    } else {
+      materials = await fetchMaterialData()
+    }
+  } catch (e) {
+    console.error(`素材リストの取得に失敗しました: ${e}`)
   }
 
   return {
@@ -24,41 +30,73 @@ export const getStaticProps: GetStaticProps<{ materials: Material[] }> = async (
 }
 
 const fetchMaterialData = async () => {
-  if (!(process.env.KEYCAP_CONTENTFUL_SPACE_ID && process.env.KEYCAP_CONTENTFUL_ACCESS_TOKEN)) {
-    throw new Error('ContentfulのSpace ID・アクセストークンを環境変数で設定してください')
-  }
-
-  const contentfulClient = contentful.createClient({
-    space: process.env.KEYCAP_CONTENTFUL_SPACE_ID,
-    accessToken: process.env.KEYCAP_CONTENTFUL_ACCESS_TOKEN,
-  })
-
-  try {
-    const response = await contentfulClient.getEntries<ContentfulMaterialFields>({
-      content_type: 'keycap-material',
-    })
-
-    const lastUpdate = response.items.reduce((a, b) =>
-      new Date(a.sys.updatedAt) > new Date(b.sys.updatedAt) ? a : b
-    ).sys.updatedAt
-    console.log(
-      `Fetched ${response.items.length} items from Contentful (Last update = ${lastUpdate})`
+  if (
+    !(
+      process.env.KEYCAP_FIREBASE_PROJECT_ID &&
+      process.env.KEYCAP_FIREBASE_PRIVATE_KEY &&
+      process.env.KEYCAP_FIREBASE_SERVICE_ACCOUNT
     )
-
-    return response.items
-      .sort((a, b) => +new Date(a.sys.updatedAt) - +new Date(b.sys.updatedAt))
-      .map((item) => ({
-        id: item.sys.id,
-        title: item.fields.title,
-        colorHex: item.fields.colorHex,
-        colorType: item.fields.colorType,
-        goodCount: item.fields.goodCount,
-        iconUrl: item.fields.iconUrl || '/sample/icon-sample.jpg',
-        bgImageUrl: item.fields.bgImageUrl || '/sample/bg-sample1.jpg',
-      }))
-  } catch (e) {
-    throw new Error(`素材リストの取得に失敗しました: ${e.stackTrace}`)
+  ) {
+    throw new Error('FirebaseのAdmin SDKを使用するためのCredentialを環境変数で設定してください')
   }
+
+  if (admin.apps.length === 0) {
+    // Firebase App の処理が複数回走るとエラーを吐くので初回のレンダリング時のみ実行する
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId: process.env.KEYCAP_FIREBASE_PROJECT_ID,
+        privateKey: process.env.KEYCAP_FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+        clientEmail: process.env.KEYCAP_FIREBASE_SERVICE_ACCOUNT,
+      }),
+      storageBucket: 'sustainable-keycap-sandbox.appspot.com',
+    })
+  }
+
+  const db = admin.firestore()
+
+  const querySnapshot = await db.collection('keycap-materials').get()
+
+  const materials = await Promise.all(
+    querySnapshot.docs.map(async (doc) => {
+      const data = doc.data() as FirestoreMaterialDocument // TODO: as 使わずにいい感じに型付けたい
+
+      // TODO: 1リクエストで両方の画像ファイル取得する方法があったら修正する（要調査）
+      const plasticImageUrl = (
+        await admin
+          .storage()
+          .bucket()
+          .file(`images/${doc.id}/plasticImage.png`)
+          .getSignedUrl({
+            action: 'read',
+            expires: dayjs().add(1, 'day').format('MM-DD-YYYY'),
+          })
+      )[0]
+      const keycapImageUrl = (
+        await admin
+          .storage()
+          .bucket()
+          .file(`images/${doc.id}/keycapImage.png`)
+          .getSignedUrl({
+            action: 'read',
+            expires: dayjs().add(1, 'day').format('MM-DD-YYYY'),
+          })
+      )[0]
+
+      return {
+        id: doc.id,
+        materialName: data.materialName,
+        colorType: data.colorType,
+        plasticType: data.plasticType,
+        goodCount: data.goodCount,
+        plasticImageUrl: plasticImageUrl,
+        keycapImageUrl: keycapImageUrl,
+      }
+    })
+  )
+
+  console.log(`Fetched ${materials.length} items from Firebase (at ${dayjs().format()})`)
+
+  return materials
 }
 
 export const MaterialContext: React.Context<Material[]> = createContext([])
