@@ -40,30 +40,35 @@ export const Home: React.VFC<Props> = ({}) => {
           </Link>
         </section>
 
-        <section>
-          <h2>Library</h2>
+        {materials.length > 0 && ( // 何らかの理由で素材リストが取れなかった時はsection全体を非表示にする
+          <section>
+            <h2>Library</h2>
 
-          <p>キーキャップに使えそうな素材のライブラリです</p>
-          <ul className='filter'>
-            <li>Red</li>
-            <li>Blue</li>
-            <li>Green</li>
-            <li>Black</li>
-            <li>White</li>
-          </ul>
+            <p>キーキャップに使えそうな素材のライブラリです</p>
+            <ul className='filter'>
+              <li>Red</li>
+              <li>Blue</li>
+              <li>Green</li>
+              <li>Black</li>
+              <li>White</li>
+            </ul>
 
-          {materials.map((material) => (
-            <div className='material' key={`material-${material.id}`}>
-              <p>{material.title}</p>
-              <p>{material.colorHex}</p>
-              <p>{material.goodCount}</p>
-            </div>
-          ))}
+            {materials.map((material) => (
+              <div className='material' key={`material-${material.id}`}>
+                <img width={100} src={material.plasticImageUrl} alt='素材プラスチック画像' />
+                <img width={50} src={material.keycapImageUrl} alt='キーキャップ画像' />
+                <p>{material.materialName}</p>
+                <p>{material.colorType}</p>
+                <p>{material.plasticType}</p>
+                <p>{material.goodCount}</p>
+              </div>
+            ))}
 
-          <Link href='#'>
-            <a>素材を追加する</a>
-          </Link>
-        </section>
+            <Link href='#'>
+              <a>素材を追加する</a>
+            </Link>
+          </section>
+        )}
       </main>
 
       <footer>{/* TODO: 書く */}</footer>

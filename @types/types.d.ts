@@ -1,18 +1,16 @@
 interface Material {
   id: string
-  title: string
-  colorHex: string
+  materialName: string
   colorType: 'red' | 'blue' | 'green' | 'black' | 'white'
+  plasticType: string
   goodCount: number
-  iconUrl: string
-  bgImageUrl: string
+  plasticImageUrl: string
+  keycapImageUrl: string
 }
 
-interface ContentfulMaterialFields {
-  title: string
-  colorHex: string
+interface FirestoreMaterialDocument {
+  materialName: string
   colorType: 'red' | 'blue' | 'green' | 'black' | 'white'
+  plasticType: string
   goodCount: number
-  iconUrl?: string
-  bgImageUrl?: string
 }
