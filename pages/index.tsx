@@ -34,7 +34,8 @@ const fetchMaterialData = async () => {
     !(
       process.env.KEYCAP_FIREBASE_PROJECT_ID &&
       process.env.KEYCAP_FIREBASE_PRIVATE_KEY &&
-      process.env.KEYCAP_FIREBASE_SERVICE_ACCOUNT
+      process.env.KEYCAP_FIREBASE_SERVICE_ACCOUNT &&
+      process.env.KEYCAP_FIREBASE_STORAGE_BUCKET_URL
     )
   ) {
     throw new Error('FirebaseのAdmin SDKを使用するためのCredentialを環境変数で設定してください')
@@ -48,7 +49,7 @@ const fetchMaterialData = async () => {
         privateKey: process.env.KEYCAP_FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
         clientEmail: process.env.KEYCAP_FIREBASE_SERVICE_ACCOUNT,
       }),
-      storageBucket: 'sustainable-keycap-sandbox.appspot.com',
+      storageBucket: process.env.KEYCAP_FIREBASE_STORAGE_BUCKET_URL,
     })
   }
 
