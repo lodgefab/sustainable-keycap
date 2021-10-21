@@ -24,7 +24,7 @@ export const Editor: React.VFC<Props> = ({}) => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, dirtyFields },
   } = useForm<RegisterForm>({
     mode: 'all',
     resolver: yupResolver(schema, {
@@ -32,6 +32,8 @@ export const Editor: React.VFC<Props> = ({}) => {
     }),
     criteriaMode: 'all',
   })
+
+  console.log(dirtyFields)
 
   const filterCelsiusInput = (
     event: React.KeyboardEvent<HTMLInputElement> | React.CompositionEvent<HTMLInputElement>
@@ -77,7 +79,7 @@ export const Editor: React.VFC<Props> = ({}) => {
           required
           {...register('plasticImage', { required: true })}
         />
-        {errors.plasticImage && (
+        {errors.plasticImage && dirtyFields.plasticImage === true && (
           <ErrorMessage key='plasticImage-error'>{errors.plasticImage.message}</ErrorMessage>
         )}
       </FormItem>
@@ -91,7 +93,7 @@ export const Editor: React.VFC<Props> = ({}) => {
           required
           {...register('keycapImage', { required: true })}
         />
-        {errors.keycapImage && (
+        {errors.keycapImage && dirtyFields.keycapImage === true && (
           <ErrorMessage key='keycapImage-error'>{errors.keycapImage.message}</ErrorMessage>
         )}
       </FormItem>
@@ -104,7 +106,7 @@ export const Editor: React.VFC<Props> = ({}) => {
           required
           {...register('materialName', { required: true })}
         />
-        {errors.materialName && (
+        {errors.materialName && dirtyFields.materialName === true && (
           <ErrorMessage key='materialName-error'>{errors.materialName.message}</ErrorMessage>
         )}
       </FormItem>
@@ -119,7 +121,7 @@ export const Editor: React.VFC<Props> = ({}) => {
           <option value='black'>黒</option>
           <option value='white'>白</option>
         </select>
-        {errors.colorType && (
+        {errors.colorType && dirtyFields.colorType === true && (
           <ErrorMessage key='colorType-error'>{errors.colorType.message}</ErrorMessage>
         )}
       </FormItem>
@@ -133,7 +135,7 @@ export const Editor: React.VFC<Props> = ({}) => {
           <option value='plastic-c'>プラスチックC</option>
           <option value='plastic-d'>プラスチックD</option>
         </select>
-        {errors.plasticType && (
+        {errors.plasticType && dirtyFields.plasticType === true && (
           <ErrorMessage key='plasticType-error'>{errors.plasticType.message}</ErrorMessage>
         )}
       </FormItem>
@@ -147,7 +149,7 @@ export const Editor: React.VFC<Props> = ({}) => {
           onKeyPress={filterCelsiusInput}
           {...register('celsius', { required: true, setValueAs: (v) => v.replace(/\D/g, '') })}
         />
-        {errors.celsius && (
+        {errors.celsius && dirtyFields.celsisus === true && (
           <ErrorMessage key='celsius-error'>{errors.celsius.message}</ErrorMessage>
         )}
       </FormItem>
@@ -155,7 +157,9 @@ export const Editor: React.VFC<Props> = ({}) => {
       <FormItem>
         <label htmlFor='note'>備考（制作する際のポイントなど）</label>
         <textarea id='note' {...register('note')} />
-        {errors.note && <ErrorMessage key='note'>{errors.note.message}</ErrorMessage>}
+        {errors.note && dirtyFields.note === true && (
+          <ErrorMessage key='note'>{errors.note.message}</ErrorMessage>
+        )}
       </FormItem>
 
       <button
