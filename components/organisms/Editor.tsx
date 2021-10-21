@@ -149,7 +149,7 @@ export const Editor: React.VFC<Props> = ({}) => {
           onKeyPress={filterCelsiusInput}
           {...register('celsius', { required: true, setValueAs: (v) => v.replace(/\D/g, '') })}
         />
-        {errors.celsius && dirtyFields.celsisus === true && (
+        {errors.celsius && dirtyFields.celsius === true && (
           <ErrorMessage key='celsius-error'>{errors.celsius.message}</ErrorMessage>
         )}
       </FormItem>
