@@ -34,7 +34,8 @@ const fetchMaterialData = async () => {
     !(
       process.env.KEYCAP_FIREBASE_PROJECT_ID &&
       process.env.KEYCAP_FIREBASE_PRIVATE_KEY &&
-      process.env.KEYCAP_FIREBASE_SERVICE_ACCOUNT
+      process.env.KEYCAP_FIREBASE_SERVICE_ACCOUNT &&
+      process.env.KEYCAP_FIREBASE_STORAGE_BUCKET_URL
     )
   ) {
     throw new Error('FirebaseのAdmin SDKを使用するためのCredentialを環境変数で設定してください')
@@ -48,7 +49,7 @@ const fetchMaterialData = async () => {
         privateKey: process.env.KEYCAP_FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
         clientEmail: process.env.KEYCAP_FIREBASE_SERVICE_ACCOUNT,
       }),
-      storageBucket: 'sustainable-keycap-sandbox.appspot.com',
+      storageBucket: process.env.KEYCAP_FIREBASE_STORAGE_BUCKET_URL,
     })
   }
 
@@ -60,27 +61,35 @@ const fetchMaterialData = async () => {
     querySnapshot.docs.map(async (doc) => {
       const data = doc.data() as FirestoreMaterialDocument // TODO: as 使わずにいい感じに型付けたい
 
-      // TODO: 1リクエストで両方の画像ファイル取得する方法があったら修正する（要調査）
-      const plasticImageUrl = (
+      const imageFiles = (
         await admin
           .storage()
           .bucket()
-          .file(`images/${doc.id}/plasticImage.png`)
-          .getSignedUrl({
-            action: 'read',
-            expires: dayjs().add(1, 'day').format('MM-DD-YYYY'),
+          .getFiles({
+            prefix: `images/${doc.id}/`,
+            delimiter: '/',
           })
       )[0]
-      const keycapImageUrl = (
-        await admin
-          .storage()
-          .bucket()
-          .file(`images/${doc.id}/keycapImage.png`)
-          .getSignedUrl({
-            action: 'read',
-            expires: dayjs().add(1, 'day').format('MM-DD-YYYY'),
-          })
-      )[0]
+
+      let plasticImageUrl: string
+      let keycapImageUrl: string
+      for (const file of imageFiles) {
+        if (file.name.startsWith(`images/${doc.id}/plasticImage`)) {
+          plasticImageUrl = (
+            await file.getSignedUrl({
+              action: 'read',
+              expires: dayjs().add(1, 'day').format('MM-DD-YYYY'),
+            })
+          )[0]
+        } else if (file.name.startsWith(`images/${doc.id}/keycapImage`)) {
+          keycapImageUrl = (
+            await file.getSignedUrl({
+              action: 'read',
+              expires: dayjs().add(1, 'day').format('MM-DD-YYYY'),
+            })
+          )[0]
+        }
+      }
 
       return {
         id: doc.id,
@@ -88,8 +97,8 @@ const fetchMaterialData = async () => {
         colorType: data.colorType,
         plasticType: data.plasticType,
         goodCount: data.goodCount,
-        plasticImageUrl: plasticImageUrl,
-        keycapImageUrl: keycapImageUrl,
+        plasticImageUrl,
+        keycapImageUrl,
       }
     })
   )
