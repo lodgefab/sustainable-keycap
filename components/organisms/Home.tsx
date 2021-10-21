@@ -64,7 +64,7 @@ export const Home: React.VFC<Props> = ({}) => {
               </div>
             ))}
 
-            <Link href='#'>
+            <Link href='/register'>
               <a>素材を追加する</a>
             </Link>
           </section>
