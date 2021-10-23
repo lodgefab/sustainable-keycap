@@ -1,13 +1,57 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import styled from '@emotion/styled'
 import { color, font, media } from '../../styles'
 import Link from 'next/link'
 import { MaterialContext } from '../../pages'
+import Axios from 'axios'
 
 type Props = {}
 
 export const Home: React.VFC<Props> = ({}) => {
   const materials = useContext(MaterialContext)
+
+  const [goodCount, setGoodCount] = useState(
+    materials.reduce(
+      (previous, current) => Object.assign(previous, { [current.id]: current.goodCount }),
+      {}
+    )
+  )
+  const [canUpvote, setUpvotability] = useState(
+    materials.reduce((previous, current) => Object.assign(previous, { [current.id]: true }), {})
+  )
+
+  const upvote = async (materialId: string) => {
+    // 二重送信防止
+    if (!canUpvote[materialId]) {
+      return
+    }
+
+    setUpvotability({
+      ...canUpvote,
+      [materialId]: false,
+    })
+
+    const response = await Axios.post(
+      '/api/upvote',
+      {
+        materialId: materialId,
+      },
+      {
+        headers: {
+          'content-type': 'application/json',
+        },
+      }
+    )
+
+    // @ts-ignore TODO: 型を書く
+    if (response.data.newGoodCount) {
+      setGoodCount({
+        ...goodCount,
+        // @ts-ignore
+        [materialId]: response.data.newGoodCount,
+      })
+    }
+  }
 
   return (
     <>
@@ -62,7 +106,10 @@ export const Home: React.VFC<Props> = ({}) => {
                 </Link>
                 <p>{material.colorType}</p>
                 <p>{material.plasticType}</p>
-                <p>{material.goodCount}</p>
+                <button onClick={() => upvote(material.id)} disabled={!canUpvote[material.id]}>
+                  Upvote
+                </button>
+                {goodCount[material.id] && <p>{goodCount[material.id]}</p>}
               </div>
             ))}
 
