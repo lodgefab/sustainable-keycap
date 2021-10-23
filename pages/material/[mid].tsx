@@ -138,6 +138,8 @@ export const MaterialDetailPage: NextPage<Props> = ({ materialId, data }) => {
         </Head>
 
         <MaterialProfile data={data} />
+
+        {router.query.action === 'register' && <p>投稿が完了しました</p>}
       </>
     )
   }
