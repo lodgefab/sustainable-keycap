@@ -90,6 +90,8 @@ const fetchMaterialData = async () => {
         goodCount: data.goodCount,
         plasticImageUrl,
         keycapImageUrl,
+        celsius: data.celsius,
+        note: data.note,
       }
     })
   )

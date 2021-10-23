@@ -5,6 +5,7 @@ import { RegisterForm } from '../../types'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import Axios from 'axios'
+import { useRouter } from 'next/router'
 
 const Form = styled.form`
   padding-top: 60px; // ヘッダーに隠れている部分が見えなくなってしまうのでその分下にずらすための暫定的な対応
@@ -21,6 +22,8 @@ const ErrorMessage = styled.p`
 type Props = {}
 
 export const Editor: React.VFC<Props> = ({}) => {
+  const router = useRouter()
+
   const {
     register,
     handleSubmit,
@@ -61,11 +64,19 @@ export const Editor: React.VFC<Props> = ({}) => {
     data.append('celsius', rawData.celsius.toString())
     data.append('note', rawData.note)
 
-    await Axios.post('/api/register', data, {
+    const response = await Axios.post('/api/register', data, {
       headers: {
         'content-type': 'multipart/form-data',
       },
     })
+
+    if (response.status === 200) {
+      await router.push({
+        // @ts-ignore TODO: 型を書く
+        pathname: `/material/${response.data.materialId}`,
+        query: { action: 'register' },
+      })
+    }
   }
 
   return (

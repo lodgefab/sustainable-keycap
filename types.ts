@@ -17,6 +17,8 @@ export interface Material {
   goodCount: number
   plasticImageUrl: string
   keycapImageUrl: string
+  celsius: number
+  note: string
 }
 
 export interface FirestoreMaterialDocument {
@@ -24,6 +26,8 @@ export interface FirestoreMaterialDocument {
   colorType: 'red' | 'blue' | 'green' | 'black' | 'white'
   plasticType: string
   goodCount: number
+  celsius: number
+  note: string
 }
 
 export interface ContentfulMaterialResponse {

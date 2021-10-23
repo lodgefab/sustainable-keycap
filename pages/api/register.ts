@@ -54,6 +54,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const keycapImageFile = bucket.file(`images/${documentId}/keycapImage.${plasticImageExt}`)
     await keycapImageFile.save(uploadedImages.keycapImage[0].buffer)
     await keycapImageFile.setMetadata({ contentType: `image/${keycapImageExt}` })
+
+    res.status(200).json({
+      message: 'ok',
+      materialId: documentId,
+    })
   } catch (e) {
     console.error(`素材データ登録失敗: ${e}`)
     res.status(500).json({
@@ -119,10 +124,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   //   })
   //   return
   // }
-
-  res.status(200).json({
-    message: 'ok',
-  })
 }
 
 export const config = {
