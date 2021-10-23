@@ -10,6 +10,8 @@ export const getSampleMaterialData: () => Material[] = () => {
       goodCount: 12,
       keycapImageUrl: '/sample/icon-sample.jpg',
       plasticImageUrl: '/sample/bg-sample1.jpg',
+      celsius: 50,
+      note: '備考',
     },
     {
       id: '11111111111111111111',
@@ -19,6 +21,8 @@ export const getSampleMaterialData: () => Material[] = () => {
       goodCount: 12,
       keycapImageUrl: '/sample/icon-sample.jpg',
       plasticImageUrl: '/sample/bg-sample2.jpg',
+      celsius: 100,
+      note: '備考',
     },
     {
       id: '22222222222222222222',
@@ -28,6 +32,8 @@ export const getSampleMaterialData: () => Material[] = () => {
       goodCount: 12,
       keycapImageUrl: '/sample/icon-sample.jpg',
       plasticImageUrl: '/sample/bg-sample1.jpg',
+      celsius: 150,
+      note: '備考',
     },
     {
       id: '33333333333333333333',
@@ -37,6 +43,8 @@ export const getSampleMaterialData: () => Material[] = () => {
       goodCount: 12,
       keycapImageUrl: '/sample/icon-sample.jpg',
       plasticImageUrl: '/sample/bg-sample1.jpg',
+      celsius: 200,
+      note: '備考',
     },
   ]
 }
