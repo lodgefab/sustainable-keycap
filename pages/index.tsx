@@ -1,10 +1,11 @@
 import Head from 'next/head'
 import { GetStaticProps, InferGetStaticPropsType, NextPage } from 'next'
-import { getSampleMaterialData } from '../lib/helper'
+import { ensureEnvironmentVariable, getSampleMaterialData } from '../lib/helper'
 import { Home } from '../components/organisms/Home'
 import React, { createContext } from 'react'
 import * as admin from 'firebase-admin'
 import dayjs from 'dayjs'
+import { FirestoreMaterialDocument, Material } from '../types'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 
@@ -30,23 +31,13 @@ export const getStaticProps: GetStaticProps<{ materials: Material[] }> = async (
 }
 
 const fetchMaterialData = async () => {
-  if (
-    !(
-      process.env.KEYCAP_FIREBASE_PROJECT_ID &&
-      process.env.KEYCAP_FIREBASE_PRIVATE_KEY &&
-      process.env.KEYCAP_FIREBASE_SERVICE_ACCOUNT &&
-      process.env.KEYCAP_FIREBASE_STORAGE_BUCKET_URL
-    )
-  ) {
-    throw new Error('FirebaseのAdmin SDKを使用するためのCredentialを環境変数で設定してください')
-  }
-
   if (admin.apps.length === 0) {
     // Firebase App の処理が複数回走るとエラーを吐くので初回のレンダリング時のみ実行する
+    ensureEnvironmentVariable()
     admin.initializeApp({
       credential: admin.credential.cert({
         projectId: process.env.KEYCAP_FIREBASE_PROJECT_ID,
-        privateKey: process.env.KEYCAP_FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+        privateKey: process.env.KEYCAP_FIREBASE_PRIVATE_KEY!.replace(/\\n/g, '\n'),
         clientEmail: process.env.KEYCAP_FIREBASE_SERVICE_ACCOUNT,
       }),
       storageBucket: process.env.KEYCAP_FIREBASE_STORAGE_BUCKET_URL,
@@ -71,8 +62,8 @@ const fetchMaterialData = async () => {
           })
       )[0]
 
-      let plasticImageUrl: string
-      let keycapImageUrl: string
+      let plasticImageUrl: string = 'hoge/huga.png' // TODO: 画像が取得できなかったときのデフォルト画像を用意する
+      let keycapImageUrl: string = 'hoge/huga.png' // TODO: 画像が取得できなかったときのデフォルト画像を用意する
       for (const file of imageFiles) {
         if (file.name.startsWith(`images/${doc.id}/plasticImage`)) {
           plasticImageUrl = (
@@ -108,7 +99,7 @@ const fetchMaterialData = async () => {
   return materials
 }
 
-export const MaterialContext: React.Context<Material[]> = createContext([])
+export const MaterialContext: React.Context<Material[]> = createContext<Material[]>([])
 
 export const Index: NextPage<Props> = (props) => {
   return (

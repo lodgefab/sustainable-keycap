@@ -1,3 +1,5 @@
+import { FirestoreMaterialDocument, Material } from '../types'
+
 export const getSampleMaterialData: () => Material[] = () => {
   return [
     {
@@ -37,4 +39,22 @@ export const getSampleMaterialData: () => Material[] = () => {
       plasticImageUrl: '/sample/bg-sample1.jpg',
     },
   ]
+}
+
+export const ensureEnvironmentVariable = (): void => {
+  if (
+    !(
+      process.env.KEYCAP_FIREBASE_PROJECT_ID &&
+      process.env.KEYCAP_FIREBASE_PRIVATE_KEY &&
+      process.env.KEYCAP_FIREBASE_SERVICE_ACCOUNT &&
+      process.env.KEYCAP_FIREBASE_STORAGE_BUCKET_URL
+    )
+  ) {
+    throw new Error('FirebaseのAdmin SDKを使用するためのCredentialを環境変数で設定してください。')
+  }
+}
+
+export const ensureFormDataIsValid = (data: unknown): data is FirestoreMaterialDocument => {
+  // TODO: バリデーション処理を実装する
+  return true
 }
