@@ -3,13 +3,26 @@ import styled from '@emotion/styled'
 // import LogoImg from '../../images/logo.png'
 import { color, font, media } from '../../styles'
 import Image from 'next/image'
+import { User } from 'firebase/auth'
 
-type Props = {}
+interface Props {
+  currentUser: User | undefined | null
+  onLoginFunc: Function
+  onLogoutFunc: Function
+}
 
-export const Header: React.VFC<Props> = ({}) => {
+export const Header: React.VFC<Props> = ({ currentUser, onLoginFunc, onLogoutFunc }) => {
   return (
     <Wrap>
       <Container>
+        {/* TODO: 認証方法を明記する */}
+        {currentUser && (
+          <p>
+            {currentUser.displayName} としてログイン中（
+            <a onClick={() => onLogoutFunc()}>ログアウト</a>）
+          </p>
+        )}
+        {currentUser === null && <button onClick={() => onLoginFunc()}>ログイン</button>}
         <Logo>{/* <Image src={LogoImg} alt='logo' /> */}</Logo>
         This is Header
       </Container>
