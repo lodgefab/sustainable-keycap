@@ -4,10 +4,12 @@ import { color, font, media } from '../../styles'
 import Link from 'next/link'
 import { MaterialContext } from '../../pages'
 import Axios from 'axios'
+import { AuthContext } from '../../lib/auth'
 
 type Props = {}
 
 export const Home: React.VFC<Props> = ({}) => {
+  const currentUser = useContext(AuthContext)
   const materials = useContext(MaterialContext)
 
   const [goodCount, setGoodCount] = useState(
@@ -26,30 +28,42 @@ export const Home: React.VFC<Props> = ({}) => {
       return
     }
 
+    // 未ログイン状態での送信は禁止
+    if (!currentUser) {
+      return
+    }
+    const idToken = await currentUser.getIdToken(true)
+
     setUpvotability({
       ...canUpvote,
       [materialId]: false,
     })
 
-    const response = await Axios.post(
-      '/api/upvote',
-      {
-        materialId: materialId,
-      },
-      {
-        headers: {
-          'content-type': 'application/json',
+    try {
+      const response = await Axios.post(
+        '/api/upvote',
+        {
+          materialId: materialId,
         },
-      }
-    )
+        {
+          headers: {
+            'content-type': 'application/json',
+            Authorization: `Bearer ${idToken}`,
+          },
+        }
+      )
 
-    // @ts-ignore TODO: 型を書く
-    if (response.data.newGoodCount) {
-      setGoodCount({
-        ...goodCount,
-        // @ts-ignore
-        [materialId]: response.data.newGoodCount,
-      })
+      // @ts-ignore TODO: 型を書く
+      if (response.data.newGoodCount) {
+        setGoodCount({
+          ...goodCount,
+          // @ts-ignore
+          [materialId]: response.data.newGoodCount,
+        })
+      }
+    } catch (error) {
+      // TODO: Upvoteに失敗した場合の処理を書く
+      console.error(error)
     }
   }
 

@@ -73,3 +73,9 @@ export interface RegisterRequestFromClient {
   celsius: string // 受け取るのは数値だが、FormData()の仕様上文字列で送られてくる
   note: string
 }
+
+export const HTTP_STATUS = {
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+} as const
