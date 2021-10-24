@@ -120,7 +120,11 @@ export const Home: React.VFC<Props> = ({}) => {
                 </Link>
                 <p>{material.colorType}</p>
                 <p>{material.plasticType}</p>
-                <button onClick={() => upvote(material.id)} disabled={!canUpvote[material.id]}>
+                {/* 既にUpvote済み、もしくは未ログインの場合はUpvoteボタンを無効化する */}
+                <button
+                  onClick={() => upvote(material.id)}
+                  disabled={!canUpvote[material.id] || !currentUser}
+                >
                   Upvote
                 </button>
                 {goodCount[material.id] && <p>{goodCount[material.id]}</p>}
