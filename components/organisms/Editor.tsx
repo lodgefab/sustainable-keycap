@@ -1,11 +1,7 @@
-import React from 'react'
+import React, { InputHTMLAttributes, TextareaHTMLAttributes } from 'react'
 import styled from '@emotion/styled'
-import { schema } from '../../lib/validation'
-import { RegisterForm } from '../../types'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
-import Axios from 'axios'
-import { useRouter } from 'next/router'
+import { InternalFieldName } from 'react-hook-form/dist/types/fields'
+import { ChangeHandler, RefCallBack } from 'react-hook-form/dist/types/form'
 
 const Form = styled.form`
   padding-top: 60px; // ヘッダーに隠れている部分が見えなくなってしまうのでその分下にずらすための暫定的な対応
@@ -19,66 +15,42 @@ const ErrorMessage = styled.p`
   color: #ff0000;
 `
 
-type Props = {}
+type InputTagAttributes<T extends React.HTMLAttributes<HTMLElement>> = T & {
+  onChange: ChangeHandler
+  onBlur: ChangeHandler
+  ref: RefCallBack
+  name: InternalFieldName
+}
 
-export const Editor: React.VFC<Props> = ({}) => {
-  const router = useRouter()
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, dirtyFields },
-  } = useForm<RegisterForm>({
-    mode: 'all',
-    resolver: yupResolver(schema, {
-      abortEarly: false,
-    }),
-    criteriaMode: 'all',
-  })
-
-  console.log(dirtyFields)
-
-  const filterCelsiusInput = (
-    event: React.KeyboardEvent<HTMLInputElement> | React.CompositionEvent<HTMLInputElement>
-  ) => {
-    if ('key' in event && !['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'].includes(event.key)) {
-      event.preventDefault()
-      return false
-    }
-
-    if ('data' in event && !/^\d+$/.test(event.data)) {
-      event.preventDefault()
-      return false
-    }
-
-    return true
+interface Props {
+  inputTagAttributes: {
+    plasticImage: InputTagAttributes<React.InputHTMLAttributes<HTMLInputElement>>
+    keycapImage: InputTagAttributes<InputHTMLAttributes<HTMLInputElement>>
+    materialName: InputTagAttributes<InputHTMLAttributes<HTMLInputElement>>
+    colorType: InputTagAttributes<InputHTMLAttributes<HTMLSelectElement>>
+    plasticType: InputTagAttributes<InputHTMLAttributes<HTMLSelectElement>>
+    celsius: InputTagAttributes<InputHTMLAttributes<HTMLInputElement>>
+    note: InputTagAttributes<TextareaHTMLAttributes<HTMLTextAreaElement>>
   }
-
-  const executeSubmit: SubmitHandler<RegisterForm> = async (rawData) => {
-    const data = new FormData()
-    data.append('plasticImage', rawData.plasticImage[0])
-    data.append('keycapImage', rawData.keycapImage[0])
-    data.append('materialName', rawData.materialName)
-    data.append('colorType', rawData.colorType)
-    data.append('plasticType', rawData.plasticType)
-    data.append('celsius', rawData.celsius.toString())
-    data.append('note', rawData.note)
-
-    const response = await Axios.post('/api/register', data, {
-      headers: {
-        'content-type': 'multipart/form-data',
-      },
-    })
-
-    if (response.status === 200) {
-      await router.push({
-        // @ts-ignore TODO: 型を書く
-        pathname: `/material/${response.data.materialId}`,
-        query: { action: 'register' },
-      })
-    }
+  errorMessage: {
+    plasticImage: string | null
+    keycapImage: string | null
+    materialName: string | null
+    colorType: string | null
+    plasticType: string | null
+    celsius: string | null
+    note: string | null
   }
+  onClickSubmit: React.MouseEventHandler<HTMLButtonElement>
+  canSubmit: boolean
+}
 
+export const Editor: React.VFC<Props> = ({
+  inputTagAttributes,
+  errorMessage,
+  onClickSubmit,
+  canSubmit,
+}) => {
   return (
     <Form>
       <FormItem>
@@ -88,10 +60,10 @@ export const Editor: React.VFC<Props> = ({}) => {
           id='plastic-image'
           accept='image/png, image/jpeg'
           required
-          {...register('plasticImage', { required: true })}
+          {...inputTagAttributes.plasticImage}
         />
-        {errors.plasticImage && dirtyFields.plasticImage === true && (
-          <ErrorMessage key='plasticImage-error'>{errors.plasticImage.message}</ErrorMessage>
+        {errorMessage.plasticImage && (
+          <ErrorMessage key='plasticImage-error'>{errorMessage.plasticImage}</ErrorMessage>
         )}
       </FormItem>
 
@@ -102,29 +74,24 @@ export const Editor: React.VFC<Props> = ({}) => {
           id='keycap-image'
           accept='image/png, image/jpeg'
           required
-          {...register('keycapImage', { required: true })}
+          {...inputTagAttributes.keycapImage}
         />
-        {errors.keycapImage && dirtyFields.keycapImage === true && (
-          <ErrorMessage key='keycapImage-error'>{errors.keycapImage.message}</ErrorMessage>
+        {errorMessage.keycapImage && (
+          <ErrorMessage key='keycapImage-error'>{errorMessage.keycapImage}</ErrorMessage>
         )}
       </FormItem>
 
       <FormItem>
         <label htmlFor='material-name'>素材の名前</label>
-        <input
-          type='text'
-          id='material-name'
-          required
-          {...register('materialName', { required: true })}
-        />
-        {errors.materialName && dirtyFields.materialName === true && (
-          <ErrorMessage key='materialName-error'>{errors.materialName.message}</ErrorMessage>
+        <input type='text' id='material-name' required {...inputTagAttributes.materialName} />
+        {errorMessage.materialName && (
+          <ErrorMessage key='materialName-error'>{errorMessage.materialName}</ErrorMessage>
         )}
       </FormItem>
 
       <FormItem>
         <label htmlFor='color-type'>色の系統</label>
-        <select id='color-type' required {...register('colorType', { required: true })}>
+        <select id='color-type' required {...inputTagAttributes.colorType}>
           <option value=''>選択してください</option>
           <option value='red'>赤</option>
           <option value='blue'>青</option>
@@ -132,52 +99,40 @@ export const Editor: React.VFC<Props> = ({}) => {
           <option value='black'>黒</option>
           <option value='white'>白</option>
         </select>
-        {errors.colorType && dirtyFields.colorType === true && (
-          <ErrorMessage key='colorType-error'>{errors.colorType.message}</ErrorMessage>
+        {errorMessage.colorType && (
+          <ErrorMessage key='colorType-error'>{errorMessage.colorType}</ErrorMessage>
         )}
       </FormItem>
 
       <FormItem>
         <label htmlFor='plastic-type'>プラスチックの種類</label>
-        <select id='plastic-type' required {...register('plasticType', { required: true })}>
+        <select id='plastic-type' required {...inputTagAttributes.plasticType}>
           <option value=''>選択してください</option>
           <option value='plastic-a'>プラスチックA</option>
           <option value='plastic-b'>プラスチックB</option>
           <option value='plastic-c'>プラスチックC</option>
           <option value='plastic-d'>プラスチックD</option>
         </select>
-        {errors.plasticType && dirtyFields.plasticType === true && (
-          <ErrorMessage key='plasticType-error'>{errors.plasticType.message}</ErrorMessage>
+        {errorMessage.plasticType && (
+          <ErrorMessage key='plasticType-error'>{errorMessage.plasticType}</ErrorMessage>
         )}
       </FormItem>
 
       <FormItem>
         <label htmlFor='celsius'>設定温度</label>
-        <input
-          type='text'
-          id='celsius'
-          required
-          onKeyPress={filterCelsiusInput}
-          {...register('celsius', { required: true, setValueAs: (v) => v.replace(/\D/g, '') })}
-        />
-        {errors.celsius && dirtyFields.celsius === true && (
-          <ErrorMessage key='celsius-error'>{errors.celsius.message}</ErrorMessage>
+        <input type='text' id='celsius' required {...inputTagAttributes.celsius} />
+        {errorMessage.celsius && (
+          <ErrorMessage key='celsius-error'>{errorMessage.celsius}</ErrorMessage>
         )}
       </FormItem>
 
       <FormItem>
         <label htmlFor='note'>備考（制作する際のポイントなど）</label>
-        <textarea id='note' {...register('note')} />
-        {errors.note && dirtyFields.note === true && (
-          <ErrorMessage key='note'>{errors.note.message}</ErrorMessage>
-        )}
+        <textarea id='note' {...inputTagAttributes.note} />
+        {errorMessage.note && <ErrorMessage key='note'>{errorMessage.note}</ErrorMessage>}
       </FormItem>
 
-      <button
-        type='button'
-        onClick={handleSubmit(executeSubmit)}
-        disabled={Object.keys(errors).length !== 0}
-      >
+      <button type='button' onClick={onClickSubmit} disabled={!canSubmit}>
         登録する
       </button>
     </Form>
