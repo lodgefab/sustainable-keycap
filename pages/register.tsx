@@ -26,6 +26,9 @@ export const Register: NextPage<Props> = (props) => {
     criteriaMode: 'all',
   })
 
+  /**
+   * 設定温度を入力するフォームで数字以外の入力を弾くためのフィルタリング処理
+   */
   const filterCelsiusInput = (
     event: React.KeyboardEvent<HTMLInputElement> | React.CompositionEvent<HTMLInputElement>
   ) => {
@@ -41,6 +44,9 @@ export const Register: NextPage<Props> = (props) => {
     return true
   }
 
+  /**
+   * react-hook-formを用いてフォーム入力を制御するために各Inputタグに設定するAttribute
+   */
   const inputTagAttributes = {
     plasticImage: register('plasticImage', { required: true }),
     keycapImage: register('keycapImage', { required: true }),
@@ -54,6 +60,10 @@ export const Register: NextPage<Props> = (props) => {
     note: register('note'),
   }
 
+  /**
+   * 送信ボタンを押した時の送信処理
+   * @param rawData ユーザーがフォームに入力した情報
+   */
   const executeSubmit: SubmitHandler<RegisterForm> = async (rawData) => {
     const data = new FormData()
     data.append('plasticImage', rawData.plasticImage[0])
@@ -79,6 +89,7 @@ export const Register: NextPage<Props> = (props) => {
     }
   }
 
+  // バリデーションした結果、各入力項目にエラーがあった場合はここでフロントに表示させるエラーメッセージを設定する
   const errorsPresented = {
     plasticImage: dirtyFields.plasticImage === true ? errors.plasticImage?.message || null : null,
     keycapImage: dirtyFields.keycapImage === true ? errors.keycapImage?.message || null : null,
@@ -89,6 +100,7 @@ export const Register: NextPage<Props> = (props) => {
     note: dirtyFields.note === true ? errors.note?.message || null : null,
   }
 
+  // 送信ボタンを押せるかどうか（入力にエラーが残っている場合は押せなくする）
   const canSubmit = Object.keys(errors).length === 0
 
   return (
@@ -102,6 +114,7 @@ export const Register: NextPage<Props> = (props) => {
       <Editor
         inputTagAttributes={inputTagAttributes}
         errorMessage={errorsPresented}
+        /* handleSubmitでバリデーションを行った後、エラーが無ければexecuteSubmitが実行される */
         onClickSubmit={handleSubmit(executeSubmit)}
         canSubmit={canSubmit}
       />
