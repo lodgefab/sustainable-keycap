@@ -49,6 +49,9 @@ export const getSampleMaterialData: () => Material[] = () => {
   ]
 }
 
+/**
+ * Firebase Admin SDKを使用するのに必要な環境変数が設定されているか確認し、設定されていない場合はエラーを投げる
+ */
 export const ensureEnvironmentVariable = (): void => {
   if (
     !(

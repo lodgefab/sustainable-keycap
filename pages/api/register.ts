@@ -1,7 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { ensureEnvironmentVariable, ensureFormDataIsValid } from '../../lib/helper'
+import { ensureFormDataIsValid } from '../../lib/helper'
 import multer from 'multer'
 import * as admin from 'firebase-admin'
+import { initAdminFirebase } from '../../lib/admin-firebase'
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -25,20 +26,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   ensureFormDataIsValid(data)
 
-  if (admin.apps.length === 0) {
-    // Firebase App の処理が複数回走るとエラーを吐くので初回のレンダリング時のみ実行する
-    ensureEnvironmentVariable()
-    admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: process.env.KEYCAP_FIREBASE_PROJECT_ID,
-        privateKey: process.env.KEYCAP_FIREBASE_PRIVATE_KEY!.replace(/\\n/g, '\n'),
-        clientEmail: process.env.KEYCAP_FIREBASE_SERVICE_ACCOUNT,
-      }),
-      storageBucket: process.env.KEYCAP_FIREBASE_STORAGE_BUCKET_URL,
-    })
-  }
-
   try {
+    initAdminFirebase()
     const db = admin.firestore()
     const addedData = await db.collection('keycap-materials').add({
       goodCount: 0, // 新規に追加する素材データはいいね数を0で初期化する

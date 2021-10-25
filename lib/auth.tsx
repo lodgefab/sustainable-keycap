@@ -36,11 +36,16 @@ export const getCurrentUser = (): User | null => {
   return auth.currentUser
 }
 
-// Userのインスタンスが入ってる場合はログイン中、nullは未ログイン、undefinedはページ表示直後の初期化処理中の状態
-export const AuthContext = createContext<User | undefined | null>(undefined)
+// ログイン状況を表すUnion
+export type AuthStatusType = any
+export const AuthStatus = {
+  NOT_LOGIN: null as AuthStatusType, // 未ログイン状態
+  INITIALIZING: undefined as AuthStatusType, // ページを開いた直後に、ログイン状況を取得している段階の状態
+} as const
+export const AuthContext = createContext<User | AuthStatusType>(AuthStatus.INITIALIZING)
 
 export const AuthProvider: React.FC = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<User | undefined | null>(undefined)
+  const [currentUser, setCurrentUser] = useState<User | AuthStatusType>(AuthStatus.INITIALIZING)
   useEffect(() => {
     auth.onAuthStateChanged(setCurrentUser)
   }, [])

@@ -1,9 +1,9 @@
-import React, { ReactNode, useContext, useEffect } from 'react'
+import React, { ReactNode, useContext } from 'react'
 import styled from '@emotion/styled'
 import { color } from '../styles'
 import { Header } from './molecules/Header'
 import { Footer } from './molecules/Footer'
-import { AuthContext, getCurrentUser, login, logout } from '../lib/auth'
+import { AuthContext, login, logout } from '../lib/auth'
 
 type Props = {
   children?: ReactNode

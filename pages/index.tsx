@@ -1,11 +1,12 @@
 import Head from 'next/head'
 import { GetStaticProps, InferGetStaticPropsType, NextPage } from 'next'
-import { ensureEnvironmentVariable, getSampleMaterialData } from '../lib/helper'
+import { getSampleMaterialData } from '../lib/helper'
 import { Home } from '../components/organisms/Home'
 import React, { createContext } from 'react'
 import * as admin from 'firebase-admin'
 import dayjs from 'dayjs'
 import { FirestoreMaterialDocument, Material } from '../types'
+import { initAdminFirebase } from '../lib/admin-firebase'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 
@@ -31,19 +32,7 @@ export const getStaticProps: GetStaticProps<{ materials: Material[] }> = async (
 }
 
 const fetchMaterialData = async () => {
-  if (admin.apps.length === 0) {
-    // Firebase App の処理が複数回走るとエラーを吐くので初回のレンダリング時のみ実行する
-    ensureEnvironmentVariable()
-    admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: process.env.KEYCAP_FIREBASE_PROJECT_ID,
-        privateKey: process.env.KEYCAP_FIREBASE_PRIVATE_KEY!.replace(/\\n/g, '\n'),
-        clientEmail: process.env.KEYCAP_FIREBASE_SERVICE_ACCOUNT,
-      }),
-      storageBucket: process.env.KEYCAP_FIREBASE_STORAGE_BUCKET_URL,
-    })
-  }
-
+  initAdminFirebase()
   const db = admin.firestore()
 
   const querySnapshot = await db.collection('keycap-materials').get()

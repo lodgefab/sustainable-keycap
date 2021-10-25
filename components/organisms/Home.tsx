@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react'
 import styled from '@emotion/styled'
 import { color, font, media } from '../../styles'
 import Link from 'next/link'
+import Image from 'next/image'
 import { MaterialContext } from '../../pages'
 import Axios from 'axios'
 import { AuthContext } from '../../lib/auth'
@@ -113,8 +114,18 @@ export const Home: React.VFC<Props> = ({}) => {
 
             {materials.map((material) => (
               <div className='material' key={`material-${material.id}`}>
-                <img width={100} src={material.plasticImageUrl} alt='素材プラスチック画像' />
-                <img width={50} src={material.keycapImageUrl} alt='キーキャップ画像' />
+                <Image
+                  width={100}
+                  height={50}
+                  src={material.plasticImageUrl}
+                  alt='素材プラスチック画像'
+                />
+                <Image
+                  width={50}
+                  height={50}
+                  src={material.keycapImageUrl}
+                  alt='キーキャップ画像'
+                />
                 <Link href={`/material/${material.id}`}>
                   <a>{material.materialName}</a>
                 </Link>
