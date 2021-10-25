@@ -2,7 +2,6 @@ import React from 'react'
 import styled from '@emotion/styled'
 // import LogoImg from '../../images/logo.png'
 import { color, font, media } from '../../styles'
-import Image from 'next/image'
 import { User } from 'firebase/auth'
 import { AuthStatus, AuthStatusType } from '../../lib/auth'
 
