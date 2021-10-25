@@ -4,9 +4,10 @@ import styled from '@emotion/styled'
 import { color, font, media } from '../../styles'
 import Image from 'next/image'
 import { User } from 'firebase/auth'
+import { AuthStatus, AuthStatusType } from '../../lib/auth'
 
 interface Props {
-  currentUser: User | undefined | null
+  currentUser: User | AuthStatusType
   onLoginFunc: Function
   onLogoutFunc: Function
 }
@@ -22,7 +23,10 @@ export const Header: React.VFC<Props> = ({ currentUser, onLoginFunc, onLogoutFun
             <a onClick={() => onLogoutFunc()}>ログアウト</a>）
           </p>
         )}
-        {currentUser === null && <button onClick={() => onLoginFunc()}>ログイン</button>}
+        {currentUser === AuthStatus.NOT_LOGIN && (
+          <button onClick={() => onLoginFunc()}>ログイン</button>
+        )}
+        {/* currentUser === AuthStatus.INITIALING のときはなにも表示させない */}
         <Logo>{/* <Image src={LogoImg} alt='logo' /> */}</Logo>
         This is Header
       </Container>
