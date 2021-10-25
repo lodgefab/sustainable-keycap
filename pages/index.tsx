@@ -1,98 +1,50 @@
 import Head from 'next/head'
 import { GetStaticProps, InferGetStaticPropsType, NextPage } from 'next'
-import { getSampleMaterialData } from '../lib/helper'
+import { getSampleMaterialData, useMaterials } from '../lib/helper'
 import { Home } from '../components/organisms/Home'
-import React, { createContext } from 'react'
+import React, { createContext, useEffect } from 'react'
 import * as admin from 'firebase-admin'
 import dayjs from 'dayjs'
 import { FirestoreMaterialDocument, Material } from '../types'
 import { initAdminFirebase } from '../lib/admin-firebase'
+import useSWR from 'swr'
+import axios from 'axios'
 
-type Props = InferGetStaticPropsType<typeof getStaticProps>
+interface Props {}
 
-export const getStaticProps: GetStaticProps<{ materials: Material[] }> = async (_) => {
-  let materials: Material[] = []
-
-  try {
-    if (process.env.KEYCAP_NO_FIREBASE && process.env.NODE_ENV !== 'production') {
-      materials = getSampleMaterialData()
-    } else {
-      materials = await fetchMaterialData()
-    }
-  } catch (e) {
-    console.error(`素材リストの取得に失敗しました: ${e}`)
-  }
-
-  return {
-    props: {
-      materials: materials,
-    },
-    revalidate: 30,
-  }
-}
-
-const fetchMaterialData = async () => {
-  initAdminFirebase()
-  const db = admin.firestore()
-
-  const querySnapshot = await db.collection('keycap-materials').get()
-
-  const materials = await Promise.all(
-    querySnapshot.docs.map(async (doc) => {
-      const data = doc.data() as FirestoreMaterialDocument // TODO: as 使わずにいい感じに型付けたい
-
-      const imageFiles = (
-        await admin
-          .storage()
-          .bucket()
-          .getFiles({
-            prefix: `images/${doc.id}/`,
-            delimiter: '/',
-          })
-      )[0]
-
-      let plasticImageUrl: string = 'hoge/huga.png' // TODO: 画像が取得できなかったときのデフォルト画像を用意する
-      let keycapImageUrl: string = 'hoge/huga.png' // TODO: 画像が取得できなかったときのデフォルト画像を用意する
-      for (const file of imageFiles) {
-        if (file.name.startsWith(`images/${doc.id}/plasticImage`)) {
-          plasticImageUrl = (
-            await file.getSignedUrl({
-              action: 'read',
-              expires: dayjs().add(1, 'day').format('MM-DD-YYYY'),
-            })
-          )[0]
-        } else if (file.name.startsWith(`images/${doc.id}/keycapImage`)) {
-          keycapImageUrl = (
-            await file.getSignedUrl({
-              action: 'read',
-              expires: dayjs().add(1, 'day').format('MM-DD-YYYY'),
-            })
-          )[0]
-        }
-      }
-
-      return {
-        id: doc.id,
-        materialName: data.materialName,
-        colorType: data.colorType,
-        plasticType: data.plasticType,
-        goodCount: data.goodCount,
-        plasticImageUrl,
-        keycapImageUrl,
-        celsius: data.celsius,
-        note: data.note,
-      }
-    })
-  )
-
-  console.log(`Fetched ${materials.length} items from Firebase (at ${dayjs().format()})`)
-
-  return materials
-}
+// export const getInitialProps: GetStaticProps<{ materials: Material[] }> = async (_) => {
+//   let materials: Material[] = []
+//
+//   try {
+//     if (process.env.KEYCAP_NO_FIREBASE && process.env.NODE_ENV !== 'production') {
+//       materials = getSampleMaterialData()
+//     } else {
+//       materials = await fetchMaterialData()
+//     }
+//   } catch (e) {
+//     console.error(`素材リストの取得に失敗しました: ${e}`)
+//   }
+//
+//   return {
+//     props: {
+//       materials: materials,
+//     },
+//     revalidate: 30,
+//   }
+// }
 
 export const MaterialContext: React.Context<Material[]> = createContext<Material[]>([])
 
-export const Index: NextPage<Props> = (props) => {
+const fetcher = (url) => axios.get(url).then((res) => res.data)
+
+export const Index: NextPage<Props> = (_) => {
+  // const { materials, isLoading } = useMaterials()
+  const { data, error } = useSWR('/api/materials', fetcher)
+  console.log(data, error)
+
+  // @ts-ignore
+  const materials = data?.materials
+
   return (
     <>
       <Head>
@@ -101,7 +53,7 @@ export const Index: NextPage<Props> = (props) => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
 
-      <MaterialContext.Provider value={props.materials}>
+      <MaterialContext.Provider value={materials || []}>
         <Home />
       </MaterialContext.Provider>
     </>

@@ -1,4 +1,16 @@
 import { FirestoreMaterialDocument, Material } from '../types'
+import { firebaseClientApp } from './auth'
+import {
+  collection,
+  DocumentData,
+  FirestoreDataConverter,
+  getDocs,
+  getFirestore,
+  QueryDocumentSnapshot,
+  SnapshotOptions,
+} from 'firebase/firestore'
+import { getStorage, listAll, ref } from 'firebase/storage'
+import useSWRImmutable from 'swr/immutable'
 
 export const getSampleMaterialData: () => Material[] = () => {
   return [
@@ -68,4 +80,95 @@ export const ensureEnvironmentVariable = (): void => {
 export const ensureFormDataIsValid = (data: unknown): data is FirestoreMaterialDocument => {
   // TODO: バリデーション処理を実装する
   return true
+}
+
+const toFireStore = (data: Material): DocumentData => {
+  return {}
+}
+
+const fromFirestore = (snapshot: QueryDocumentSnapshot, options: SnapshotOptions): Material => {
+  const data = snapshot.data(options)
+
+  // TODO: バリデーション処理を実装する
+
+  return {
+    id: snapshot.id,
+    materialName: data.materialName,
+    colorType: data.colorType,
+    plasticType: data.plasticType,
+    goodCount: data.goodCount,
+    plasticImageUrl: '/hoge/huga',
+    keycapImageUrl: 'hoge/huga',
+    celsius: data.celsius,
+    note: data.note,
+  }
+}
+
+export const fetchMaterials = async (): Promise<Material[]> => {
+  const querySnapshot = await getDocs(collection(getFirestore(firebaseClientApp), 'materials'))
+  const storage = getStorage(firebaseClientApp)
+
+  console.log(querySnapshot.docs)
+
+  return await Promise.all(
+    querySnapshot.docs.map(async (doc) => {
+      const data = doc.data() as FirestoreMaterialDocument // TODO: as 使わずにいい感じに型付けたい
+
+      const listResult = await listAll(ref(storage, `images/${doc.id}/`))
+      console.log(listResult)
+
+      // const url = await getDownloadURL(ref(storage, `images/${doc.id}/plasticImage.`))
+      //
+      // const imageFiles = (
+      //     storage.
+      //     .getFiles({
+      //       prefix: `images/${doc.id}/`,
+      //       delimiter: '/',
+      //     })
+      // )[0]
+      //
+      // let plasticImageUrl: string = 'hoge/huga.png' // TODO: 画像が取得できなかったときのデフォルト画像を用意する
+      // let keycapImageUrl: string = 'hoge/huga.png' // TODO: 画像が取得できなかったときのデフォルト画像を用意する
+      // for (const file of imageFiles) {
+      //   if (file.name.startsWith(`images/${doc.id}/plasticImage`)) {
+      //     plasticImageUrl = (
+      //       await file.getSignedUrl({
+      //         action: 'read',
+      //         expires: dayjs().add(1, 'day').format('MM-DD-YYYY'),
+      //       })
+      //     )[0]
+      //   } else if (file.name.startsWith(`images/${doc.id}/keycapImage`)) {
+      //     keycapImageUrl = (
+      //       await file.getSignedUrl({
+      //         action: 'read',
+      //         expires: dayjs().add(1, 'day').format('MM-DD-YYYY'),
+      //       })
+      //     )[0]
+      //   }
+      // }
+
+      return {
+        id: doc.id,
+        materialName: data.materialName,
+        colorType: data.colorType,
+        plasticType: data.plasticType,
+        goodCount: data.goodCount,
+        plasticImageUrl: '',
+        keycapImageUrl: '',
+        celsius: data.celsius,
+        note: data.note,
+      }
+    })
+  )
+}
+
+export const useMaterials = () => {
+  const { data, error } = useSWRImmutable('materials', fetchMaterials)
+  console.log(data, error)
+
+  return {
+    materials: data,
+    isLoading: !error && !data,
+    isError: error,
+  }
 }
