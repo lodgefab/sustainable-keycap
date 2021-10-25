@@ -1,8 +1,43 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ensureEnvironmentVariable, ensureFormDataIsValid } from '../../lib/helper'
 import * as admin from 'firebase-admin'
+import { HTTP_STATUS } from '../../types'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  const authHeader = req.headers.authorization
+
+  if (!authHeader) {
+    res.status(HTTP_STATUS.UNAUTHORIZED).json({
+      message: '認証が必要です。',
+    })
+    return
+  }
+
+  if (!authHeader.startsWith('Bearer ')) {
+    res.status(HTTP_STATUS.BAD_REQUEST).json({
+      message: '認証トークンのフォーマットが不正です。',
+    })
+    return
+  }
+
+  try {
+    const decodedToken = await admin
+      .auth()
+      .verifyIdToken(authHeader.substring(7, authHeader.length), true)
+  } catch (error) {
+    if (error.code === 'auth/id-token-revoked') {
+      // ユーザーがFirebase側で削除・変更されるなどの更新が発生した場合
+      res.status(HTTP_STATUS.UNAUTHORIZED).json({
+        message: 'ユーザー情報の更新が発生しました。再ログインしてください。',
+      })
+    } else {
+      res.status(HTTP_STATUS.UNAUTHORIZED).json({
+        message: 'この操作は許可されていません。',
+      })
+    }
+    return
+  }
+
   const materialId = req.body.materialId
 
   if (admin.apps.length === 0) {

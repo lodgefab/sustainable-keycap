@@ -3,10 +3,11 @@ import React from 'react'
 import emotionReset from 'emotion-reset'
 import { color } from '../styles'
 import Layout from '../components/Layout'
+import { AuthProvider } from '../lib/auth'
 
 function MyApp({ Component, pageProps }) {
   return (
-    <>
+    <AuthProvider>
       <Global
         styles={css`
           ${emotionReset}
@@ -31,7 +32,7 @@ function MyApp({ Component, pageProps }) {
       <Layout>
         <Component {...pageProps} />
       </Layout>
-    </>
+    </AuthProvider>
   )
 }
 
