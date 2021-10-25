@@ -38,7 +38,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return
   }
 
-  const materialId = req.body.materialId
+  const { materialId } = req.body
 
   initAdminFirebase()
 
