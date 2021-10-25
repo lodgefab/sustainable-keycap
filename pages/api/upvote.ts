@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { ensureEnvironmentVariable, ensureFormDataIsValid } from '../../lib/helper'
 import * as admin from 'firebase-admin'
 import { HTTP_STATUS } from '../../types'
+import { initAdminFirebase } from '../../lib/admin-firebase'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const authHeader = req.headers.authorization
@@ -40,18 +40,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const materialId = req.body.materialId
 
-  if (admin.apps.length === 0) {
-    // Firebase App の処理が複数回走るとエラーを吐くので初回のレンダリング時のみ実行する
-    ensureEnvironmentVariable()
-    admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: process.env.KEYCAP_FIREBASE_PROJECT_ID,
-        privateKey: process.env.KEYCAP_FIREBASE_PRIVATE_KEY!.replace(/\\n/g, '\n'),
-        clientEmail: process.env.KEYCAP_FIREBASE_SERVICE_ACCOUNT,
-      }),
-      storageBucket: process.env.KEYCAP_FIREBASE_STORAGE_BUCKET_URL,
-    })
-  }
+  initAdminFirebase()
 
   let targetDoc: admin.firestore.DocumentReference<admin.firestore.DocumentData>
 

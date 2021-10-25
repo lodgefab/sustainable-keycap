@@ -3,27 +3,15 @@ import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType, NextPage } fro
 import React from 'react'
 import { useRouter } from 'next/router'
 import * as admin from 'firebase-admin'
-import { ensureEnvironmentVariable } from '../../lib/helper'
 import { Material } from '../../types'
 import dayjs from 'dayjs'
 import { MaterialProfile } from '../../components/organisms/MaterialProfile'
+import { initAdminFirebase } from '../../lib/admin-firebase'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 
 export const getStaticPaths: GetStaticPaths = async (context) => {
-  if (admin.apps.length === 0) {
-    // Firebase App の処理が複数回走るとエラーを吐くので初回のレンダリング時のみ実行する
-    ensureEnvironmentVariable()
-    admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: process.env.KEYCAP_FIREBASE_PROJECT_ID,
-        privateKey: process.env.KEYCAP_FIREBASE_PRIVATE_KEY!.replace(/\\n/g, '\n'),
-        clientEmail: process.env.KEYCAP_FIREBASE_SERVICE_ACCOUNT,
-      }),
-      storageBucket: process.env.KEYCAP_FIREBASE_STORAGE_BUCKET_URL,
-    })
-  }
-
+  initAdminFirebase()
   const db = admin.firestore()
   const querySnapshot = await db.collection('keycap-materials').get()
   const materialIds = querySnapshot.docs.map((doc) => `/material/${doc.id.toString()}`)
@@ -48,19 +36,7 @@ export const getStaticProps: GetStaticProps<
     }
   }
 
-  if (admin.apps.length === 0) {
-    // Firebase App の処理が複数回走るとエラーを吐くので初回のレンダリング時のみ実行する
-    ensureEnvironmentVariable()
-    admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: process.env.KEYCAP_FIREBASE_PROJECT_ID,
-        privateKey: process.env.KEYCAP_FIREBASE_PRIVATE_KEY!.replace(/\\n/g, '\n'),
-        clientEmail: process.env.KEYCAP_FIREBASE_SERVICE_ACCOUNT,
-      }),
-      storageBucket: process.env.KEYCAP_FIREBASE_STORAGE_BUCKET_URL,
-    })
-  }
-
+  initAdminFirebase()
   const db = admin.firestore()
   const querySnapshot = await db.collection('keycap-materials').doc(materialId).get()
   const data = querySnapshot.data()
