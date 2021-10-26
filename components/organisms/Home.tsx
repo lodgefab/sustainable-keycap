@@ -70,18 +70,29 @@ export const Home: React.VFC<Props> = ({}) => {
 
   return (
     <>
-      <header>
-        <h1>#ONECAP</h1>
-        <p>
-          #ONECAPは、廃棄プラスチックを使ってキーキャップを自作するオープンソースコミュニティです。
-        </p>
-        <p>
-          家庭やオフィスで出るプラゴミを原材料としたユニークなキーキャップを製作すると同時に、その方法や金型のデータを公開し、ワークショップなど通じて、仲間の輪を広げる活動を行なっています。
-        </p>
-      </header>
       <main>
-        <Section id='hero' color={'aqua'}></Section>
-        <Section id='concept' color={'green'}></Section>
+        <Hero id='hero' color={'transparent'}>
+          <VideoWrap>
+            <VideoPlayer>
+              <iframe
+                src='https://www.youtube.com/embed/bfleByM49CM?autoplay=1&mute=1&playsinline=1&loop=1&playlist=bfleByM49CM&controls=0&disablekb=1'
+                frameborder='0'
+                allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture'
+                allowfullscreen
+              ></iframe>
+            </VideoPlayer>
+            <VideoMask></VideoMask>
+          </VideoWrap>
+        </Hero>
+        <Section id='concept' color={'green'}>
+          <h1>#ONECAP</h1>
+          <p>
+            #ONECAPは、廃棄プラスチックを使ってキーキャップを自作するオープンソースコミュニティです。
+          </p>
+          <p>
+            家庭やオフィスで出るプラゴミを原材料としたユニークなキーキャップを製作すると同時に、その方法や金型のデータを公開し、ワークショップなど通じて、仲間の輪を広げる活動を行なっています。
+          </p>
+        </Section>
         <Section id='why' color={'purple'}></Section>
         <Section id='workshop' color={'lime'}></Section>
         <Section id='making' color={'Coral'}></Section>
@@ -148,5 +159,47 @@ const Section = styled.section<{ color: string }>`
   padding: 128px 0px;
   width: 100%;
   background-color: ${(props) => `${props.color}`};
-  height: 600px;
+`
+
+const Hero = styled(Section)`
+  position: relative;
+  height: calc(100vw * 2 / 3);
+  ${media.mdsp`
+    min-height:100vh;
+  `}
+`
+
+const VideoWrap = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(100vw * 2 / 3);
+  height: calc(100vw * 2 / 3);
+  background-color: tomato;
+`
+
+const VideoMask = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('/images/mask.svg');
+  background-size: cover;
+`
+
+const VideoPlayer = styled.div`
+  position: relative;
+  height: 100%;
+  background: #333333;
+  overflow: hidden;
+  iframe {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(100vw * 2 / 3);
+    height: calc(100vw * 2 / 3);
+  }
 `

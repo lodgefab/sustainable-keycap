@@ -1,10 +1,11 @@
 import React from 'react'
 import styled from '@emotion/styled'
 // import LogoImg from '../../images/logo.png'
-import { color, font, media } from '../../styles'
+import { color, font, media, zIndex } from '../../styles'
 import { User } from 'firebase/auth'
 import { AuthStatus, AuthStatusType } from '../../lib/auth'
 import { Link as Scroll } from 'react-scroll'
+import Link from 'next/link'
 
 interface Props {
   currentUser: User | AuthStatusType
@@ -16,19 +17,24 @@ export const Header: React.VFC<Props> = ({ currentUser, onLoginFunc, onLogoutFun
   return (
     <Wrap>
       <Container>
-        <Logo href={'/'}>{/* <Image src={LogoImg} alt='logo' /> */}</Logo>
-        <PageLink to='workshop' smooth={true} duration={500} offset={-100}>
-          Workshop
-        </PageLink>
-        <PageLink to='mold' smooth={true} duration={500} offset={-100}>
-          Mold
-        </PageLink>
-        <PageLink to='aboutus' smooth={true} duration={500} offset={-100}>
-          AboutUs
-        </PageLink>
-        <PageLink to='library' smooth={true} duration={500} offset={-100}>
-          Library
-        </PageLink>
+        <Left>
+          <Logo to='hero' smooth={true} duration={500}></Logo>
+          <PageLink to='workshop' smooth={true} duration={500} offset={-100}>
+            Workshop
+          </PageLink>
+          <PageLink to='mold' smooth={true} duration={500} offset={-100}>
+            Mold
+          </PageLink>
+          <PageLink to='aboutus' smooth={true} duration={500} offset={-100}>
+            AboutUs
+          </PageLink>
+          <PageLink to='library' smooth={true} duration={500} offset={-100}>
+            Library
+          </PageLink>
+          <Link passHref href={'https://www.instagram.com/vernacular_cookbook/'}>
+            <Insta target='_blank'></Insta>
+          </Link>
+        </Left>
         {/* TODO: 認証方法を明記する */}
         {currentUser && (
           <p>
@@ -51,6 +57,7 @@ const Wrap = styled.div`
   width: 56px;
   height: 100vh;
   background: transparent;
+  z-index: ${zIndex.header};
   ${media.mdsp`
         height:44px;
         width:100vw;
@@ -69,13 +76,36 @@ const Container = styled.div`
     flex-direction: row;
   `}
 `
-const Logo = styled.a`
+const Left = styled.div`
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  min-height: 480px;
+  align-items: center;
+`
+
+const Logo = styled(Scroll)`
   width: 56px;
   height: 56px;
-  background-image: url() ('/public/images/logo.svg');
+  background-image: url('/images/logo.svg');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  cursor: pointer;
 `
 const PageLink = styled(Scroll)`
   transform: rotate(-90deg);
   ${font.courier.subtitle1};
   cursor: pointer;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+`
+const Insta = styled.a`
+  width: 24px;
+  height: 24px;
+  background-image: url('/images/icons/insta.svg');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
 `

@@ -103,3 +103,9 @@ export const curve = {
   button: 'transition: all .3s 0s ease-out;',
   fade: 'transition: all .6s 0s ease-out;',
 } as const
+
+export const zIndex = {
+  base: 0,
+  header: 10,
+  behind: -1,
+} as const
