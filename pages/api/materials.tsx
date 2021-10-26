@@ -27,7 +27,7 @@ export const getMaterialsWithoutLogin = async (req: NextApiRequest, res: NextApi
   }
 
   // レスポンスは30秒間キャッシュする
-  res.setHeader('Cache-Control', 'max-age=30, public')
+  res.setHeader('Cache-Control', 'max-age=0, s-maxage=30, public')
 
   res.status(200).json({
     message: 'ok',
