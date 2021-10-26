@@ -80,24 +80,14 @@ export const Home: React.VFC<Props> = ({}) => {
         </p>
       </header>
       <main>
-        <section>
-          <h2>ONECAPの特徴</h2>
-          <ul>
-            <li>recyclable</li>
-            <li>unique texture</li>
-            <li>circular design</li>
-            <li>produced locally</li>
-          </ul>
-        </section>
-
-        <section>
-          <h2>Resource</h2>
-          <p>金型のデータを公開し、同様の活動を行おうとする人を応援します</p>
-
-          <Link href='#'>
-            <a>金型データをDLする</a>
-          </Link>
-        </section>
+        <Section id='hero' color={'aqua'}></Section>
+        <Section id='concept' color={'green'}></Section>
+        <Section id='why' color={'purple'}></Section>
+        <Section id='workshop' color={'lime'}></Section>
+        <Section id='making' color={'Coral'}></Section>
+        <Section id='mold' color={'DarkSeaGreen '}></Section>
+        <Section id='aboutus' color={'LightSkyBlue '}></Section>
+        <Section id='library' color={'Peru'}></Section>
 
         {materials.length > 0 && ( // 何らかの理由で素材リストが取れなかった時はsection全体を非表示にする
           <section>
@@ -153,3 +143,10 @@ export const Home: React.VFC<Props> = ({}) => {
     </>
   )
 }
+
+const Section = styled.section<{ color: string }>`
+  padding: 128px 0px;
+  width: 100%;
+  background-color: ${(props) => `${props.color}`};
+  height: 600px;
+`

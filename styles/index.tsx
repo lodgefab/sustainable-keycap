@@ -47,32 +47,32 @@ export const font = {
     overline: 'font-weight: 400; font-size: 10px; line-height: 1.5;',
     unit: 'font-weight: 700; font-size: 10px; line-height: 1.3;',
   },
-  noto: {
-    h1: 'font-family: Noto Serif JP, serif; font-weight: 400; font-size: 48px; line-height: 1.3;',
-    h2: 'font-family: Noto Serif JP, serif; font-weight: 400; font-size: 32px; line-height: 1.3;',
-    h3: 'font-family: Noto Serif JP, serif; font-weight: 400; font-size: 20px; line-height: 1.3;',
-    h4: 'font-family: Noto Serif JP, serif; font-weight: 400; font-size: 18px; line-height: 1.3;',
+  courier: {
+    h1: 'font-family: Courier Prime, monospace, serif; font-weight: 400; font-size: 48px; line-height: 1.3;',
+    h2: 'font-family: Courier Prime, monospace, serif; font-weight: 400; font-size: 32px; line-height: 1.3;',
+    h3: 'font-family: Courier Prime, monospace, serif; font-weight: 400; font-size: 20px; line-height: 1.3;',
+    h4: 'font-family: Courier Prime, monospace, serif; font-weight: 400; font-size: 18px; line-height: 1.3;',
     subtitle1:
-      'font-family: Noto Serif JP, serif; font-weight: 600; font-size: 16px; line-height: 1.3;',
+      'font-family: Courier Prime, monospace, serif; font-weight: 600; font-size: 16px; line-height: 1.3;',
     subtitle2:
-      'font-family: Noto Serif JP, serif; font-weight: 600; font-size: 14px; line-height: 1.3;',
+      'font-family: Courier Prime, monospace, serif; font-weight: 600; font-size: 14px; line-height: 1.3;',
     body1:
-      'font-family: Noto Serif JP, serif; font-weight: 500; font-size: 16px; line-height: 1.3;',
+      'font-family: Courier Prime, monospace, serif; font-weight: 500; font-size: 16px; line-height: 1.3;',
     body2:
-      'font-family: Noto Serif JP, serif; font-weight: 500; font-size: 14px; line-height: 1.3;',
+      'font-family: Courier Prime, monospace, serif; font-weight: 500; font-size: 14px; line-height: 1.3;',
     article1:
-      'font-family: Noto Serif JP, serif; font-weight: 500; font-size: 16px; line-height: 2.0;',
+      'font-family: Courier Prime, monospace, serif; font-weight: 500; font-size: 16px; line-height: 2.0;',
     article2:
-      'font-family: Noto Serif JP, serif; font-weight: 500; font-size: 14px; line-height: 2.0;',
+      'font-family: Courier Prime, monospace, serif; font-weight: 500; font-size: 14px; line-height: 2.0;',
     button:
-      'font-family: Noto Serif JP, serif; font-weight: 700; font-size: 14px; line-height: 1.5;',
+      'font-family: Courier Prime, monospace, serif; font-weight: 700; font-size: 14px; line-height: 1.5;',
     caption:
-      'font-family: Noto Serif JP, serif; font-weight: 400; font-size: 12px; line-height: 1.5;',
+      'font-family: Courier Prime, monospace, serif; font-weight: 400; font-size: 12px; line-height: 1.5;',
     label:
-      'font-family: Noto Serif JP, serif; font-weight: 600; font-size: 12px; line-height: 1.5;',
+      'font-family: Courier Prime, monospace, serif; font-weight: 600; font-size: 12px; line-height: 1.5;',
     overline:
-      'font-family: Noto Serif JP, serif; font-weight: 400; font-size: 10px; line-height: 1.5;',
-    unit: 'font-family: Noto Serif JP, serif; font-weight: 700; font-size: 10px; line-height: 1.3;',
+      'font-family: Courier Prime, monospace, serif; font-weight: 400; font-size: 10px; line-height: 1.5;',
+    unit: 'font-family: Courier Prime, monospace, serif; font-weight: 700; font-size: 10px; line-height: 1.3;',
   },
 } as const
 
