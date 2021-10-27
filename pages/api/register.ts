@@ -55,65 +55,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       message: 'サーバーエラーにより素材データの登録ができませんでした。',
     })
   }
-
-  // const client = createClient({
-  //   accessToken: process.env.KEYCAP_CONTENTFUL_ACCESS_TOKEN!,
-  // })
-  // const space = await client.getSpace(process.env.KEYCAP_CONTENTFUL_SPACE_ID!)
-  // const environment = await space.getEnvironment(process.env.KEYCAP_CONTENTFUL_ENVIRONMENT_ID!)
-  //
-  // try {
-  //   const plasticAssetTmp1 = await environment.createAssetFromFiles({
-  //     fields: {
-  //       title: {
-  //         'en-US': `plasticImage-${+new Date()}`,
-  //       },
-  //       description: {
-  //         'en-US': 'Uploaded in development mode',
-  //       },
-  //       file: {
-  //         'en-US': {
-  //           contentType: uploadedImages.plasticImage[0].mimetype,
-  //           fileName: uploadedImages.plasticImage[0].originalname,
-  //           file: uploadedImages.plasticImage[0].buffer,
-  //         },
-  //       },
-  //     },
-  //   })
-  //   const plasticAssetTmp2 = await plasticAssetTmp1.processForAllLocales()
-  //   const plasticAsset = await plasticAssetTmp2.publish()
-  //
-  //   const keycapAssetTmp1 = await environment.createAssetFromFiles({
-  //     fields: {
-  //       title: {
-  //         'en-US': `keycapImage-${+new Date()}`,
-  //       },
-  //       description: {
-  //         'en-US': 'Uploaded in development mode',
-  //       },
-  //       file: {
-  //         'en-US': {
-  //           contentType: uploadedImages.keycapImage[0].mimetype,
-  //           fileName: uploadedImages.keycapImage[0].originalname,
-  //           file: uploadedImages.keycapImage[0].buffer,
-  //         },
-  //       },
-  //     },
-  //   })
-  //   const keycapAssetTmp2 = await keycapAssetTmp1.processForAllLocales()
-  //   const keycapAsset = await keycapAssetTmp2.publish()
-  //
-  //   const insertedEntry = await environment.createEntry(
-  //     process.env.KEYCAP_CONTENTFUL_CONTENT_TYPE!,
-  //     { fields: convertFormInputToContentfulModel(req.body, plasticAsset, keycapAsset) }
-  //   )
-  //   await insertedEntry.publish()
-  // } catch (e) {
-  //   res.status(500).json({
-  //     message: 'Error white saving data',
-  //   })
-  //   return
-  // }
 }
 
 export const config = {
