@@ -1,16 +1,14 @@
 import { FirestoreMaterialDocument, Material } from '../types'
-import { firebaseClientApp } from './auth'
+import { firebaseClientApp, getCurrentUser } from './auth'
 import {
   collection,
   DocumentData,
-  FirestoreDataConverter,
   getDocs,
   getFirestore,
   QueryDocumentSnapshot,
   SnapshotOptions,
 } from 'firebase/firestore'
-import { getStorage, listAll, ref } from 'firebase/storage'
-import useSWRImmutable from 'swr/immutable'
+import { getDownloadURL, getStorage, listAll, ref } from 'firebase/storage'
 
 export const getSampleMaterialData: () => Material[] = () => {
   return [
@@ -104,48 +102,35 @@ const fromFirestore = (snapshot: QueryDocumentSnapshot, options: SnapshotOptions
   }
 }
 
-export const fetchMaterials = async (): Promise<Material[]> => {
-  const querySnapshot = await getDocs(collection(getFirestore(firebaseClientApp), 'materials'))
-  const storage = getStorage(firebaseClientApp)
+export const fetchMaterialsWithAuth = async (): Promise<Material[]> => {
+  if (getCurrentUser() === null) {
+    throw new Error('Authentication is required to fetch material data.')
+  }
 
-  console.log(querySnapshot.docs)
+  const querySnapshot = await getDocs(
+    collection(getFirestore(firebaseClientApp), 'keycap-materials')
+  )
+  const storage = getStorage(firebaseClientApp)
 
   return await Promise.all(
     querySnapshot.docs.map(async (doc) => {
       const data = doc.data() as FirestoreMaterialDocument // TODO: as 使わずにいい感じに型付けたい
 
       const listResult = await listAll(ref(storage, `images/${doc.id}/`))
-      console.log(listResult)
 
-      // const url = await getDownloadURL(ref(storage, `images/${doc.id}/plasticImage.`))
-      //
-      // const imageFiles = (
-      //     storage.
-      //     .getFiles({
-      //       prefix: `images/${doc.id}/`,
-      //       delimiter: '/',
-      //     })
-      // )[0]
-      //
-      // let plasticImageUrl: string = 'hoge/huga.png' // TODO: 画像が取得できなかったときのデフォルト画像を用意する
-      // let keycapImageUrl: string = 'hoge/huga.png' // TODO: 画像が取得できなかったときのデフォルト画像を用意する
-      // for (const file of imageFiles) {
-      //   if (file.name.startsWith(`images/${doc.id}/plasticImage`)) {
-      //     plasticImageUrl = (
-      //       await file.getSignedUrl({
-      //         action: 'read',
-      //         expires: dayjs().add(1, 'day').format('MM-DD-YYYY'),
-      //       })
-      //     )[0]
-      //   } else if (file.name.startsWith(`images/${doc.id}/keycapImage`)) {
-      //     keycapImageUrl = (
-      //       await file.getSignedUrl({
-      //         action: 'read',
-      //         expires: dayjs().add(1, 'day').format('MM-DD-YYYY'),
-      //       })
-      //     )[0]
-      //   }
-      // }
+      const plasticImageFile = listResult.items.filter((item) =>
+        item.name.startsWith('plasticImage')
+      )[0]
+      const keycapImageFile = listResult.items.filter((item) =>
+        item.name.startsWith('keycapImage')
+      )[0]
+
+      const plasticImageUrl = await getDownloadURL(
+        ref(storage, `images/${doc.id}/${plasticImageFile.name}`)
+      )
+      const keycapImageUrl = await getDownloadURL(
+        ref(storage, `images/${doc.id}/${keycapImageFile.name}`)
+      )
 
       return {
         id: doc.id,
@@ -153,22 +138,11 @@ export const fetchMaterials = async (): Promise<Material[]> => {
         colorType: data.colorType,
         plasticType: data.plasticType,
         goodCount: data.goodCount,
-        plasticImageUrl: '',
-        keycapImageUrl: '',
+        plasticImageUrl: plasticImageUrl,
+        keycapImageUrl: keycapImageUrl,
         celsius: data.celsius,
         note: data.note,
       }
     })
   )
-}
-
-export const useMaterials = () => {
-  const { data, error } = useSWRImmutable('materials', fetchMaterials)
-  console.log(data, error)
-
-  return {
-    materials: data,
-    isLoading: !error && !data,
-    isError: error,
-  }
 }

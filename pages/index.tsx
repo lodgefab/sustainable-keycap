@@ -1,37 +1,96 @@
 import Head from 'next/head'
 import { NextPage } from 'next'
 import { Home } from '../components/organisms/Home'
-import React, { createContext, useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Material } from '../types'
-import useSWR from 'swr'
 import axios from 'axios'
 import { AuthContext, AuthStatus } from '../lib/auth'
-
-export const MaterialContext: React.Context<Material[]> = createContext<Material[]>([])
-
-const fetcher = (authState: 'guest' | 'authed' | 'none') => {
-  if (authState === 'guest') {
-    return axios.get('/api/materials').then((res) => res.data)
-  } else if (authState === 'authed') {
-    // TODO: Firebaseを叩く
-    return axios.get('/api/materials').then((res) => res.data)
-  } else {
-    return {
-      data: [],
-      error: undefined,
-    }
-  }
-}
+import { fetchMaterialsWithAuth } from '../lib/helper'
 
 export const Index: NextPage = () => {
   const currentUser = useContext(AuthContext)
 
-  let materials: Material[] = []
-  const key = currentUser ? 'authed' : currentUser === AuthStatus.NOT_LOGIN ? 'guest' : 'none'
-  const { data, error } = useSWR(key, fetcher)
-  if (!error) {
-    // @ts-ignore
-    materials = data?.materials
+  const [upvotableMaterials, setUpvotableMaterials] = useState<string[]>([])
+  const [materials, setMaterials] = useState<Material[]>([])
+
+  // 認証の初期化が完了し、ログイン状態が変化した時にキーキャップ素材データを取得する処理
+  useEffect(() => {
+    ;(async () => {
+      let data
+      if (currentUser) {
+        data = await fetchMaterialsWithAuth()
+        setMaterials(data)
+        setUpvotableMaterials(data.map((material) => material.id))
+      } else if (currentUser === AuthStatus.NOT_LOGIN) {
+        const response = await axios.get<Material[]>('/api/materials').then((res) => res.data)
+        // @ts-ignore
+        data = response.materials
+        setMaterials(data)
+        setUpvotableMaterials([])
+      } else {
+        return
+      }
+    })()
+  }, [currentUser])
+
+  /**
+   * 表示されているいいねの数を変更する
+   * @param materialId 変更するキーキャップ素材のID
+   * @param count 変更後のいいねの数
+   */
+  const setGoodCount = async (materialId: string, count: number) => {
+    await setMaterials(
+      materials.map((material) => {
+        if (material.id === materialId) {
+          material.goodCount = count
+        }
+        return material
+      })
+    )
+  }
+
+  /**
+   * いいねを増やす
+   * @param materialId いいねを増やすキーキャップ素材のID
+   */
+  const upvote = async (materialId: string) => {
+    // 二重送信防止
+    if (!upvotableMaterials.includes(materialId)) {
+      return
+    }
+
+    // 未ログイン状態での送信は禁止
+    if (!currentUser) {
+      return
+    }
+
+    setUpvotableMaterials(upvotableMaterials.filter((item) => item !== materialId))
+
+    const idToken = await currentUser.getIdToken(true)
+
+    try {
+      const response = await axios.post(
+        '/api/upvote',
+        {
+          materialId: materialId,
+        },
+        {
+          headers: {
+            'content-type': 'application/json',
+            Authorization: `Bearer ${idToken}`,
+          },
+        }
+      )
+
+      // @ts-ignore TODO: 型を書く
+      if (response.data.newGoodCount) {
+        // @ts-ignore
+        await setGoodCount(materialId, response.data.newGoodCount)
+      }
+    } catch (error) {
+      // TODO: Upvoteに失敗した場合の処理を書く
+      console.error(error)
+    }
   }
 
   return (
@@ -42,9 +101,12 @@ export const Index: NextPage = () => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
 
-      <MaterialContext.Provider value={materials || []}>
-        <Home />
-      </MaterialContext.Provider>
+      <Home
+        materials={materials || []}
+        setGoodCount={setGoodCount}
+        upvotableMaterials={upvotableMaterials}
+        upvote={upvote}
+      />
     </>
   )
 }
