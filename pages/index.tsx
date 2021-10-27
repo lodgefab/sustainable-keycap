@@ -21,9 +21,13 @@ export const Index: NextPage = () => {
     ;(async () => {
       let data: Material[]
       if (currentUser) {
-        data = await fetchMaterialsWithAuth()
-        setMaterials(data)
-        setUpvotableMaterials(data.map((material) => material.id))
+        const fetchResult = await fetchMaterialsWithAuth()
+        setMaterials(fetchResult.materials)
+        setUpvotableMaterials(
+          fetchResult.materials
+            .filter((material) => !fetchResult.alreadyUpvoted.includes(material.id))
+            .map((material) => material.id)
+        )
       } else if (currentUser === AuthStatus.NOT_LOGIN) {
         try {
           const response = await axios
@@ -65,7 +69,7 @@ export const Index: NextPage = () => {
    * @param materialId いいねを増やすキーキャップ素材のID
    */
   const upvote = async (materialId: string) => {
-    // 二重送信防止
+    // 二重送信・既にUpvote済みの素材に対する再送信の防止
     if (!upvotableMaterials.includes(materialId)) {
       return
     }

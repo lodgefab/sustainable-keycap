@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React from 'react'
 import styled from '@emotion/styled'
 import { color, font, media } from '../../styles'
 import Link from 'next/link'
