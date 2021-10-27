@@ -71,7 +71,7 @@ const Container = styled.div`
   width: 100%;
   height: 100%;
   margin: 0 auto;
-  font-family: ${font.mont.body2};
+  font-family: ${font.inter.body2};
   ${media.mdsp`
     flex-direction: row;
   `}

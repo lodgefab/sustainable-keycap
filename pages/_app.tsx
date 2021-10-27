@@ -12,7 +12,7 @@ function MyApp({ Component, pageProps }) {
         styles={css`
           ${emotionReset}
           @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
-          @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap');
           *,
           html,
           body {
