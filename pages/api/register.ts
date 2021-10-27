@@ -8,6 +8,7 @@ const upload = multer({
   storage: multer.memoryStorage(),
 })
 
+// TODO: method not allowedな バリデーションを書く
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const uploadedImages: any = await new Promise((resolve, reject) => {
     upload.fields([

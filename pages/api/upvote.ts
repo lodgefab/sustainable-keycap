@@ -21,6 +21,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   try {
+    initAdminFirebase()
     const decodedToken = await admin
       .auth()
       .verifyIdToken(authHeader.substring(7, authHeader.length), true)

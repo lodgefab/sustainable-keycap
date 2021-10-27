@@ -3,72 +3,17 @@ import styled from '@emotion/styled'
 import { color, font, media } from '../../styles'
 import Link from 'next/link'
 import Image from 'next/image'
-import { MaterialContext } from '../../pages'
-import Axios from 'axios'
-import { AuthContext } from '../../lib/auth'
 import { Button } from '../atoms/Button'
+import { Material } from '../../types'
 
-type Props = {}
+type Props = {
+  materials: Material[]
+  setGoodCount: (materialId: string, count: number) => void
+  upvotableMaterials: string[]
+  upvote: Function
+}
 
-export const Home: React.VFC<Props> = ({}) => {
-  const currentUser = useContext(AuthContext)
-  const materials = useContext(MaterialContext)
-
-  const [goodCount, setGoodCount] = useState(
-    materials.reduce(
-      (previous, current) => Object.assign(previous, { [current.id]: current.goodCount }),
-      {}
-    )
-  )
-  const [canUpvote, setUpvotability] = useState(
-    materials.reduce((previous, current) => Object.assign(previous, { [current.id]: true }), {})
-  )
-
-  const upvote = async (materialId: string) => {
-    // 二重送信防止
-    if (!canUpvote[materialId]) {
-      return
-    }
-
-    // 未ログイン状態での送信は禁止
-    if (!currentUser) {
-      return
-    }
-    const idToken = await currentUser.getIdToken(true)
-
-    setUpvotability({
-      ...canUpvote,
-      [materialId]: false,
-    })
-
-    try {
-      const response = await Axios.post(
-        '/api/upvote',
-        {
-          materialId: materialId,
-        },
-        {
-          headers: {
-            'content-type': 'application/json',
-            Authorization: `Bearer ${idToken}`,
-          },
-        }
-      )
-
-      // @ts-ignore TODO: 型を書く
-      if (response.data.newGoodCount) {
-        setGoodCount({
-          ...goodCount,
-          // @ts-ignore
-          [materialId]: response.data.newGoodCount,
-        })
-      }
-    } catch (error) {
-      // TODO: Upvoteに失敗した場合の処理を書く
-      console.error(error)
-    }
-  }
-
+export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMaterials, upvote }) => {
   return (
     <>
       <main>
@@ -218,11 +163,11 @@ export const Home: React.VFC<Props> = ({}) => {
                 {/* 既にUpvote済み、もしくは未ログインの場合はUpvoteボタンを無効化する */}
                 <button
                   onClick={() => upvote(material.id)}
-                  disabled={!canUpvote[material.id] || !currentUser}
+                  disabled={!upvotableMaterials.includes(material.id)}
                 >
                   Upvote
                 </button>
-                {goodCount[material.id] && <p>{goodCount[material.id]}</p>}
+                <p>{material.goodCount}</p>
               </div>
             ))}
 
