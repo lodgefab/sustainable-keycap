@@ -13,6 +13,7 @@ export const color = {
     bague: '#F5F5F5',
     dark: '#333',
     white: '#fff',
+    blue: '#EDF2F5',
   },
   utils: {
     error: '#FF3B30',
@@ -30,49 +31,54 @@ export const color = {
 } as const
 
 export const font = {
-  mont: {
-    h1: 'font-weight: 400; font-size: 48px; line-height: 1.3;',
-    h2: 'font-weight: 400; font-size: 32px; line-height: 1.3;',
-    h3: 'font-weight: 400; font-size: 20px; line-height: 1.3;',
-    h4: 'font-weight: 400; font-size: 18px; line-height: 1.3;',
-    subtitle1: 'font-weight: 600; font-size: 16px; line-height: 1.3;',
-    subtitle2: 'font-weight: 600; font-size: 14px; line-height: 1.3;',
-    body1: 'font-weight: 500; font-size: 16px; line-height: 1.3;',
-    body2: 'font-weight: 500; font-size: 14px; line-height: 1.3;',
-    article1: 'font-weight: 500; font-size: 16px; line-height: 2.0;',
-    article2: 'font-weight: 500; font-size: 14px; line-height: 2.0;',
-    button: 'font-weight: 700; font-size: 14px; line-height: 1.5;',
-    caption: 'font-weight: 400; font-size: 12px; line-height: 1.5;',
-    label: 'font-weight: 600; font-size: 12px; line-height: 1.5;',
-    overline: 'font-weight: 400; font-size: 10px; line-height: 1.5;',
-    unit: 'font-weight: 700; font-size: 10px; line-height: 1.3;',
-  },
-  noto: {
-    h1: 'font-family: Noto Serif JP, serif; font-weight: 400; font-size: 48px; line-height: 1.3;',
-    h2: 'font-family: Noto Serif JP, serif; font-weight: 400; font-size: 32px; line-height: 1.3;',
-    h3: 'font-family: Noto Serif JP, serif; font-weight: 400; font-size: 20px; line-height: 1.3;',
-    h4: 'font-family: Noto Serif JP, serif; font-weight: 400; font-size: 18px; line-height: 1.3;',
+  inter: {
+    h1: 'font-family: Inter, sans-serif; font-weight: 600; font-size: 48px; line-height: 1.3;',
+    h2: 'font-family: Inter, sans-serif; font-weight: 600; font-size: 32px; line-height: 1.3;',
+    h3: 'font-family: Inter, sans-serif; font-weight: 600; font-size: 20px; line-height: 1.3;',
+    h4: 'font-family: Inter, sans-serif; font-weight: 600; font-size: 18px; line-height: 1.3;',
     subtitle1:
-      'font-family: Noto Serif JP, serif; font-weight: 600; font-size: 16px; line-height: 1.3;',
+      'font-family: Inter, sans-serif; font-weight: 600; font-size: 16px; line-height: 1.3;',
     subtitle2:
-      'font-family: Noto Serif JP, serif; font-weight: 600; font-size: 14px; line-height: 1.3;',
-    body1:
-      'font-family: Noto Serif JP, serif; font-weight: 500; font-size: 16px; line-height: 1.3;',
-    body2:
-      'font-family: Noto Serif JP, serif; font-weight: 500; font-size: 14px; line-height: 1.3;',
+      'font-family: Inter, sans-serif; font-weight: 600; font-size: 14px; line-height: 1.3;',
+    body1: 'font-family: Inter, sans-serif; font-weight: 500; font-size: 16px; line-height: 1.3;',
+    body2: 'font-family: Inter, sans-serif; font-weight: 500; font-size: 14px; line-height: 1.3;',
     article1:
-      'font-family: Noto Serif JP, serif; font-weight: 500; font-size: 16px; line-height: 2.0;',
+      'font-family: Inter, sans-serif; font-weight: 500; font-size: 16px; line-height: 2.0;',
     article2:
-      'font-family: Noto Serif JP, serif; font-weight: 500; font-size: 14px; line-height: 2.0;',
-    button:
-      'font-family: Noto Serif JP, serif; font-weight: 700; font-size: 14px; line-height: 1.5;',
-    caption:
-      'font-family: Noto Serif JP, serif; font-weight: 400; font-size: 12px; line-height: 1.5;',
-    label:
-      'font-family: Noto Serif JP, serif; font-weight: 600; font-size: 12px; line-height: 1.5;',
+      'font-family: Inter, sans-serif; font-weight: 500; font-size: 14px; line-height: 2.0;',
+    button: 'font-family: Inter, sans-serif; font-weight: 700; font-size: 14px; line-height: 1.5;',
+    caption: 'font-family: Inter, sans-serif; font-weight: 400; font-size: 12px; line-height: 1.5;',
+    label: 'font-family: Inter, sans-serif; font-weight: 600; font-size: 12px; line-height: 1.5;',
     overline:
-      'font-family: Noto Serif JP, serif; font-weight: 400; font-size: 10px; line-height: 1.5;',
-    unit: 'font-family: Noto Serif JP, serif; font-weight: 700; font-size: 10px; line-height: 1.3;',
+      'font-family: Inter, sans-serif; font-weight: 400; font-size: 10px; line-height: 1.5;',
+    unit: 'font-family: Inter, sans-serif; font-weight: 700; font-size: 10px; line-height: 1.3;',
+  },
+  courier: {
+    h1: 'font-family: Courier Prime, monospace, serif; font-weight: 400; font-size: 48px; line-height: 1.3;',
+    h2: 'font-family: Courier Prime, monospace, serif; font-weight: 400; font-size: 32px; line-height: 1.3;',
+    h3: 'font-family: Courier Prime, monospace, serif; font-weight: 400; font-size: 20px; line-height: 1.3;',
+    h4: 'font-family: Courier Prime, monospace, serif; font-weight: 400; font-size: 18px; line-height: 1.3;',
+    subtitle1:
+      'font-family: Courier Prime, monospace, serif; font-weight: 600; font-size: 16px; line-height: 1.3;',
+    subtitle2:
+      'font-family: Courier Prime, monospace, serif; font-weight: 600; font-size: 14px; line-height: 1.3;',
+    body1:
+      'font-family: Courier Prime, monospace, serif; font-weight: 500; font-size: 16px; line-height: 1.3;',
+    body2:
+      'font-family: Courier Prime, monospace, serif; font-weight: 500; font-size: 14px; line-height: 1.3;',
+    article1:
+      'font-family: Courier Prime, monospace, serif; font-weight: 500; font-size: 16px; line-height: 2.0;',
+    article2:
+      'font-family: Courier Prime, monospace, serif; font-weight: 500; font-size: 14px; line-height: 2.0;',
+    button:
+      'font-family: Courier Prime, monospace, serif; font-weight: 700; font-size: 14px; line-height: 1.5;',
+    caption:
+      'font-family: Courier Prime, monospace, serif; font-weight: 400; font-size: 12px; line-height: 1.5;',
+    label:
+      'font-family: Courier Prime, monospace, serif; font-weight: 600; font-size: 12px; line-height: 1.5;',
+    overline:
+      'font-family: Courier Prime, monospace, serif; font-weight: 400; font-size: 10px; line-height: 1.5;',
+    unit: 'font-family: Courier Prime, monospace, serif; font-weight: 700; font-size: 10px; line-height: 1.3;',
   },
 } as const
 
@@ -102,4 +108,10 @@ export const media = {
 export const curve = {
   button: 'transition: all .3s 0s ease-out;',
   fade: 'transition: all .6s 0s ease-out;',
+} as const
+
+export const zIndex = {
+  base: 0,
+  header: 10,
+  behind: -1,
 } as const
