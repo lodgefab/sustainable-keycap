@@ -8,8 +8,13 @@ const upload = multer({
   storage: multer.memoryStorage(),
 })
 
+export interface RegisterApiResponse {
+  message: string
+  materialId?: string
+}
+
 // TODO: method not allowedな バリデーションを書く
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse<RegisterApiResponse>) => {
   const uploadedImages: any = await new Promise((resolve, reject) => {
     upload.fields([
       { name: 'plasticImage', maxCount: 1 },

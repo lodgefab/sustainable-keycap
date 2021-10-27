@@ -3,7 +3,12 @@ import * as admin from 'firebase-admin'
 import { HTTP_STATUS } from '../../types'
 import { initAdminFirebase } from '../../lib/admin-firebase'
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+export interface UpvoteApiResponse {
+  message: string
+  newGoodCount?: number | null
+}
+
+const handler = async (req: NextApiRequest, res: NextApiResponse<UpvoteApiResponse>) => {
   const authHeader = req.headers.authorization
 
   if (!authHeader) {

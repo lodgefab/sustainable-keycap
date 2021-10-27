@@ -5,11 +5,19 @@ import { initAdminFirebase } from '../../lib/admin-firebase'
 import * as admin from 'firebase-admin'
 import dayjs from 'dayjs'
 
+export interface MaterialsApiResponse {
+  message: string
+  materials?: Material[]
+}
+
 /**
  * 未ログイン状態でトップページを開いた時にキーキャップ素材の一覧を取得するためのAPI
  * 頻繁にいいね数が変わることを想定していないので、Firebaseへのリクエスト数を減らすためにレスポンスは30秒間キャッシュする
  */
-export const getMaterialsWithoutLogin = async (req: NextApiRequest, res: NextApiResponse) => {
+export const getMaterialsWithoutLogin = async (
+  req: NextApiRequest,
+  res: NextApiResponse<MaterialsApiResponse>
+) => {
   let materials: Material[] = []
 
   try {
