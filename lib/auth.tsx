@@ -1,5 +1,12 @@
 import { initializeApp } from 'firebase/app'
-import { getAuth, GoogleAuthProvider, signInWithRedirect, signOut, User } from 'firebase/auth'
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithRedirect,
+  signOut,
+  User,
+  onAuthStateChanged,
+} from 'firebase/auth'
 import React, { createContext, useEffect, useState } from 'react'
 import Router from 'next/router'
 
@@ -47,7 +54,7 @@ export const AuthContext = createContext<User | AuthStatusType>(AuthStatus.INITI
 export const AuthProvider: React.FC = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | AuthStatusType>(AuthStatus.INITIALIZING)
   useEffect(() => {
-    auth.onAuthStateChanged(setCurrentUser)
+    onAuthStateChanged(auth, setCurrentUser)
   }, [])
 
   return <AuthContext.Provider value={currentUser}>{children}</AuthContext.Provider>
