@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import styled from '@emotion/styled'
 import { color, font, media } from '../../styles'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '../atoms/Button'
 import { Material } from '../../types'
+import { AuthContext } from '../../lib/auth'
 
 type Props = {
   materials: Material[]
@@ -14,6 +15,8 @@ type Props = {
 }
 
 export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMaterials, upvote }) => {
+  const currentUser = useContext(AuthContext)
+
   return (
     <>
       <main>
@@ -171,9 +174,14 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
               </div>
             ))}
 
-            <Link href='/register'>
+            {/* 登録ページへのリンクはログイン中のみ有効にする */}
+            {currentUser ? (
+              <Link href='/register'>
+                <a>素材を追加する</a>
+              </Link>
+            ) : (
               <a>素材を追加する</a>
-            </Link>
+            )}
           </section>
         )}
       </main>
