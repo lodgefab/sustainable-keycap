@@ -4,17 +4,24 @@ import { color } from '../styles'
 import { Header } from './molecules/Header'
 import { Footer } from './molecules/Footer'
 import { AuthContext, login, logout } from '../lib/auth'
+import { getAuth } from 'firebase/auth'
 
 type Props = {
   children?: ReactNode
 }
 
 const Layout = ({ children }: Props) => {
-  const currentUser = useContext(AuthContext)
+  const authState = useContext(AuthContext)
+  const currentUser = getAuth().currentUser
 
   return (
     <Container>
-      <Header currentUser={currentUser} onLoginFunc={login} onLogoutFunc={logout} />
+      <Header
+        currentUser={currentUser}
+        authState={authState}
+        onLoginFunc={login}
+        onLogoutFunc={logout}
+      />
       {children}
       <Footer />
     </Container>

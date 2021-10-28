@@ -1,4 +1,4 @@
-import { FirestoreMaterialDocument, Material } from '../types'
+import { FirestoreMaterialDocument, HTTP_STATUS, Material, ResponseData } from '../types'
 import { firebaseClientApp, getCurrentUser } from './auth'
 import {
   collection,
@@ -11,6 +11,7 @@ import {
   SnapshotOptions,
 } from 'firebase/firestore'
 import { getDownloadURL, getStorage, listAll, ref } from 'firebase/storage'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 export const getSampleMaterialData: () => Material[] = () => {
   return [
@@ -177,4 +178,45 @@ export const fetchMaterialsWithAuth = async (): Promise<FetchMaterialsWithAuthRe
     materials: materials,
     alreadyUpvoted: alreadyUpvotedMaterials,
   }
+}
+
+export const ensureRequestIsAuthorized = (req: NextApiRequest) => {
+  const authHeader = req.headers.authorization
+
+  if (!authHeader) {
+    throw {
+      response: HTTP_STATUS.UNAUTHORIZED,
+      message: '認証が必要です。',
+    }
+  }
+
+  if (!authHeader.startsWith('Bearer ')) {
+    throw {
+      response: HTTP_STATUS.BAD_REQUEST,
+      message: '認証トークンのフォーマットが不正です。',
+    }
+  }
+}
+
+export const isErrorResponse = (arg: any): arg is ResponseData => {
+  return (
+    typeof arg === 'object' &&
+    equalsArray(Object.keys(arg), ['status', 'message']) &&
+    typeof arg.status === 'number' &&
+    typeof arg.message === 'string'
+  )
+}
+
+const equalsArray = (setA: string[], setB: string[]) => {
+  if (setA.length !== setB.length) return false
+  for (let i = 0; i < setA.length; i++) {
+    if (setA[i] !== setB[i]) return false
+  }
+  return true
+}
+
+export const respondAsInternalServerError = (res: NextApiResponse) => {
+  res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+    message: 'サーバーエラーにより素材データの登録ができませんでした。',
+  })
 }

@@ -4,14 +4,16 @@ import { Home } from '../components/organisms/Home'
 import React, { useContext, useEffect, useState } from 'react'
 import { Material } from '../types'
 import axios from 'axios'
-import { AuthContext, AuthStatus } from '../lib/auth'
+import { AuthContext } from '../lib/auth'
 import { fetchMaterialsWithAuth } from '../lib/helper'
 import { MaterialsApiResponse } from './api/materials'
 import Axios from 'axios'
 import { UpvoteApiResponse } from './api/upvote'
+import { getAuth } from 'firebase/auth'
 
 export const Index: NextPage = () => {
-  const currentUser = useContext(AuthContext)
+  const authState = useContext(AuthContext)
+  const currentUser = getAuth().currentUser
 
   const [upvotableMaterials, setUpvotableMaterials] = useState<string[]>([])
   const [materials, setMaterials] = useState<Material[]>([])
@@ -20,7 +22,7 @@ export const Index: NextPage = () => {
   useEffect(() => {
     ;(async () => {
       let data: Material[]
-      if (currentUser) {
+      if (authState === 'LOGGED_IN' && currentUser) {
         const fetchResult = await fetchMaterialsWithAuth()
         setMaterials(fetchResult.materials)
         setUpvotableMaterials(
@@ -28,7 +30,7 @@ export const Index: NextPage = () => {
             .filter((material) => !fetchResult.alreadyUpvoted.includes(material.id))
             .map((material) => material.id)
         )
-      } else if (currentUser === AuthStatus.NOT_LOGIN) {
+      } else if (authState === 'NOT_LOGIN') {
         try {
           const response = await axios
             .get<MaterialsApiResponse>('/api/materials')
@@ -46,7 +48,7 @@ export const Index: NextPage = () => {
         return
       }
     })()
-  }, [currentUser])
+  }, [currentUser, authState])
 
   /**
    * 表示されているいいねの数を変更する
