@@ -8,8 +8,8 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { schema } from '../lib/validation'
 import Axios from 'axios'
 import { useRouter } from 'next/router'
-import { AuthContext, AuthStatus, login } from '../lib/auth'
-import { getAuth, User } from 'firebase/auth'
+import { AuthContext, login } from '../lib/auth'
+import { getAuth } from 'firebase/auth'
 
 interface Props {}
 
