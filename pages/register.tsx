@@ -8,13 +8,14 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { schema } from '../lib/validation'
 import Axios from 'axios'
 import { useRouter } from 'next/router'
-import { AuthContext, AuthStatus, AuthStatusType, login } from '../lib/auth'
+import { AuthContext, AuthStatus, login } from '../lib/auth'
 import { getAuth, User } from 'firebase/auth'
 
 interface Props {}
 
 export const Register: NextPage<Props> = (props) => {
-  const currentUser = useContext(AuthContext)
+  const authState = useContext(AuthContext)
+  const currentUser = getAuth().currentUser
   const router = useRouter()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -125,7 +126,7 @@ export const Register: NextPage<Props> = (props) => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
 
-      {currentUser === AuthStatus.NOT_LOGIN && (
+      {authState === 'NOT_LOGIN' && (
         <div>
           <p>キーキャップ素材の投稿にはログインが必要です。</p>
           <ul>
@@ -135,7 +136,7 @@ export const Register: NextPage<Props> = (props) => {
           </ul>
         </div>
       )}
-      {currentUser && (
+      {authState === 'LOGGED_IN' && currentUser && (
         <>
           <Editor
             inputTagAttributes={inputTagAttributes}

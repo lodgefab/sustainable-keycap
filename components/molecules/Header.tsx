@@ -3,17 +3,18 @@ import styled from '@emotion/styled'
 // import LogoImg from '../../images/logo.png'
 import { color, font, media, zIndex } from '../../styles'
 import { User } from 'firebase/auth'
-import { AuthStatus, AuthStatusType } from '../../lib/auth'
+import { AuthStatus } from '../../lib/auth'
 import { Link as Scroll } from 'react-scroll'
 import Link from 'next/link'
 
 interface Props {
-  currentUser: User | AuthStatusType
+  currentUser: User | null
+  authState: AuthStatus
   onLoginFunc: Function
   onLogoutFunc: Function
 }
 
-export const Header: React.VFC<Props> = ({ currentUser, onLoginFunc, onLogoutFunc }) => {
+export const Header: React.VFC<Props> = ({ currentUser, authState, onLoginFunc, onLogoutFunc }) => {
   return (
     <Wrap>
       <Container>
@@ -36,16 +37,14 @@ export const Header: React.VFC<Props> = ({ currentUser, onLoginFunc, onLogoutFun
           </Link>
         </Left>
         {/* TODO: 認証方法を明記する */}
-        {currentUser && (
+        {authState === 'LOGGED_IN' && currentUser && (
           <p>
             {currentUser.displayName} としてログイン中（
             <a onClick={() => onLogoutFunc()}>ログアウト</a>）
           </p>
         )}
-        {currentUser === AuthStatus.NOT_LOGIN && (
-          <button onClick={() => onLoginFunc()}>ログイン</button>
-        )}
-        {/* currentUser === AuthStatus.INITIALING のときはなにも表示させない */}
+        {authState === 'NOT_LOGIN' && <button onClick={() => onLoginFunc()}>ログイン</button>}
+        {/* authState === 'INITIALING' のときはなにも表示させない */}
       </Container>
     </Wrap>
   )
