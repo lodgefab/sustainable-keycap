@@ -1,5 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { ensureFormDataIsValid } from '../../lib/helper'
+import {
+  ensureFormDataIsValid,
+  ensureRequestIsAuthorized,
+  isErrorResponse,
+  respondAsInternalServerError,
+} from '../../lib/helper'
 import multer from 'multer'
 import * as admin from 'firebase-admin'
 import { initAdminFirebase } from '../../lib/admin-firebase'
@@ -20,6 +25,20 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<RegisterApiResp
     res.status(HTTP_STATUS.METHOD_NOT_ALLOWED).json({
       message: `${req.method} is not allowed.`,
     })
+    return
+  }
+
+  try {
+    ensureRequestIsAuthorized(req)
+  } catch (e) {
+    if (isErrorResponse(e)) {
+      res.status(e.status).json({
+        message: e.message,
+      })
+    } else {
+      console.error(e)
+      respondAsInternalServerError(res)
+    }
     return
   }
 
