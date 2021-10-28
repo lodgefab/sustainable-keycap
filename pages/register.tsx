@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import { NextPage } from 'next'
-import React from 'react'
+import React, { useContext } from 'react'
 import { Editor } from '../components/organisms/Editor'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { RegisterForm } from '../types'
@@ -8,10 +8,12 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { schema } from '../lib/validation'
 import Axios from 'axios'
 import { useRouter } from 'next/router'
+import { AuthContext, AuthStatus, login } from '../lib/auth'
 
 interface Props {}
 
 export const Register: NextPage<Props> = (props) => {
+  const currentUser = useContext(AuthContext)
   const router = useRouter()
 
   const {
@@ -111,13 +113,25 @@ export const Register: NextPage<Props> = (props) => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
 
-      <Editor
-        inputTagAttributes={inputTagAttributes}
-        errorMessage={errorsPresented}
-        /* handleSubmitでバリデーションを行った後、エラーが無ければexecuteSubmitが実行される */
-        onClickSubmit={handleSubmit(executeSubmit)}
-        canSubmit={canSubmit}
-      />
+      {currentUser === AuthStatus.NOT_LOGIN && (
+        <div>
+          <p>キーキャップ素材の投稿にはログインが必要です。</p>
+          <ul>
+            <li onClick={login}>
+              <a href='#'>Googleアカウントでログインする</a>
+            </li>
+          </ul>
+        </div>
+      )}
+      {currentUser && (
+        <Editor
+          inputTagAttributes={inputTagAttributes}
+          errorMessage={errorsPresented}
+          /* handleSubmitでバリデーションを行った後、エラーが無ければexecuteSubmitが実行される */
+          onClickSubmit={handleSubmit(executeSubmit)}
+          canSubmit={canSubmit}
+        />
+      )}
     </>
   )
 }
