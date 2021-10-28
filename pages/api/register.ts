@@ -3,6 +3,7 @@ import { ensureFormDataIsValid } from '../../lib/helper'
 import multer from 'multer'
 import * as admin from 'firebase-admin'
 import { initAdminFirebase } from '../../lib/admin-firebase'
+import { HTTP_STATUS } from '../../types'
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -13,8 +14,15 @@ export interface RegisterApiResponse {
   materialId?: string
 }
 
-// TODO: method not allowedな バリデーションを書く
 const handler = async (req: NextApiRequest, res: NextApiResponse<RegisterApiResponse>) => {
+  // POSTリクエスト以外は弾く
+  if (req.method !== 'POST') {
+    res.status(HTTP_STATUS.METHOD_NOT_ALLOWED).json({
+      message: `${req.method} is not allowed.`,
+    })
+    return
+  }
+
   const uploadedImages: any = await new Promise((resolve, reject) => {
     upload.fields([
       { name: 'plasticImage', maxCount: 1 },

@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { FirestoreMaterialDocument, Material } from '../../types'
+import { FirestoreMaterialDocument, HTTP_STATUS, Material } from '../../types'
 import { getSampleMaterialData } from '../../lib/helper'
 import { initAdminFirebase } from '../../lib/admin-firebase'
 import * as admin from 'firebase-admin'
@@ -18,6 +18,14 @@ export const getMaterialsWithoutLogin = async (
   req: NextApiRequest,
   res: NextApiResponse<MaterialsApiResponse>
 ) => {
+  // GETリクエスト以外は弾く
+  if (req.method !== 'GET') {
+    res.status(HTTP_STATUS.METHOD_NOT_ALLOWED).json({
+      message: `${req.method} is not allowed.`,
+    })
+    return
+  }
+
   let materials: Material[] = []
 
   try {

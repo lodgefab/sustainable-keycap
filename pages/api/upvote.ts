@@ -13,6 +13,14 @@ export interface UpvoteFirestoreData extends admin.firestore.DocumentData {
 }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<UpvoteApiResponse>) => {
+  // POSTリクエスト以外は弾く
+  if (req.method !== 'POST') {
+    res.status(HTTP_STATUS.METHOD_NOT_ALLOWED).json({
+      message: `${req.method} is not allowed.`,
+    })
+    return
+  }
+
   const authHeader = req.headers.authorization
 
   if (!authHeader) {
