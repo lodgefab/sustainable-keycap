@@ -1,9 +1,26 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import * as admin from 'firebase-admin'
-import { HTTP_STATUS } from '../../types'
+import { FirestoreMaterialDocument, HTTP_STATUS } from '../../types'
 import { initAdminFirebase } from '../../lib/admin-firebase'
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+export interface UpvoteApiResponse {
+  message: string
+  newGoodCount?: number | null
+}
+
+export interface UpvoteFirestoreData extends admin.firestore.DocumentData {
+  materials: string[]
+}
+
+const handler = async (req: NextApiRequest, res: NextApiResponse<UpvoteApiResponse>) => {
+  // POSTリクエスト以外は弾く
+  if (req.method !== 'POST') {
+    res.status(HTTP_STATUS.METHOD_NOT_ALLOWED).json({
+      message: `${req.method} is not allowed.`,
+    })
+    return
+  }
+
   const authHeader = req.headers.authorization
 
   if (!authHeader) {
@@ -20,11 +37,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return
   }
 
+  let userId: string
+
   try {
     initAdminFirebase()
     const decodedToken = await admin
       .auth()
       .verifyIdToken(authHeader.substring(7, authHeader.length), true)
+    userId = decodedToken.uid
   } catch (error) {
     if (error.code === 'auth/id-token-revoked') {
       // ユーザーがFirebase側で削除・変更されるなどの更新が発生した場合
@@ -45,37 +65,73 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   let targetDoc: admin.firestore.DocumentReference<admin.firestore.DocumentData>
 
-  // TODO: 既にupvoteしている場合はrejectする
+  let db: admin.firestore.Firestore
   try {
-    const db = admin.firestore()
-    targetDoc = await db.collection('keycap-materials').doc(materialId)
-    const response = await targetDoc.update({
-      goodCount: admin.firestore.FieldValue.increment(1),
-    })
+    db = admin.firestore()
   } catch (e) {
-    console.log(e)
+    console.error(e)
     res.status(500).json({
       message: '素材データの更新に失敗しました。',
     })
     return
   }
 
-  // goodCountのインクリメント後、最新のgoodCountの取得を試みる。
-  // 取得できた場合はその値をレスポンスに含めるが、取得できなかった場合もインクリメントには既に成功しているので200を返す
+  let newGoodCount: number
   try {
-    const newData = await targetDoc!.get()
-    const newGoodCount = await newData.get('goodCount')
+    const response = await db.runTransaction(async (t) => {
+      const targetMaterialDoc = await db.collection('keycap-materials').doc(materialId).get()
+      const targetMaterialData = targetMaterialDoc.data() as FirestoreMaterialDocument | undefined
+      // 該当IDのMaterialが見つからない場合、404を返す
+      if (!targetMaterialDoc.exists || targetMaterialData === undefined) {
+        throw {
+          response: HTTP_STATUS.NOT_FOUND,
+          message: '素材データが見つかりません。',
+        }
+      }
 
-    res.status(200).json({
-      message: 'ok',
-      newGoodCount: newGoodCount,
+      const newGoodCount = targetMaterialData.goodCount + 1
+
+      const upvoteRecordDoc = await db.collection('upvotes').doc(userId).get()
+      const upvoteRecord = upvoteRecordDoc.data() as UpvoteFirestoreData | undefined
+
+      // 既にUpvote済みの場合、409を返す
+      if (upvoteRecordDoc.exists && upvoteRecord?.materials.includes(materialId)) {
+        throw {
+          response: HTTP_STATUS.CONFLICT,
+          message: '既にUpvote済みの素材データです。',
+        }
+      }
+
+      await t.update(db.collection('keycap-materials').doc(materialId), {
+        goodCount: newGoodCount,
+      })
+
+      await t.update(db.collection('upvotes').doc(userId), {
+        materials: admin.firestore.FieldValue.arrayUnion(materialId),
+      })
+
+      return newGoodCount
     })
+
+    newGoodCount = response
   } catch (e) {
-    res.status(200).json({
-      message: 'ok',
-      newGoodCount: null,
-    })
+    if (e.response && e.message) {
+      res.status(e.response).json({
+        message: e.message,
+      })
+    } else {
+      console.error(e)
+      res.status(500).json({
+        message: '素材データの更新に失敗しました。',
+      })
+    }
+    return
   }
+
+  res.status(200).json({
+    message: 'ok',
+    newGoodCount: newGoodCount,
+  })
 }
 
 export default handler

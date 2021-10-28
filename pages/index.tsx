@@ -6,6 +6,9 @@ import { Material } from '../types'
 import axios from 'axios'
 import { AuthContext, AuthStatus } from '../lib/auth'
 import { fetchMaterialsWithAuth } from '../lib/helper'
+import { MaterialsApiResponse } from './api/materials'
+import Axios from 'axios'
+import { UpvoteApiResponse } from './api/upvote'
 
 export const Index: NextPage = () => {
   const currentUser = useContext(AuthContext)
@@ -16,17 +19,29 @@ export const Index: NextPage = () => {
   // 認証の初期化が完了し、ログイン状態が変化した時にキーキャップ素材データを取得する処理
   useEffect(() => {
     ;(async () => {
-      let data
+      let data: Material[]
       if (currentUser) {
-        data = await fetchMaterialsWithAuth()
-        setMaterials(data)
-        setUpvotableMaterials(data.map((material) => material.id))
+        const fetchResult = await fetchMaterialsWithAuth()
+        setMaterials(fetchResult.materials)
+        setUpvotableMaterials(
+          fetchResult.materials
+            .filter((material) => !fetchResult.alreadyUpvoted.includes(material.id))
+            .map((material) => material.id)
+        )
       } else if (currentUser === AuthStatus.NOT_LOGIN) {
-        const response = await axios.get<Material[]>('/api/materials').then((res) => res.data)
-        // @ts-ignore
-        data = response.materials
-        setMaterials(data)
-        setUpvotableMaterials([])
+        try {
+          const response = await axios
+            .get<MaterialsApiResponse>('/api/materials')
+            .then((res) => res.data)
+          data = response.materials!
+          setMaterials(data)
+          setUpvotableMaterials([])
+        } catch (e) {
+          if (Axios.isAxiosError(e) && e.response) {
+            console.log(e)
+          }
+          console.log(e)
+        }
       } else {
         return
       }
@@ -54,7 +69,7 @@ export const Index: NextPage = () => {
    * @param materialId いいねを増やすキーキャップ素材のID
    */
   const upvote = async (materialId: string) => {
-    // 二重送信防止
+    // 二重送信・既にUpvote済みの素材に対する再送信の防止
     if (!upvotableMaterials.includes(materialId)) {
       return
     }
@@ -69,7 +84,7 @@ export const Index: NextPage = () => {
     const idToken = await currentUser.getIdToken(true)
 
     try {
-      const response = await axios.post(
+      const response = await axios.post<UpvoteApiResponse>(
         '/api/upvote',
         {
           materialId: materialId,
@@ -82,9 +97,7 @@ export const Index: NextPage = () => {
         }
       )
 
-      // @ts-ignore TODO: 型を書く
       if (response.data.newGoodCount) {
-        // @ts-ignore
         await setGoodCount(materialId, response.data.newGoodCount)
       }
     } catch (error) {

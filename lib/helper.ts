@@ -3,6 +3,8 @@ import { firebaseClientApp, getCurrentUser } from './auth'
 import {
   collection,
   DocumentData,
+  doc,
+  getDoc,
   getDocs,
   getFirestore,
   QueryDocumentSnapshot,
@@ -102,9 +104,34 @@ const fromFirestore = (snapshot: QueryDocumentSnapshot, options: SnapshotOptions
   }
 }
 
-export const fetchMaterialsWithAuth = async (): Promise<Material[]> => {
+export const upvoteMaterial = async () => {
   if (getCurrentUser() === null) {
+    throw new Error('Authentication is required to upvote.')
+  }
+
+  const querySnapshot = await getDocs(
+    collection(getFirestore(firebaseClientApp), 'keycap-materials')
+  )
+}
+
+export interface FetchMaterialsWithAuthResult {
+  materials: Material[]
+  alreadyUpvoted: string[]
+}
+
+export const fetchMaterialsWithAuth = async (): Promise<FetchMaterialsWithAuthResult> => {
+  const currentUser = getCurrentUser()
+  if (currentUser === null) {
     throw new Error('Authentication is required to fetch material data.')
+  }
+
+  const upvotesQuerySnapshot = await getDoc(
+    doc(getFirestore(firebaseClientApp), 'upvotes', currentUser.uid)
+  )
+
+  let alreadyUpvotedMaterials: string[] = []
+  if (upvotesQuerySnapshot.exists()) {
+    alreadyUpvotedMaterials = upvotesQuerySnapshot.data().materials
   }
 
   const querySnapshot = await getDocs(
@@ -112,7 +139,7 @@ export const fetchMaterialsWithAuth = async (): Promise<Material[]> => {
   )
   const storage = getStorage(firebaseClientApp)
 
-  return await Promise.all(
+  const materials = await Promise.all(
     querySnapshot.docs.map(async (doc) => {
       const data = doc.data() as FirestoreMaterialDocument // TODO: as 使わずにいい感じに型付けたい
 
@@ -145,4 +172,9 @@ export const fetchMaterialsWithAuth = async (): Promise<Material[]> => {
       }
     })
   )
+
+  return {
+    materials: materials,
+    alreadyUpvoted: alreadyUpvotedMaterials,
+  }
 }
