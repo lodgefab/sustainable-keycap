@@ -8,25 +8,41 @@ const Article = styled.article`
 `
 
 interface Props {
-  data: Material
+  material: Material
+  canUpvote: boolean
+  upvote: Function
 }
 
-export const MaterialProfile: React.VFC<Props> = ({ data }) => {
+export const MaterialProfile: React.VFC<Props> = ({ material, canUpvote, upvote }) => {
+  const {
+    id,
+    materialName,
+    keycapImageUrl,
+    plasticImageUrl,
+    goodCount,
+    colorType,
+    plasticType,
+    note,
+  } = material
+
   return (
     <Article>
-      <h1>{data.materialName}</h1>
-      <Image src={data.keycapImageUrl} alt='キーキャップ画像' width={100} height={50} />
-      <Image src={data.plasticImageUrl} alt='キーキャップ画像' width={50} height={50} />
-      <p>{data.goodCount}</p>
+      <h1>{materialName}</h1>
+      <button onClick={() => upvote(id)} disabled={!canUpvote}>
+        Upvote
+      </button>
+      <Image src={keycapImageUrl} alt='キーキャップ画像' width={100} height={50} />
+      <Image src={plasticImageUrl} alt='キーキャップ画像' width={50} height={50} />
+      <p>{goodCount}</p>
       <dl>
         <dt>色の系統</dt>
-        <dd>{data.colorType}</dd>
+        <dd>{colorType}</dd>
 
         <dt>プラスチックの種類</dt>
-        <dd>{data.plasticType}</dd>
+        <dd>{plasticType}</dd>
 
         <dt>備考</dt>
-        <dd>{data.note}</dd>
+        <dd>{note}</dd>
       </dl>
     </Article>
   )

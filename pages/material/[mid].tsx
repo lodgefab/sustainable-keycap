@@ -1,123 +1,152 @@
 import Head from 'next/head'
-import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType, NextPage } from 'next'
-import React from 'react'
+import { NextPage } from 'next'
+import React, { useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import * as admin from 'firebase-admin'
 import { Material } from '../../types'
-import dayjs from 'dayjs'
 import { MaterialProfile } from '../../components/organisms/MaterialProfile'
-import { initAdminFirebase } from '../../lib/admin-firebase'
+import axios from 'axios'
+import { AuthContext } from '../../lib/auth'
+import { getAuth } from 'firebase/auth'
+import { MaterialApiResponse } from '../api/materials/[materialId]'
+import { fetchMaterialWithAuth } from '../../lib/helper'
+import { UpvoteApiResponse } from '../api/upvote'
 
-type Props = InferGetStaticPropsType<typeof getStaticProps>
+interface Props {}
 
-export const getStaticPaths: GetStaticPaths = async (context) => {
-  initAdminFirebase()
-  const db = admin.firestore()
-  const querySnapshot = await db.collection('keycap-materials').get()
-  const materialIds = querySnapshot.docs.map((doc) => `/material/${doc.id.toString()}`)
-
-  return {
-    paths: materialIds,
-    fallback: true,
-  }
-}
-
-export const getStaticProps: GetStaticProps<
-  { materialId: string | null; data?: Material },
-  { mid: string }
-> = async ({ params }) => {
-  const materialId = params?.mid ? params.mid : null
-
-  if (!materialId) {
-    return {
-      props: {
-        materialId: null,
-      },
-    }
-  }
-
-  initAdminFirebase()
-  const db = admin.firestore()
-  const querySnapshot = await db.collection('keycap-materials').doc(materialId).get()
-  const data = querySnapshot.data()
-
-  if (!data) {
-    return {
-      props: {
-        materialId: null,
-      },
-    }
-  }
-
-  const imageFiles = (
-    await admin
-      .storage()
-      .bucket()
-      .getFiles({
-        prefix: `images/${materialId}/`,
-        delimiter: '/',
-      })
-  )[0]
-
-  let plasticImageUrl: string = 'hoge/huga.png' // TODO: 画像が取得できなかったときのデフォルト画像を用意する
-  let keycapImageUrl: string = 'hoge/huga.png' // TODO: 画像が取得できなかったときのデフォルト画像を用意する
-  for (const file of imageFiles) {
-    if (file.name.startsWith(`images/${materialId}/plasticImage`)) {
-      plasticImageUrl = (
-        await file.getSignedUrl({
-          action: 'read',
-          expires: dayjs().add(1, 'day').format('MM-DD-YYYY'),
-        })
-      )[0]
-    } else if (file.name.startsWith(`images/${materialId}/keycapImage`)) {
-      keycapImageUrl = (
-        await file.getSignedUrl({
-          action: 'read',
-          expires: dayjs().add(1, 'day').format('MM-DD-YYYY'),
-        })
-      )[0]
-    }
-  }
-
-  return {
-    props: {
-      materialId: materialId,
-      data: {
-        id: materialId,
-        materialName: data.materialName,
-        colorType: data.colorType,
-        plasticType: data.plasticType,
-        goodCount: data.goodCount,
-        celsius: data.celsius,
-        plasticImageUrl: plasticImageUrl,
-        keycapImageUrl: keycapImageUrl,
-        note: data.note,
-      },
-    },
-  }
-}
-
-export const MaterialDetailPage: NextPage<Props> = ({ materialId, data }) => {
+export const MaterialDetailPage: NextPage<Props> = () => {
   const router = useRouter()
+  const authState = useContext(AuthContext)
+  const { currentUser } = getAuth()
+  const [isFound, setIsFound] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [material, setMaterial] = useState<Material | null>(null)
+  const [canUpvote, setCanUpvote] = useState<boolean>(false)
+  const [error, setError] = useState<string | null>(null)
 
-  if (router.isFallback) {
+  const { mid } = router.query
+
+  // 認証の初期化が完了し、ログイン状態が変化した時にキーキャップ素材データを取得する処理
+  useEffect(() => {
+    ;(async () => {
+      if (authState === 'INITIALIZING') {
+        return
+      }
+
+      if (typeof mid !== 'string' || mid.length === 0) {
+        setIsFound(false)
+        setIsLoading(false)
+        return
+      }
+
+      if (authState === 'LOGGED_IN' && currentUser) {
+        try {
+          const { material, isAlreadyUpvoted } = await fetchMaterialWithAuth(mid)
+          setMaterial(material)
+          setCanUpvote(!isAlreadyUpvoted)
+          setIsFound(true)
+        } catch (e) {
+          setIsFound(false)
+        } finally {
+          setIsLoading(false)
+        }
+      } else if (authState === 'NOT_LOGIN') {
+        try {
+          const response = await axios
+            .get<MaterialApiResponse>(`/api/materials/${mid}`) // TODO: URLエンコーディング + バリデーション
+            .then((res) => res.data)
+          const material = response.material!
+          setMaterial(material)
+          setCanUpvote(false)
+          setIsFound(true)
+        } catch (e) {
+          console.log(e)
+          if (axios.isAxiosError(e) && e.response) {
+          }
+          setIsFound(false)
+        } finally {
+          setIsLoading(false)
+        }
+      } else {
+        return
+      }
+    })()
+  }, [currentUser, authState])
+
+  /**
+   * 表示されているいいねの数を変更する
+   * @param materialId 変更するキーキャップ素材のID
+   * @param count 変更後のいいねの数
+   */
+  const setGoodCount = async (count: number) => {
+    if (!material) {
+      return
+    }
+
+    await setMaterial({
+      ...material,
+      goodCount: count,
+    })
+  }
+
+  /**
+   * いいねを増やす
+   */
+  const upvote = async () => {
+    // 二重送信・既にUpvote済みの素材に対する再送信の防止
+    // 未ログイン状態での送信は禁止
+    // 投稿データが読み込まれていない段階での操作は禁止
+    if (!canUpvote || !currentUser || !material) {
+      return
+    }
+
+    setCanUpvote(false)
+
+    const idToken = await currentUser.getIdToken(true)
+
+    try {
+      const response = await axios.post<UpvoteApiResponse>(
+        '/api/upvote',
+        {
+          materialId: material.id,
+        },
+        {
+          headers: {
+            'content-type': 'application/json',
+            Authorization: `Bearer ${idToken}`,
+          },
+        }
+      )
+
+      if (response.data.newGoodCount) {
+        await setGoodCount(response.data.newGoodCount)
+      }
+    } catch (error) {
+      console.error(error)
+      setError('いいねに失敗しました。時間を置いてやり直してください。')
+      setCanUpvote(true)
+    }
+  }
+
+  if (isLoading) {
     return <div>Loading...</div>
-  } else if (!materialId || !data) {
-    return <div>Invalid</div> /* TODO: 書く */
-  } else {
+  } else if (!isFound) {
+    return <div>キーキャップ素材が見つかりませんでした。</div>
+  } else if (material) {
     return (
       <>
         <Head>
-          <title>素材を登録</title>
-          <meta name='description' content='Generated by create next app' />
+          <title>{material.materialName} の詳細</title>
           <link rel='icon' href='/favicon.ico' />
         </Head>
 
-        <MaterialProfile data={data} />
+        <MaterialProfile material={material} canUpvote={canUpvote} upvote={upvote} />
 
         {router.query.action === 'register' && <p>投稿が完了しました</p>}
+        {error && <p>{error}</p>}
       </>
     )
+  } else {
+    return <p>エラーが発生しました。時間を置いてやり直してください。</p> /* TODO: 書く */
   }
 }
 
