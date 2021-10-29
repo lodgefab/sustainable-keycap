@@ -63,8 +63,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<UpvoteApiRespon
 
   initAdminFirebase()
 
-  let targetDoc: admin.firestore.DocumentReference<admin.firestore.DocumentData>
-
   let db: admin.firestore.Firestore
   try {
     db = admin.firestore()
@@ -78,7 +76,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<UpvoteApiRespon
 
   let newGoodCount: number
   try {
-    const response = await db.runTransaction(async (t) => {
+    newGoodCount = await db.runTransaction(async (t) => {
       const targetMaterialDoc = await db.collection('keycap-materials').doc(materialId).get()
       const targetMaterialData = targetMaterialDoc.data() as FirestoreMaterialDocument | undefined
       // 該当IDのMaterialが見つからない場合、404を返す
@@ -106,14 +104,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<UpvoteApiRespon
         goodCount: newGoodCount,
       })
 
-      await t.update(db.collection('upvotes').doc(userId), {
-        materials: admin.firestore.FieldValue.arrayUnion(materialId),
-      })
+      await t.set(
+        db.collection('upvotes').doc(userId),
+        {
+          materials: admin.firestore.FieldValue.arrayUnion(materialId),
+        },
+        { merge: true }
+      )
 
       return newGoodCount
     })
-
-    newGoodCount = response
   } catch (e) {
     if (e.response && e.message) {
       res.status(e.response).json({

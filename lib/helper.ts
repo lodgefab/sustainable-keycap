@@ -2,8 +2,8 @@ import { FirestoreMaterialDocument, HTTP_STATUS, Material, ResponseData } from '
 import { firebaseClientApp, getCurrentUser } from './auth'
 import {
   collection,
-  DocumentData,
   doc,
+  DocumentData,
   getDoc,
   getDocs,
   getFirestore,
@@ -113,6 +113,74 @@ export const upvoteMaterial = async () => {
   const querySnapshot = await getDocs(
     collection(getFirestore(firebaseClientApp), 'keycap-materials')
   )
+}
+
+export interface FetchMaterialWithAuthResult {
+  material: Material
+  isAlreadyUpvoted: boolean
+}
+
+export const fetchMaterialWithAuth = async (
+  materialId: string
+): Promise<FetchMaterialWithAuthResult> => {
+  const currentUser = getCurrentUser()
+  if (currentUser === null) {
+    throw {
+      status: HTTP_STATUS.UNAUTHORIZED,
+      message: 'Authentication is required to fetch material data.',
+    }
+  }
+
+  const app = getFirestore(firebaseClientApp)
+
+  const upvotesQuerySnapshot = await getDoc(doc(app, 'upvotes', currentUser.uid))
+
+  let isAlreadyUpvoted: boolean
+  if (upvotesQuerySnapshot.exists()) {
+    isAlreadyUpvoted = upvotesQuerySnapshot.data().materials.includes(materialId)
+  } else {
+    isAlreadyUpvoted = false
+  }
+
+  const querySnapshot = await getDoc(doc(app, 'keycap-materials', materialId))
+
+  if (!querySnapshot.exists()) {
+    throw {
+      status: HTTP_STATUS.NOT_FOUND,
+      message: `Material with Id = ${materialId} was not found.`,
+    }
+  }
+  const data = querySnapshot.data() as FirestoreMaterialDocument // TODO: as 使わずにいい感じに型付けたい
+  const { id } = querySnapshot
+
+  const storage = getStorage(firebaseClientApp)
+
+  const listResult = await listAll(ref(storage, `images/${id}/`))
+
+  const plasticImageFile = listResult.items.filter((item) =>
+    item.name.startsWith('plasticImage')
+  )[0]
+  const keycapImageFile = listResult.items.filter((item) => item.name.startsWith('keycapImage'))[0]
+
+  const plasticImageUrl = await getDownloadURL(
+    ref(storage, `images/${id}/${plasticImageFile.name}`)
+  )
+  const keycapImageUrl = await getDownloadURL(ref(storage, `images/${id}/${keycapImageFile.name}`))
+
+  return {
+    material: {
+      id: id,
+      materialName: data.materialName,
+      colorType: data.colorType,
+      plasticType: data.plasticType,
+      goodCount: data.goodCount,
+      plasticImageUrl: plasticImageUrl,
+      keycapImageUrl: keycapImageUrl,
+      celsius: data.celsius,
+      note: data.note,
+    },
+    isAlreadyUpvoted: isAlreadyUpvoted,
+  }
 }
 
 export interface FetchMaterialsWithAuthResult {
