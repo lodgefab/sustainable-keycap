@@ -1,14 +1,47 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { ensureFormDataIsValid } from '../../lib/helper'
+import {
+  ensureFormDataIsValid,
+  ensureRequestIsAuthorized,
+  isErrorResponse,
+  respondAsInternalServerError,
+} from '../../lib/helper'
 import multer from 'multer'
 import * as admin from 'firebase-admin'
 import { initAdminFirebase } from '../../lib/admin-firebase'
+import { HTTP_STATUS } from '../../types'
 
 const upload = multer({
   storage: multer.memoryStorage(),
 })
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+export interface RegisterApiResponse {
+  message: string
+  materialId?: string
+}
+
+const handler = async (req: NextApiRequest, res: NextApiResponse<RegisterApiResponse>) => {
+  // POSTリクエスト以外は弾く
+  if (req.method !== 'POST') {
+    res.status(HTTP_STATUS.METHOD_NOT_ALLOWED).json({
+      message: `${req.method} is not allowed.`,
+    })
+    return
+  }
+
+  try {
+    ensureRequestIsAuthorized(req)
+  } catch (e) {
+    if (isErrorResponse(e)) {
+      res.status(e.status).json({
+        message: e.message,
+      })
+    } else {
+      console.error(e)
+      respondAsInternalServerError(res)
+    }
+    return
+  }
+
   const uploadedImages: any = await new Promise((resolve, reject) => {
     upload.fields([
       { name: 'plasticImage', maxCount: 1 },
@@ -54,65 +87,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       message: 'サーバーエラーにより素材データの登録ができませんでした。',
     })
   }
-
-  // const client = createClient({
-  //   accessToken: process.env.KEYCAP_CONTENTFUL_ACCESS_TOKEN!,
-  // })
-  // const space = await client.getSpace(process.env.KEYCAP_CONTENTFUL_SPACE_ID!)
-  // const environment = await space.getEnvironment(process.env.KEYCAP_CONTENTFUL_ENVIRONMENT_ID!)
-  //
-  // try {
-  //   const plasticAssetTmp1 = await environment.createAssetFromFiles({
-  //     fields: {
-  //       title: {
-  //         'en-US': `plasticImage-${+new Date()}`,
-  //       },
-  //       description: {
-  //         'en-US': 'Uploaded in development mode',
-  //       },
-  //       file: {
-  //         'en-US': {
-  //           contentType: uploadedImages.plasticImage[0].mimetype,
-  //           fileName: uploadedImages.plasticImage[0].originalname,
-  //           file: uploadedImages.plasticImage[0].buffer,
-  //         },
-  //       },
-  //     },
-  //   })
-  //   const plasticAssetTmp2 = await plasticAssetTmp1.processForAllLocales()
-  //   const plasticAsset = await plasticAssetTmp2.publish()
-  //
-  //   const keycapAssetTmp1 = await environment.createAssetFromFiles({
-  //     fields: {
-  //       title: {
-  //         'en-US': `keycapImage-${+new Date()}`,
-  //       },
-  //       description: {
-  //         'en-US': 'Uploaded in development mode',
-  //       },
-  //       file: {
-  //         'en-US': {
-  //           contentType: uploadedImages.keycapImage[0].mimetype,
-  //           fileName: uploadedImages.keycapImage[0].originalname,
-  //           file: uploadedImages.keycapImage[0].buffer,
-  //         },
-  //       },
-  //     },
-  //   })
-  //   const keycapAssetTmp2 = await keycapAssetTmp1.processForAllLocales()
-  //   const keycapAsset = await keycapAssetTmp2.publish()
-  //
-  //   const insertedEntry = await environment.createEntry(
-  //     process.env.KEYCAP_CONTENTFUL_CONTENT_TYPE!,
-  //     { fields: convertFormInputToContentfulModel(req.body, plasticAsset, keycapAsset) }
-  //   )
-  //   await insertedEntry.publish()
-  // } catch (e) {
-  //   res.status(500).json({
-  //     message: 'Error white saving data',
-  //   })
-  //   return
-  // }
 }
 
 export const config = {

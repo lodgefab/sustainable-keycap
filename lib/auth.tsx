@@ -1,5 +1,12 @@
 import { initializeApp } from 'firebase/app'
-import { getAuth, GoogleAuthProvider, signInWithRedirect, signOut, User } from 'firebase/auth'
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithRedirect,
+  signOut,
+  User,
+  onAuthStateChanged,
+} from 'firebase/auth'
 import React, { createContext, useEffect, useState } from 'react'
 import Router from 'next/router'
 
@@ -37,17 +44,18 @@ export const getCurrentUser = (): User | null => {
 }
 
 // ログイン状況を表すUnion
-export type AuthStatusType = any
-export const AuthStatus = {
-  NOT_LOGIN: null as AuthStatusType, // 未ログイン状態
-  INITIALIZING: undefined as AuthStatusType, // ページを開いた直後に、ログイン状況を取得している段階の状態
-} as const
-export const AuthContext = createContext<User | AuthStatusType>(AuthStatus.INITIALIZING)
+// NOT_LOGIN = 未ログイン状態
+// INITIALIZING = ページを開いた直後に、ログイン状況を取得している段階の状態
+// LOGGED_IN = ログイン状態
+export type AuthStatus = 'NOT_LOGIN' | 'INITIALIZING' | 'LOGGED_IN'
+export const AuthContext = createContext<AuthStatus>('INITIALIZING')
 
 export const AuthProvider: React.FC = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<User | AuthStatusType>(AuthStatus.INITIALIZING)
+  const [currentUser, setCurrentUser] = useState<AuthStatus>('INITIALIZING')
   useEffect(() => {
-    auth.onAuthStateChanged(setCurrentUser)
+    onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user ? 'LOGGED_IN' : 'NOT_LOGIN')
+    })
   }, [])
 
   return <AuthContext.Provider value={currentUser}>{children}</AuthContext.Provider>

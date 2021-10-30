@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import { NextPage } from 'next'
-import React from 'react'
+import React, { useContext, useState } from 'react'
 import { Editor } from '../components/organisms/Editor'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { RegisterForm } from '../types'
@@ -8,11 +8,16 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { schema } from '../lib/validation'
 import Axios from 'axios'
 import { useRouter } from 'next/router'
+import { AuthContext, login } from '../lib/auth'
+import { getAuth } from 'firebase/auth'
 
 interface Props {}
 
 export const Register: NextPage<Props> = (props) => {
+  const authState = useContext(AuthContext)
+  const currentUser = getAuth().currentUser
   const router = useRouter()
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const {
     register,
@@ -65,6 +70,11 @@ export const Register: NextPage<Props> = (props) => {
    * @param rawData ユーザーがフォームに入力した情報
    */
   const executeSubmit: SubmitHandler<RegisterForm> = async (rawData) => {
+    // 未ログイン状態での送信は禁止
+    if (!currentUser) {
+      return
+    }
+
     const data = new FormData()
     data.append('plasticImage', rawData.plasticImage[0])
     data.append('keycapImage', rawData.keycapImage[0])
@@ -74,9 +84,12 @@ export const Register: NextPage<Props> = (props) => {
     data.append('celsius', rawData.celsius.toString())
     data.append('note', rawData.note)
 
+    const idToken = await currentUser.getIdToken(true)
+
     const response = await Axios.post('/api/register', data, {
       headers: {
         'content-type': 'multipart/form-data',
+        Authorization: `Bearer ${idToken}`,
       },
     })
 
@@ -86,6 +99,8 @@ export const Register: NextPage<Props> = (props) => {
         pathname: `/material/${response.data.materialId}`,
         query: { action: 'register' },
       })
+    } else {
+      setErrorMessage('投稿に失敗しました。時間を置いてやり直してください。')
     }
   }
 
@@ -111,13 +126,28 @@ export const Register: NextPage<Props> = (props) => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
 
-      <Editor
-        inputTagAttributes={inputTagAttributes}
-        errorMessage={errorsPresented}
-        /* handleSubmitでバリデーションを行った後、エラーが無ければexecuteSubmitが実行される */
-        onClickSubmit={handleSubmit(executeSubmit)}
-        canSubmit={canSubmit}
-      />
+      {authState === 'NOT_LOGIN' && (
+        <div>
+          <p>キーキャップ素材の投稿にはログインが必要です。</p>
+          <ul>
+            <li onClick={login}>
+              <a href='#'>Googleアカウントでログインする</a>
+            </li>
+          </ul>
+        </div>
+      )}
+      {authState === 'LOGGED_IN' && currentUser && (
+        <>
+          <Editor
+            inputTagAttributes={inputTagAttributes}
+            errorMessage={errorsPresented}
+            /* handleSubmitでバリデーションを行った後、エラーが無ければexecuteSubmitが実行される */
+            onClickSubmit={handleSubmit(executeSubmit)}
+            canSubmit={canSubmit}
+          />
+          {errorMessage && <p>{errorMessage}</p>}
+        </>
+      )}
     </>
   )
 }
