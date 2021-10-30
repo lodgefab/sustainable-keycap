@@ -434,8 +434,10 @@ const ProgramDesc = styled.p`
 
 const WorkshopInfo = styled.div`
   display: flex;
-  flex-direction: column;
-
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
   width: 100%;
 `
 
