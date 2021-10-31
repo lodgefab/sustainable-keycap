@@ -1,7 +1,8 @@
-import React, { InputHTMLAttributes, TextareaHTMLAttributes } from 'react'
+import React, { InputHTMLAttributes, TextareaHTMLAttributes, useState } from 'react'
 import styled from '@emotion/styled'
 import { InternalFieldName } from 'react-hook-form/dist/types/fields'
 import { ChangeHandler, RefCallBack } from 'react-hook-form/dist/types/form'
+import ColorPicker from './ColorPicker'
 
 const Form = styled.form`
   padding-top: 60px; // ヘッダーに隠れている部分が見えなくなってしまうのでその分下にずらすための暫定的な対応
@@ -9,6 +10,14 @@ const Form = styled.form`
 
 const FormItem = styled.div`
   margin: 20px auto;
+  position: relative;
+`
+
+const ColorPickerWrapper = styled.div`
+  position: absolute;
+  background: #ffffff;
+  z-index: 1;
+  top: 40px;
 `
 
 const ErrorMessage = styled.p`
@@ -27,7 +36,7 @@ interface Props {
     plasticImage: InputTagAttributes<React.InputHTMLAttributes<HTMLInputElement>>
     keycapImage: InputTagAttributes<InputHTMLAttributes<HTMLInputElement>>
     materialName: InputTagAttributes<InputHTMLAttributes<HTMLInputElement>>
-    colorType: InputTagAttributes<InputHTMLAttributes<HTMLSelectElement>>
+    colorType: InputTagAttributes<InputHTMLAttributes<HTMLInputElement>>
     plasticType: InputTagAttributes<InputHTMLAttributes<HTMLSelectElement>>
     celsius: InputTagAttributes<InputHTMLAttributes<HTMLInputElement>>
     note: InputTagAttributes<TextareaHTMLAttributes<HTMLTextAreaElement>>
@@ -51,8 +60,26 @@ export const Editor: React.VFC<Props> = ({
   onClickSubmit,
   canSubmit,
 }) => {
+  const [isColorPickerVisible, setColorPickerVisibility] = useState<boolean>(false)
+
+  /**
+   * フォームのどこかをクリックした時にカラーピッカーを非表示にする
+   * NOTE: 「色の系統」をクリックした時はonClickColorForm内でstopPropagation()が実行されるのでこの処理は呼び出されない
+   */
+  const onClickForm = () => {
+    setColorPickerVisibility(false)
+  }
+
+  /**
+   * 「色の系統」をクリックした時にカラーピッカーを表示する
+   */
+  const onClickColorForm = (event: React.MouseEvent) => {
+    event.stopPropagation() // onClickForm()が実行されないようにイベント伝搬を止める
+    setColorPickerVisibility(true)
+  }
+
   return (
-    <Form>
+    <Form onClick={onClickForm}>
       <FormItem>
         <label htmlFor='plastic-image'>廃プラ画像を追加</label>
         <input
@@ -89,19 +116,15 @@ export const Editor: React.VFC<Props> = ({
         )}
       </FormItem>
 
-      <FormItem>
+      <FormItem onClick={onClickColorForm}>
         <label htmlFor='color-type'>色の系統</label>
-        <select id='color-type' required {...inputTagAttributes.colorType}>
-          <option value=''>選択してください</option>
-          <option value='red'>赤</option>
-          <option value='blue'>青</option>
-          <option value='green'>緑</option>
-          <option value='black'>黒</option>
-          <option value='white'>白</option>
-        </select>
+        <input type='text' id='color-type' {...inputTagAttributes.colorType} readOnly />
         {errorMessage.colorType && (
           <ErrorMessage key='colorType-error'>{errorMessage.colorType}</ErrorMessage>
         )}
+        <ColorPickerWrapper style={{ display: isColorPickerVisible ? 'block' : 'none' }}>
+          <ColorPicker />
+        </ColorPickerWrapper>
       </FormItem>
 
       <FormItem>

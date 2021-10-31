@@ -2,7 +2,7 @@ import Head from 'next/head'
 import { NextPage } from 'next'
 import React, { useContext, useState } from 'react'
 import { Editor } from '../components/organisms/Editor'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { RegisterForm } from '../types'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { schema } from '../lib/validation'
@@ -19,17 +19,18 @@ export const Register: NextPage<Props> = (props) => {
   const router = useRouter()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, dirtyFields },
-  } = useForm<RegisterForm>({
+  const methods = useForm<RegisterForm>({
     mode: 'all',
     resolver: yupResolver(schema, {
       abortEarly: false,
     }),
     criteriaMode: 'all',
   })
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, dirtyFields },
+  } = methods
 
   /**
    * 設定温度を入力するフォームで数字以外の入力を弾くためのフィルタリング処理
@@ -137,7 +138,7 @@ export const Register: NextPage<Props> = (props) => {
         </div>
       )}
       {authState === 'LOGGED_IN' && currentUser && (
-        <>
+        <FormProvider {...methods}>
           <Editor
             inputTagAttributes={inputTagAttributes}
             errorMessage={errorsPresented}
@@ -146,7 +147,7 @@ export const Register: NextPage<Props> = (props) => {
             canSubmit={canSubmit}
           />
           {errorMessage && <p>{errorMessage}</p>}
-        </>
+        </FormProvider>
       )}
     </>
   )
