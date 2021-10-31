@@ -1,4 +1,4 @@
-export const colorTypeItems: ReadonlyArray<string> = [
+export const hexColorTypeItems: ReadonlyArray<string> = [
   '#ffcdd2',
   '#e57373',
   '#f44336',
@@ -94,22 +94,26 @@ export const colorTypeItems: ReadonlyArray<string> = [
   '#969696',
   '#525252',
   '#000000',
-]
+] as const
+export type HexColorType = typeof hexColorTypeItems[number]
 
-export type ColorType = typeof colorTypeItems[number]
-
-export const plasticTypeItems: ReadonlyArray<string> = [
-  'plastic-a',
-  'plastic-b',
-  'plastic-c',
-  'plastic-d',
+export const categorisedColorTypeItems: ReadonlyArray<string> = [
+  'red',
+  'blue',
+  'green',
+  'black',
+  'white',
 ]
+export type CategorisedColorType = typeof categorisedColorTypeItems[number]
+
+export const plasticTypeItems: ReadonlyArray<string> = ['PP', 'PE', 'PS']
 export type PlasticType = typeof plasticTypeItems[number]
 
 export interface Material {
   id: string
   materialName: string
-  colorType: 'red' | 'blue' | 'green' | 'black' | 'white'
+  hexColor: HexColorType
+  categorisedColor: CategorisedColorType
   plasticType: string
   goodCount: number
   plasticImageUrl: string
@@ -118,58 +122,44 @@ export interface Material {
   note: string
 }
 
+export interface RegisterRequestFromClient {
+  materialName: string
+  hexColor: HexColorType
+  plasticType: PlasticType
+  celsius: string // 実質的な値は整数値だが、フォームの使用上文字列の型として渡ってくる
+  note: string
+}
+
 export interface FirestoreMaterialDocument {
   materialName: string
-  colorType: 'red' | 'blue' | 'green' | 'black' | 'white'
-  plasticType: string
-  goodCount: number
-  celsius: number
-  note: string
-}
-
-export interface ContentfulMaterialResponse {
-  materialName: string
-  plasticImage: File
-  keycapImage: File
-  colorType: ColorType
-  colorHex: string
+  hexColor: HexColorType
+  categorisedColor: CategorisedColorType
   plasticType: PlasticType
-  goodCount: number
   celsius: number
   note: string
-}
-
-export interface ContentfulMaterialRequest {
-  materialName: { 'en-US': string }
-  plasticImage: { 'en-US': any }
-  keycapImage: { 'en-US': any }
-  colorType: { 'en-US': ColorType }
-  colorHex: { 'en-US': string }
-  plasticType: { 'en-US': PlasticType }
-  goodCount: { 'en-US': number }
-  celsius: { 'en-US': number }
-  note: { 'en-US': string }
+  goodCount: number
+  createdAt: Date
 }
 
 export interface RegisterForm {
   plasticImage: FileList
   keycapImage: FileList
   materialName: string
-  colorType: string
+  hexColor: string
   plasticType: string
   celsius: number
   note: string
 }
 
-export interface RegisterRequestFromClient {
-  plasticImage: BinaryData
-  keycapImage: BinaryData
-  materialName: string
-  colorType: string
-  plasticType: string
-  celsius: string // 受け取るのは数値だが、FormData()の仕様上文字列で送られてくる
-  note: string
-}
+// export interface RegisterRequestFromClient {
+//   plasticImage: BinaryData
+//   keycapImage: BinaryData
+//   materialName: string
+//   colorType: string
+//   plasticType: string
+//   celsius: string // 受け取るのは数値だが、FormData()の仕様上文字列で送られてくる
+//   note: string
+// }
 
 export const HTTP_STATUS = {
   BAD_REQUEST: 400,

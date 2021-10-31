@@ -1,4 +1,4 @@
-import { colorTypeItems, plasticTypeItems } from '../types'
+import { hexColorTypeItems, plasticTypeItems } from '../types'
 import * as yup from 'yup'
 
 /**
@@ -41,10 +41,10 @@ export const schema = yup
     materialName: yup.string().required(),
 
     // 色の種類: 入力必須、かつ選択肢から外れた入力は受け付けない
-    colorType: yup
+    hexColor: yup
       .string()
       .required()
-      .test('matchWithColorType', (value) => colorTypeItems.includes(value!)),
+      .test('matchWithColorType', (value) => hexColorTypeItems.includes(value!)),
 
     // プラスチックの種類: 入力必須、かつ選択肢から外れた入力は受け付けない
     plasticType: yup

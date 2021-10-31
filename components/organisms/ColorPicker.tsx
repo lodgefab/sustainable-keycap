@@ -56,7 +56,7 @@ interface Props {}
 
 const ColorPicker: React.VFC<Props> = () => {
   const { getValues, setValue } = useFormContext()
-  const currentColor = getValues('colorType')
+  const currentColor = getValues('hexColor')
 
   return (
     <Wrapper>
@@ -69,7 +69,7 @@ const ColorPicker: React.VFC<Props> = () => {
                 key={color}
                 color={color}
                 onClick={() =>
-                  setValue('colorType', color, { shouldDirty: true, shouldValidate: true })
+                  setValue('hexColor', color, { shouldDirty: true, shouldValidate: true })
                 }
               />
             ))}

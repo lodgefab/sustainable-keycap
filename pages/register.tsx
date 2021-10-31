@@ -57,7 +57,7 @@ export const Register: NextPage<Props> = (props) => {
     plasticImage: register('plasticImage', { required: true }),
     keycapImage: register('keycapImage', { required: true }),
     materialName: register('materialName', { required: true }),
-    colorType: register('colorType', { required: true }),
+    hexColor: register('hexColor', { required: true }),
     plasticType: register('plasticType', { required: true }),
     celsius: {
       onKeyPress: filterCelsiusInput,
@@ -80,7 +80,7 @@ export const Register: NextPage<Props> = (props) => {
     data.append('plasticImage', rawData.plasticImage[0])
     data.append('keycapImage', rawData.keycapImage[0])
     data.append('materialName', rawData.materialName)
-    data.append('colorType', rawData.colorType)
+    data.append('hexColor', rawData.hexColor)
     data.append('plasticType', rawData.plasticType)
     data.append('celsius', rawData.celsius.toString())
     data.append('note', rawData.note)
@@ -110,7 +110,7 @@ export const Register: NextPage<Props> = (props) => {
     plasticImage: dirtyFields.plasticImage === true ? errors.plasticImage?.message || null : null,
     keycapImage: dirtyFields.keycapImage === true ? errors.keycapImage?.message || null : null,
     materialName: dirtyFields.materialName === true ? errors.materialName?.message || null : null,
-    colorType: dirtyFields.colorType === true ? errors.colorType?.message || null : null,
+    hexColor: dirtyFields.hexColor === true ? errors.hexColor?.message || null : null,
     plasticType: dirtyFields.plasticType === true ? errors.plasticType?.message || null : null,
     celsius: dirtyFields.celsius === true ? errors.celsius?.message || null : null,
     note: dirtyFields.note === true ? errors.note?.message || null : null,

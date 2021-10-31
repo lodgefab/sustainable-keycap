@@ -51,7 +51,7 @@ export const getMaterialsWithoutLogin = async (
   })
 }
 
-const fetchMaterialData = async () => {
+const fetchMaterialData = async (): Promise<Material[]> => {
   initAdminFirebase()
   const db = admin.firestore()
 
@@ -94,7 +94,8 @@ const fetchMaterialData = async () => {
       return {
         id: doc.id,
         materialName: data.materialName,
-        colorType: data.colorType,
+        hexColor: data.hexColor,
+        categorisedColor: data.categorisedColor,
         plasticType: data.plasticType,
         goodCount: data.goodCount,
         plasticImageUrl,

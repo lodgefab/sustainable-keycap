@@ -20,7 +20,8 @@ export const MaterialProfile: React.VFC<Props> = ({ material, canUpvote, upvote 
     keycapImageUrl,
     plasticImageUrl,
     goodCount,
-    colorType,
+    hexColor,
+    categorisedColor,
     plasticType,
     note,
   } = material
@@ -36,7 +37,9 @@ export const MaterialProfile: React.VFC<Props> = ({ material, canUpvote, upvote 
       <p>{goodCount}</p>
       <dl>
         <dt>色の系統</dt>
-        <dd>{colorType}</dd>
+        <dd>
+          {categorisedColor}（{hexColor}）
+        </dd>
 
         <dt>プラスチックの種類</dt>
         <dd>{plasticType}</dd>

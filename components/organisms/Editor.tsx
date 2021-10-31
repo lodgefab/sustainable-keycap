@@ -36,7 +36,7 @@ interface Props {
     plasticImage: InputTagAttributes<React.InputHTMLAttributes<HTMLInputElement>>
     keycapImage: InputTagAttributes<InputHTMLAttributes<HTMLInputElement>>
     materialName: InputTagAttributes<InputHTMLAttributes<HTMLInputElement>>
-    colorType: InputTagAttributes<InputHTMLAttributes<HTMLInputElement>>
+    hexColor: InputTagAttributes<InputHTMLAttributes<HTMLInputElement>>
     plasticType: InputTagAttributes<InputHTMLAttributes<HTMLSelectElement>>
     celsius: InputTagAttributes<InputHTMLAttributes<HTMLInputElement>>
     note: InputTagAttributes<TextareaHTMLAttributes<HTMLTextAreaElement>>
@@ -45,7 +45,7 @@ interface Props {
     plasticImage: string | null
     keycapImage: string | null
     materialName: string | null
-    colorType: string | null
+    hexColor: string | null
     plasticType: string | null
     celsius: string | null
     note: string | null
@@ -118,9 +118,9 @@ export const Editor: React.VFC<Props> = ({
 
       <FormItem onClick={onClickColorForm}>
         <label htmlFor='color-type'>色の系統</label>
-        <input type='text' id='color-type' {...inputTagAttributes.colorType} readOnly />
-        {errorMessage.colorType && (
-          <ErrorMessage key='colorType-error'>{errorMessage.colorType}</ErrorMessage>
+        <input type='text' id='color-type' {...inputTagAttributes.hexColor} readOnly />
+        {errorMessage.hexColor && (
+          <ErrorMessage key='hexColor-error'>{errorMessage.hexColor}</ErrorMessage>
         )}
         <ColorPickerWrapper style={{ display: isColorPickerVisible ? 'block' : 'none' }}>
           <ColorPicker />
@@ -131,10 +131,9 @@ export const Editor: React.VFC<Props> = ({
         <label htmlFor='plastic-type'>プラスチックの種類</label>
         <select id='plastic-type' required {...inputTagAttributes.plasticType}>
           <option value=''>選択してください</option>
-          <option value='plastic-a'>プラスチックA</option>
-          <option value='plastic-b'>プラスチックB</option>
-          <option value='plastic-c'>プラスチックC</option>
-          <option value='plastic-d'>プラスチックD</option>
+          <option value='PP'>PP（ポリプロピレン）</option>
+          <option value='PE'>PE（ポリエチレン）</option>
+          <option value='PS'>PS（ポリスチレン）</option>
         </select>
         {errorMessage.plasticType && (
           <ErrorMessage key='plasticType-error'>{errorMessage.plasticType}</ErrorMessage>
