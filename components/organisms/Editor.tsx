@@ -66,20 +66,22 @@ export const Editor: React.VFC<Props> = ({
    * フォームのどこかをクリックした時にカラーピッカーを非表示にする
    * NOTE: 「色の系統」をクリックした時はonClickColorForm内でstopPropagation()が実行されるのでこの処理は呼び出されない
    */
-  const onClickForm = () => {
+  const onColorFormBeInActive = () => {
     setColorPickerVisibility(false)
   }
 
   /**
    * 「色の系統」をクリックした時にカラーピッカーを表示する
    */
-  const onClickColorForm = (event: React.MouseEvent) => {
+  const onColorFormBeActive = (
+    event: React.MouseEvent<HTMLDivElement> | React.FocusEvent<HTMLInputElement>
+  ) => {
     event.stopPropagation() // onClickForm()が実行されないようにイベント伝搬を止める
     setColorPickerVisibility(true)
   }
 
   return (
-    <Form onClick={onClickForm}>
+    <Form onClick={onColorFormBeInActive} onFocus={onColorFormBeInActive}>
       <FormItem>
         <label htmlFor='plastic-image'>廃プラ画像を追加</label>
         <input
@@ -116,9 +118,15 @@ export const Editor: React.VFC<Props> = ({
         )}
       </FormItem>
 
-      <FormItem onClick={onClickColorForm}>
+      <FormItem onClick={onColorFormBeActive}>
         <label htmlFor='color-type'>色の系統</label>
-        <input type='text' id='color-type' {...inputTagAttributes.hexColor} readOnly />
+        <input
+          type='text'
+          id='color-type'
+          {...inputTagAttributes.hexColor}
+          readOnly
+          onFocus={onColorFormBeActive}
+        />
         {errorMessage.hexColor && (
           <ErrorMessage key='hexColor-error'>{errorMessage.hexColor}</ErrorMessage>
         )}
