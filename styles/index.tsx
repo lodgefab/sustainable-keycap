@@ -5,9 +5,12 @@ export const color = {
   secondary: '#CBA4A0',
   white: '#fff',
   subColor: {
-    blue: '#3D98B8',
-    orange: '#FF9575',
-    yellow: '#DDB882',
+    blue: '#88D9F4',
+    red: '#F2464A',
+    green: '#80C067',
+    dark: '#333333',
+    yellow: '#FFE923',
+    orange: '#FF9F2E',
   },
   background: {
     bague: '#F5F5F5',
@@ -26,6 +29,7 @@ export const color = {
     superLight: 'rgba(0, 0, 0, 0.08);',
     gray1: '#BDBDBD',
     gray2: '#EBEBEB',
+    white: '#ffffff',
   },
   active: 'linear-gradient(180deg, #FD80A8 0%, #FCCF42 100%);',
 } as const
@@ -112,6 +116,8 @@ export const curve = {
 
 export const zIndex = {
   base: 0,
+  default: 1,
   header: 10,
   behind: -1,
+  back: -2,
 } as const
