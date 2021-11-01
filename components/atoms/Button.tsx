@@ -27,7 +27,9 @@ export const Button: React.FC<Props> = ({
       </Disabled>
     )
   }
-
+  {
+    /* hrefの有無によって、aタグとhrefタグを使い分ける */
+  }
   return href ? (
     <AnchorButton className={className} href={href}>
       {iconPath && (

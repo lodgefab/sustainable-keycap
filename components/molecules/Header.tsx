@@ -36,15 +36,18 @@ export const Header: React.VFC<Props> = ({ currentUser, authState, onLoginFunc, 
             <Insta target='_blank'></Insta>
           </Link>
         </Left>
-        {/* TODO: 認証方法を明記する */}
-        {authState === 'LOGGED_IN' && currentUser && (
-          <p>
-            {currentUser.displayName} としてログイン中（
-            <a onClick={() => onLogoutFunc()}>ログアウト</a>）
-          </p>
-        )}
-        {authState === 'NOT_LOGIN' && <button onClick={() => onLoginFunc()}>ログイン</button>}
-        {/* authState === 'INITIALING' のときはなにも表示させない */}
+        <Right>
+          <TranslateButton isJa={true} />
+          {/* TODO: 認証方法を明記する */}
+          {authState === 'LOGGED_IN' && currentUser && (
+            <p>
+              {currentUser.displayName} としてログイン中（
+              <a onClick={() => onLogoutFunc()}>ログアウト</a>）
+            </p>
+          )}
+          {authState === 'NOT_LOGIN' && <button onClick={() => onLoginFunc()}>ログイン</button>}
+          {/* authState === 'INITIALING' のときはなにも表示させない */}
+        </Right>
       </Container>
     </Wrap>
   )
@@ -107,4 +110,23 @@ const Insta = styled.a`
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
+`
+const Right = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 16px 0;
+`
+const TranslateButton = styled.button<{ isJa: boolean }>`
+  width: 32px;
+  height: 42px;
+  margin: 24px;
+  background-color: transparent;
+  border: 0px;
+  background-image: url(${(props) =>
+    props.isJa ? '/images/icons/ja.svg' : '/images/icons/en.svg'});
+  background-size: contain;
+  background-position: center center;
+  cursor: pointer;
 `
