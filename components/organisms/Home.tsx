@@ -9,6 +9,7 @@ import { AuthContext } from '../../lib/auth'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
 import Slider from 'react-slick'
+import { MaterialItem } from '../molecules/MaterialItem'
 
 type Props = {
   materials: Material[]
@@ -229,19 +230,25 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
               <Button label={'お問合わせ'} />
             </AboutLeft>
             <AboutRight>
-              <Image src='/images/photos/012.jpg' alt={'Yahoo! LODGE'} width={495} height={360} />
+              <Image
+                src='/images/photos/012.jpg'
+                alt={'Yahoo! LODGE'}
+                width={495}
+                height={360}
+                layout='fixed'
+              />
             </AboutRight>
           </AboutWrap>
         </AboutSection>
-        <LibrarySection id='library' color={'Peru'}>
+        <LibrarySection id='library' color={'transparent'}>
           <LibraryWrap>
             <SectionTitleGroup>
               <SectionTitle>Library</SectionTitle>
               <SectionSubTitle>ライブラリ</SectionSubTitle>
             </SectionTitleGroup>
-            <p>
+            <LibraryDesc>
               みんなが見つけたキーキャップに使えそうな素材とそのレポートです。実際に作ってみたものがあればどんどう投稿していってみましょう！いいねの多い人気素材は実際に販売されることがあるかも...?!
-            </p>
+            </LibraryDesc>
             {materials.length > 0 && ( // 何らかの理由で素材リストが取れなかった時はsection全体を非表示にする
               <>
                 <Filters className='filter'>
@@ -281,44 +288,28 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
                     White
                   </Filter>
                 </Filters>
-
-                {materials.map((material) => (
-                  <div className='material' key={`material-${material.id}`}>
-                    <Image
-                      width={100}
-                      height={50}
-                      src={material.plasticImageUrl}
-                      alt='素材プラスチック画像'
+                <MaterialGrid>
+                  {materials.map((material) => (
+                    <MaterialItem
+                      key={`material-${material.id}`}
+                      plasticImageUrl={material.plasticImageUrl}
+                      keycapImageUrl={material.keycapImageUrl}
+                      id={material.id}
+                      materialName={material.materialName}
+                      colorType={material.colorType}
+                      plasticType={material.plasticType}
+                      goodCount={material.goodCount}
+                      upvotableMaterials={upvotableMaterials}
+                      upvote={upvote}
                     />
-                    <Image
-                      width={50}
-                      height={50}
-                      src={material.keycapImageUrl}
-                      alt='キーキャップ画像'
-                    />
-                    <Link href={`/material/${material.id}`}>
-                      <a>{material.materialName}</a>
-                    </Link>
-                    <p>{material.colorType}</p>
-                    <p>{material.plasticType}</p>
-                    {/* 既にUpvote済み、もしくは未ログインの場合はUpvoteボタンを無効化する */}
-                    <button
-                      onClick={() => upvote(material.id)}
-                      disabled={!upvotableMaterials.includes(material.id)}
-                    >
-                      Upvote
-                    </button>
-                    <p>{material.goodCount}</p>
-                  </div>
-                ))}
+                  ))}
+                </MaterialGrid>
 
                 {/* 登録ページへのリンクはログイン中のみ有効にする */}
                 {currentUser ? (
-                  <Link href='/register'>
-                    <a>素材を追加する</a>
-                  </Link>
+                  <Button label={'素材を追加する'} href='/register' />
                 ) : (
-                  <a>素材を追加する</a>
+                  <Button label={'素材を追加する'} disabled />
                 )}
               </>
             )}
@@ -684,17 +675,19 @@ const LibraryWrap = styled(Wrap)`
 const Filters = styled.ul`
   display: flex;
   flex-direction: columns;
+  padding: 0 0 32px 0;
 `
 
 const Filter = styled.li<{ isSelected: boolean }>`
   display: flex;
   background-color: ${(props) => (props.isSelected ? color.primary : color.background.white)};
-  color: ${(props) => (props.isSelected ? color.content : color.background.white)};
+  color: ${(props) => (props.isSelected ? color.content.white : color.background.dark)};
   padding: 8px;
   margin: 0 16px 0 0;
   border-radius: 4px;
   border: 2px solid ${color.primary};
   ${font.courier.subtitle2};
+  cursor: pointer;
 `
 const Palette = styled.span<{ color: string; isSelected: boolean }>`
   position: relative;
@@ -717,4 +710,16 @@ const Palette = styled.span<{ color: string; isSelected: boolean }>`
     border-radius: 50%;
     border: 1px solid ${(props) => props.color};
   }
+`
+const LibraryDesc = styled.p`
+  ${font.inter.article1};
+  padding: 0 0 32px 0;
+`
+
+const MaterialGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  width: 100%;
+  margin: 0 0 32px 0;
 `

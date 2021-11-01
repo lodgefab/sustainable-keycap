@@ -1,7 +1,7 @@
 import { css } from '@emotion/css'
 
 export const color = {
-  primary: '#294446',
+  primary: '#333333',
   secondary: '#CBA4A0',
   white: '#fff',
   subColor: {
@@ -16,7 +16,7 @@ export const color = {
     bague: '#F5F5F5',
     dark: '#333',
     white: '#fff',
-    blue: '#EDF2F5',
+    blue: '#D8F0FF',
   },
   utils: {
     error: '#FF3B30',
@@ -110,7 +110,8 @@ export const media = {
 }
 
 export const curve = {
-  button: 'transition: all .3s 0s ease-out;',
+  button: 'transition: all .1s 0s ease-out;',
+  card: 'transition: all .3s 0s ease-out;',
   fade: 'transition: all .6s 0s ease-out;',
 } as const
 
