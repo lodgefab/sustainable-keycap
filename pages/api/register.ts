@@ -1,14 +1,15 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import {
-  ensureFormDataIsValid,
+  categoriseColor,
+  ensureRegisterRequestIsValid,
   ensureRequestIsAuthorized,
   isErrorResponse,
   respondAsInternalServerError,
 } from '../../lib/helper'
 import multer from 'multer'
 import * as admin from 'firebase-admin'
-import { initAdminFirebase } from '../../lib/admin-firebase'
-import { HTTP_STATUS } from '../../types'
+import { getAdminFirestoreDb, initAdminFirebase } from '../../lib/admin-firebase'
+import { FirestoreMaterialDocument, HTTP_STATUS } from '../../types'
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -56,16 +57,30 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<RegisterApiResp
   const keycapImageExt = uploadedImages.keycapImage[0].mimetype.split('/')[1]
 
   const data = req.body
+  console.log(data)
 
-  ensureFormDataIsValid(data)
+  if (!ensureRegisterRequestIsValid(data)) {
+    res.status(400).json({
+      message: 'Form data is invalid.',
+    })
+    return
+  }
+
+  const dataSubmittedToFirebase: FirestoreMaterialDocument = {
+    ...data,
+    goodCount: 0,
+    categorisedColor: categoriseColor(data.hexColor),
+    celsius: Number.parseInt(data.celsius),
+    // @ts-ignore
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+  }
+
+  console.log(dataSubmittedToFirebase)
 
   try {
     initAdminFirebase()
-    const db = admin.firestore()
-    const addedData = await db.collection('keycap-materials').add({
-      goodCount: 0, // 新規に追加する素材データはいいね数を0で初期化する
-      ...data,
-    })
+    const db = getAdminFirestoreDb()
+    const addedData = await db.collection('keycap-materials').add(dataSubmittedToFirebase)
     const documentId = addedData.id
 
     const bucket = admin.storage().bucket()

@@ -1,4 +1,14 @@
-import { FirestoreMaterialDocument, HTTP_STATUS, Material, ResponseData } from '../types'
+import {
+  CategorisedColorType,
+  categorisedColorTypeItems,
+  FirestoreMaterialDocument,
+  hexColorTypeItems,
+  HTTP_STATUS,
+  Material,
+  plasticTypeItems,
+  RegisterRequestFromClient,
+  ResponseData,
+} from '../types'
 import { firebaseClientApp, getCurrentUser } from './auth'
 import {
   collection,
@@ -12,13 +22,15 @@ import {
 } from 'firebase/firestore'
 import { getDownloadURL, getStorage, listAll, ref } from 'firebase/storage'
 import { NextApiRequest, NextApiResponse } from 'next'
+import hexRgb from 'hex-rgb'
 
 export const getSampleMaterialData: () => Material[] = () => {
   return [
     {
       id: '00000000000000000000',
       materialName: 'Cocacola Red',
-      colorType: 'red',
+      hexColor: '#FF0000',
+      categorisedColor: 'red',
       plasticType: 'plastic-a',
       goodCount: 12,
       keycapImageUrl: '/sample/icon-sample.jpg',
@@ -29,7 +41,8 @@ export const getSampleMaterialData: () => Material[] = () => {
     {
       id: '11111111111111111111',
       materialName: 'Tide レッド',
-      colorType: 'red',
+      hexColor: '#FF0000',
+      categorisedColor: 'red',
       plasticType: 'plastic-b',
       goodCount: 12,
       keycapImageUrl: '/sample/icon-sample.jpg',
@@ -40,7 +53,8 @@ export const getSampleMaterialData: () => Material[] = () => {
     {
       id: '22222222222222222222',
       materialName: 'Cocacola Red 2',
-      colorType: 'red',
+      hexColor: '#FF0000',
+      categorisedColor: 'red',
       plasticType: 'plastic-c',
       goodCount: 12,
       keycapImageUrl: '/sample/icon-sample.jpg',
@@ -51,7 +65,8 @@ export const getSampleMaterialData: () => Material[] = () => {
     {
       id: '33333333333333333333',
       materialName: 'Cocacola Red 3',
-      colorType: 'red',
+      hexColor: '#FF0000',
+      categorisedColor: 'red',
       plasticType: 'plastic-d',
       goodCount: 12,
       keycapImageUrl: '/sample/icon-sample.jpg',
@@ -78,9 +93,48 @@ export const ensureEnvironmentVariable = (): void => {
   }
 }
 
-export const ensureFormDataIsValid = (data: unknown): data is FirestoreMaterialDocument => {
-  // TODO: バリデーション処理を実装する
-  return true
+export const ensureRegisterRequestIsValid = (
+  requestBody: any
+): requestBody is RegisterRequestFromClient => {
+  return (
+    typeof requestBody?.materialName === 'string' &&
+    requestBody.materialName.length > 0 &&
+    typeof requestBody?.hexColor === 'string' &&
+    hexColorTypeItems.includes(requestBody.hexColor) &&
+    typeof requestBody?.plasticType === 'string' &&
+    plasticTypeItems.includes(requestBody.plasticType) &&
+    typeof requestBody?.celsius === 'string' &&
+    /^\d+$/.test(requestBody?.celsius) &&
+    Number.parseInt(requestBody?.celsius) > 0 &&
+    typeof requestBody?.note === 'string'
+  )
+}
+
+export const categoriseColor = (baseColorHex: string): CategorisedColorType => {
+  const baseColorRgb = hexRgb(baseColorHex)
+  const distanceFrom = [
+    // Distance from red
+    (255 - baseColorRgb.red) ** 2 + (0 - baseColorRgb.green) ** 2 + (0 - baseColorRgb.blue) ** 2,
+    // Distance from blue
+    (0 - baseColorRgb.red) ** 2 + (0 - baseColorRgb.green) ** 2 + (255 - baseColorRgb.blue) ** 2,
+    // Distance from green
+    (0 - baseColorRgb.red) ** 2 + (255 - baseColorRgb.green) ** 2 + (0 - baseColorRgb.blue) ** 2,
+    // Distance from black
+    (0 - baseColorRgb.red) ** 2 + (0 - baseColorRgb.green) ** 2 + (0 - baseColorRgb.blue) ** 2,
+    // Distance from white
+    (255 - baseColorRgb.red) ** 2 +
+      (255 - baseColorRgb.green) ** 2 +
+      (255 - baseColorRgb.blue) ** 2,
+  ]
+  console.log(
+    baseColorHex,
+    baseColorRgb,
+    distanceFrom,
+    Math.min(...distanceFrom),
+    distanceFrom.indexOf(Math.min(...distanceFrom)),
+    categorisedColorTypeItems[distanceFrom.indexOf(Math.min(...distanceFrom))]
+  )
+  return categorisedColorTypeItems[distanceFrom.indexOf(Math.min(...distanceFrom))]
 }
 
 const toFireStore = (data: Material): DocumentData => {
@@ -95,7 +149,8 @@ const fromFirestore = (snapshot: QueryDocumentSnapshot, options: SnapshotOptions
   return {
     id: snapshot.id,
     materialName: data.materialName,
-    colorType: data.colorType,
+    hexColor: data.hexColor,
+    categorisedColor: data.categorisedColor,
     plasticType: data.plasticType,
     goodCount: data.goodCount,
     plasticImageUrl: '/hoge/huga',
@@ -171,7 +226,8 @@ export const fetchMaterialWithAuth = async (
     material: {
       id: id,
       materialName: data.materialName,
-      colorType: data.colorType,
+      hexColor: data.hexColor,
+      categorisedColor: data.categorisedColor,
       plasticType: data.plasticType,
       goodCount: data.goodCount,
       plasticImageUrl: plasticImageUrl,
@@ -231,7 +287,8 @@ export const fetchMaterialsWithAuth = async (): Promise<FetchMaterialsWithAuthRe
       return {
         id: doc.id,
         materialName: data.materialName,
-        colorType: data.colorType,
+        hexColor: data.hexColor,
+        categorisedColor: data.categorisedColor,
         plasticType: data.plasticType,
         goodCount: data.goodCount,
         plasticImageUrl: plasticImageUrl,
