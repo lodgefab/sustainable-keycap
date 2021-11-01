@@ -1,11 +1,14 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import styled from '@emotion/styled'
-import { color, font, media } from '../../styles'
+import { color, font, media, zIndex } from '../../styles'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '../atoms/Button'
 import { Material } from '../../types'
 import { AuthContext } from '../../lib/auth'
+import 'slick-carousel/slick/slick.css'
+import 'slick-carousel/slick/slick-theme.css'
+import Slider from 'react-slick'
 
 type Props = {
   materials: Material[]
@@ -16,7 +19,14 @@ type Props = {
 
 export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMaterials, upvote }) => {
   const currentUser = useContext(AuthContext)
-
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+  }
+  const [currentFilter, setCurrentFilter] = useState(0)
   return (
     <>
       <main>
@@ -120,70 +130,200 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
               </Program>
               <Divider />
               <WorkshopInfo>
-                <Price>1200円</Price>
+                <Price>
+                  1200円<span>（材料費・実費）</span>
+                </Price>
                 <Button label={'参加する'} />
               </WorkshopInfo>
             </WorkShopRight>
           </WorkshopWrap>
         </WorkshopSection>
-        <Section id='making' color={'Coral'}></Section>
-        <Section id='mold' color={'DarkSeaGreen '}></Section>
-        <Section id='aboutus' color={'LightSkyBlue '}></Section>
-        <Section id='library' color={'Peru'}></Section>
+        <MakingSection id='making' color={'transparent'}>
+          <MakingWrap>
+            <SectionTitleGroup>
+              <SectionTitle>Making #ANYCAP</SectionTitle>
+              <SectionSubTitle>廃プラキーキャップができるまで</SectionSubTitle>
+            </SectionTitleGroup>
+            <MakingScrollWrap>
+              <MakingScrollContents>
+                <MakingItem>
+                  <MakingItemImg src={'/images/photos/007.jpg'} />
+                  <h3>
+                    <span>01.</span>素材をさがす
+                  </h3>
+                  <p>
+                    キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
+                  </p>
+                </MakingItem>
+                <MakingItem>
+                  <MakingItemImg src={'/images/photos/008.jpg'} />
+                  <h3>
+                    <span>02.</span>破砕する
+                  </h3>
+                  <p>集めた素材を砕いて、5mm角程度の大きさにします。</p>
+                </MakingItem>
+                <MakingItem>
+                  <MakingItemImg src={'/images/photos/009.jpg'} />
+                  <h3>
+                    <span>03.</span>金型を用意する
+                  </h3>
+                  <p>
+                    キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
+                  </p>
+                </MakingItem>
+                <MakingItem>
+                  <MakingItemImg src={'/images/photos/010.jpg'} />
+                  <h3>
+                    <span>04.</span>金型を用意する
+                  </h3>
+                  <p>
+                    キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
+                  </p>
+                </MakingItem>
+              </MakingScrollContents>
+            </MakingScrollWrap>
+          </MakingWrap>
+        </MakingSection>
+        <MoldSection id='mold' color={'transparent'}>
+          <Wrap>
+            <MoldLeft>
+              <MoldSlider>
+                <Slider {...sliderSettings}>
+                  <SlideImg src={'/images/photos/011.jpg'} />
+                  <SlideImg src={'/images/photos/011.jpg'} />
+                  <SlideImg src={'/images/photos/011.jpg'} />
+                  <SlideImg src={'/images/photos/011.jpg'} />
+                </Slider>
+              </MoldSlider>
+            </MoldLeft>
+            <MoldRight>
+              <SectionTitleGroup>
+                <SectionTitle>Mold</SectionTitle>
+                <SectionSubTitle>金型</SectionSubTitle>
+              </SectionTitleGroup>
+              <MoldDesc>
+                金型を用意し、家庭用の射出成形機（ORIGINALMIND社製のINARIなど）を使えば、ご自身でキーキャップを作ることも可能です。
+                <br />
+                より多くの方に活動に参加してもらいたいという思いから、金型の3Dデータを公開しています。
+                <br />
+                ご興味のある方は、下記のコンタクトフォームよりお問い合わせください
+              </MoldDesc>
+              <Divider />
+              <Download href={'/'}>ダウンロードする</Download>
+            </MoldRight>
+          </Wrap>
+        </MoldSection>
+        <AboutSection id='aboutus' color={'transparent '}>
+          <AboutWrap>
+            <AboutLeft>
+              <SectionTitleGroup>
+                <SectionTitle>About Us</SectionTitle>
+                <SectionSubTitle>わたしたちについて</SectionSubTitle>
+              </SectionTitleGroup>
+              <p>
+                #ANYCAPは、ヤフー社員の自主制作チームToasterによって運営されており、オープンコラボレーションハブLODGEを拠点に活動しています。
+                <br />
+                #ANYCAPプロジェクトは、協業いただける企業・団体・個人のみなさまをお待ちしております。
+              </p>
+              <AboutDivider />
+              <Button label={'お問合わせ'} />
+            </AboutLeft>
+            <AboutRight>
+              <Image src='/images/photos/012.jpg' alt={'Yahoo! LODGE'} width={495} height={360} />
+            </AboutRight>
+          </AboutWrap>
+        </AboutSection>
+        <LibrarySection id='library' color={'Peru'}>
+          <LibraryWrap>
+            <SectionTitleGroup>
+              <SectionTitle>Library</SectionTitle>
+              <SectionSubTitle>ライブラリ</SectionSubTitle>
+            </SectionTitleGroup>
+            <p>
+              みんなが見つけたキーキャップに使えそうな素材とそのレポートです。実際に作ってみたものがあればどんどう投稿していってみましょう！いいねの多い人気素材は実際に販売されることがあるかも...?!
+            </p>
+            {materials.length > 0 && ( // 何らかの理由で素材リストが取れなかった時はsection全体を非表示にする
+              <>
+                <Filters className='filter'>
+                  <Filter isSelected={currentFilter == 0 ? true : false}>
+                    <Palette
+                      isSelected={currentFilter == 0 ? true : false}
+                      color={color.subColor.red}
+                    ></Palette>
+                    Red
+                  </Filter>
+                  <Filter isSelected={currentFilter == 1 ? true : false}>
+                    <Palette
+                      isSelected={currentFilter == 1 ? true : false}
+                      color={color.subColor.blue}
+                    ></Palette>
+                    Blue
+                  </Filter>
+                  <Filter isSelected={currentFilter == 2 ? true : false}>
+                    <Palette
+                      isSelected={currentFilter == 2 ? true : false}
+                      color={color.subColor.green}
+                    ></Palette>
+                    Green
+                  </Filter>
+                  <Filter isSelected={currentFilter == 3 ? true : false}>
+                    <Palette
+                      isSelected={currentFilter == 3 ? true : false}
+                      color={color.subColor.dark}
+                    ></Palette>
+                    Black
+                  </Filter>
+                  <Filter isSelected={currentFilter == 4 ? true : false}>
+                    <Palette
+                      isSelected={currentFilter == 4 ? true : false}
+                      color={color.content.white}
+                    ></Palette>
+                    White
+                  </Filter>
+                </Filters>
 
-        {materials.length > 0 && ( // 何らかの理由で素材リストが取れなかった時はsection全体を非表示にする
-          <section>
-            <h2>Library</h2>
+                {materials.map((material) => (
+                  <div className='material' key={`material-${material.id}`}>
+                    <Image
+                      width={100}
+                      height={50}
+                      src={material.plasticImageUrl}
+                      alt='素材プラスチック画像'
+                    />
+                    <Image
+                      width={50}
+                      height={50}
+                      src={material.keycapImageUrl}
+                      alt='キーキャップ画像'
+                    />
+                    <Link href={`/material/${material.id}`}>
+                      <a>{material.materialName}</a>
+                    </Link>
+                    <p>{material.colorType}</p>
+                    <p>{material.plasticType}</p>
+                    {/* 既にUpvote済み、もしくは未ログインの場合はUpvoteボタンを無効化する */}
+                    <button
+                      onClick={() => upvote(material.id)}
+                      disabled={!upvotableMaterials.includes(material.id)}
+                    >
+                      Upvote
+                    </button>
+                    <p>{material.goodCount}</p>
+                  </div>
+                ))}
 
-            <p>キーキャップに使えそうな素材のライブラリです</p>
-            <ul className='filter'>
-              <li>Red</li>
-              <li>Blue</li>
-              <li>Green</li>
-              <li>Black</li>
-              <li>White</li>
-            </ul>
-
-            {materials.map((material) => (
-              <div className='material' key={`material-${material.id}`}>
-                <Image
-                  width={100}
-                  height={50}
-                  src={material.plasticImageUrl}
-                  alt='素材プラスチック画像'
-                />
-                <Image
-                  width={50}
-                  height={50}
-                  src={material.keycapImageUrl}
-                  alt='キーキャップ画像'
-                />
-                <Link href={`/material/${material.id}`}>
-                  <a>{material.materialName}</a>
-                </Link>
-                <p>{material.categorisedColor}</p>
-                <p>{material.plasticType}</p>
-                {/* 既にUpvote済み、もしくは未ログインの場合はUpvoteボタンを無効化する */}
-                <button
-                  onClick={() => upvote(material.id)}
-                  disabled={!upvotableMaterials.includes(material.id)}
-                >
-                  Upvote
-                </button>
-                <p>{material.goodCount}</p>
-              </div>
-            ))}
-
-            {/* 登録ページへのリンクはログイン中のみ有効にする */}
-            {currentUser ? (
-              <Link href='/register'>
-                <a>素材を追加する</a>
-              </Link>
-            ) : (
-              <a>素材を追加する</a>
+                {/* 登録ページへのリンクはログイン中のみ有効にする */}
+                {currentUser ? (
+                  <Link href='/register'>
+                    <a>素材を追加する</a>
+                  </Link>
+                ) : (
+                  <a>素材を追加する</a>
+                )}
+              </>
             )}
-          </section>
-        )}
+          </LibraryWrap>
+        </LibrarySection>
       </main>
 
       <footer>{/* TODO: 書く */}</footer>
@@ -364,6 +504,7 @@ const WorkshopDesc = styled.p`
 `
 const Program = styled.div`
   padding: 16px;
+  margin: 0 0 16px 0;
   background-color: ${color.background.blue};
   text-align: left;
   border-radius: 8px;
@@ -387,8 +528,10 @@ const ProgramDesc = styled.p`
 
 const WorkshopInfo = styled.div`
   display: flex;
-  flex-direction: column;
-
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
   width: 100%;
 `
 
@@ -396,5 +539,182 @@ const Price = styled.p`
   ${font.inter.h3};
   span {
     ${font.inter.label};
+  }
+`
+
+const MakingSection = styled(Section)``
+
+const MakingWrap = styled(Wrap)`
+  justify-content: flex-start;
+  flex-direction: column;
+`
+
+const MakingScrollWrap = styled.div`
+  width: 100%;
+  overflow: auto;
+  padding: 0 0 64px 0;
+  ::-webkit-scrollbar {
+    height: 5px;
+  }
+  ::-webkit-scrollbar-track {
+    background: ${color.content.superLight};
+    border: none;
+    border-radius: 0px;
+    height: 5px;
+    /* box-shadow: inset 0 0 2px #777;  */
+  }
+  ::-webkit-scrollbar-thumb {
+    background: ${color.content.dark};
+    border-radius: 0px;
+    box-shadow: none;
+  }
+`
+
+const MakingItem = styled.div`
+  width: 360px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  h3 {
+    ${font.inter.h3};
+    margin: 0 0 32px 0;
+  }
+  p {
+    ${font.inter.body2};
+  }
+`
+const MakingItemImg = styled.img`
+  width: 100%;
+  height: auto;
+  margin: 0 0 32px 0;
+`
+
+const MakingScrollContents = styled.div`
+  display: grid;
+  gap: 32px;
+  grid-template-columns: repeat(4, auto);
+`
+
+const MoldSection = styled(Section)``
+
+const MoldLeft = styled.div``
+
+const MoldRight = styled.div`
+  margin: 0 0 0 64px;
+`
+
+const MoldDesc = styled.p`
+  text-align: left;
+  ${font.inter.article1};
+  margin: 0 0 32px 0;
+`
+
+const MoldSlider = styled.div`
+  position: relative;
+  max-width: 495px;
+  img {
+    object-fit: cover;
+  }
+`
+
+const SlideImg = styled.img`
+  /* min-width:495px; */
+  /* height: 360px; */
+  width: 100%;
+  height: 100%;
+`
+
+const Download = styled.a`
+  ${font.inter.body1};
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 16px 0 0 0;
+  cursor: pointer;
+  &:before {
+    content: '';
+    display: block;
+    width: 32px;
+    height: 32px;
+    margin: 0 16px 0 0;
+    background-image: url('/images/icons/openNew.svg');
+    background-size: cover;
+  }
+`
+
+const AboutSection = styled(Section)``
+
+const AboutWrap = styled(Wrap)``
+const AboutLeft = styled.div`
+  text-align: left;
+  margin: 0 64px 0 0;
+  p {
+    ${font.inter.article1};
+    margin: 0 0 32px 0;
+  }
+`
+const AboutRight = styled.div`
+  position: relative;
+  &:after {
+    content: '';
+    display: block;
+    width: 124px;
+    height: 124px;
+    position: absolute;
+    top: -16px;
+    left: -16px;
+    background-image: url('/images/lodgeLogo.svg');
+    background-size: cover;
+    ${zIndex.default};
+  }
+`
+
+const AboutDivider = styled(Divider)`
+  margin: 0 0 32px 0;
+`
+
+const LibrarySection = styled(Section)``
+const LibraryWrap = styled(Wrap)`
+  max-width: 640px;
+  flex-direction: column;
+  align-items: center;
+  text-align: left;
+`
+
+const Filters = styled.ul`
+  display: flex;
+  flex-direction: columns;
+`
+
+const Filter = styled.li<{ isSelected: boolean }>`
+  display: flex;
+  background-color: ${(props) => (props.isSelected ? color.primary : color.background.white)};
+  color: ${(props) => (props.isSelected ? color.content : color.background.white)};
+  padding: 8px;
+  margin: 0 16px 0 0;
+  border-radius: 4px;
+  border: 2px solid ${color.primary};
+  ${font.courier.subtitle2};
+`
+const Palette = styled.span<{ color: string; isSelected: boolean }>`
+  position: relative;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin: 0 12px 0 0;
+  border-radius: 50%;
+  background-color: ${(props) => props.color};
+  border: ${(props) => (props.isSelected ? 1 : 0)}px solid ${color.background.white};
+  &:after {
+    content: '';
+    display: ${(props) => (props.isSelected ? 'none' : 'block')};
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid ${(props) => props.color};
   }
 `
