@@ -2,7 +2,7 @@ import Head from 'next/head'
 import { NextPage } from 'next'
 import React, { useContext, useState } from 'react'
 import { Editor } from '../components/organisms/Editor'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { RegisterForm } from '../types'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { schema } from '../lib/validation'
@@ -19,17 +19,18 @@ export const Register: NextPage<Props> = (props) => {
   const router = useRouter()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, dirtyFields },
-  } = useForm<RegisterForm>({
+  const methods = useForm<RegisterForm>({
     mode: 'all',
     resolver: yupResolver(schema, {
       abortEarly: false,
     }),
     criteriaMode: 'all',
   })
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, dirtyFields },
+  } = methods
 
   /**
    * 設定温度を入力するフォームで数字以外の入力を弾くためのフィルタリング処理
@@ -56,7 +57,7 @@ export const Register: NextPage<Props> = (props) => {
     plasticImage: register('plasticImage', { required: true }),
     keycapImage: register('keycapImage', { required: true }),
     materialName: register('materialName', { required: true }),
-    colorType: register('colorType', { required: true }),
+    hexColor: register('hexColor', { required: true }),
     plasticType: register('plasticType', { required: true }),
     celsius: {
       onKeyPress: filterCelsiusInput,
@@ -79,7 +80,7 @@ export const Register: NextPage<Props> = (props) => {
     data.append('plasticImage', rawData.plasticImage[0])
     data.append('keycapImage', rawData.keycapImage[0])
     data.append('materialName', rawData.materialName)
-    data.append('colorType', rawData.colorType)
+    data.append('hexColor', rawData.hexColor)
     data.append('plasticType', rawData.plasticType)
     data.append('celsius', rawData.celsius.toString())
     data.append('note', rawData.note)
@@ -109,7 +110,7 @@ export const Register: NextPage<Props> = (props) => {
     plasticImage: dirtyFields.plasticImage === true ? errors.plasticImage?.message || null : null,
     keycapImage: dirtyFields.keycapImage === true ? errors.keycapImage?.message || null : null,
     materialName: dirtyFields.materialName === true ? errors.materialName?.message || null : null,
-    colorType: dirtyFields.colorType === true ? errors.colorType?.message || null : null,
+    hexColor: dirtyFields.hexColor === true ? errors.hexColor?.message || null : null,
     plasticType: dirtyFields.plasticType === true ? errors.plasticType?.message || null : null,
     celsius: dirtyFields.celsius === true ? errors.celsius?.message || null : null,
     note: dirtyFields.note === true ? errors.note?.message || null : null,
@@ -137,7 +138,7 @@ export const Register: NextPage<Props> = (props) => {
         </div>
       )}
       {authState === 'LOGGED_IN' && currentUser && (
-        <>
+        <FormProvider {...methods}>
           <Editor
             inputTagAttributes={inputTagAttributes}
             errorMessage={errorsPresented}
@@ -146,7 +147,7 @@ export const Register: NextPage<Props> = (props) => {
             canSubmit={canSubmit}
           />
           {errorMessage && <p>{errorMessage}</p>}
-        </>
+        </FormProvider>
       )}
     </>
   )

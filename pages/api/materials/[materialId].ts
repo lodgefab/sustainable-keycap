@@ -117,7 +117,8 @@ const fetchMaterialData = async (materialId: string): Promise<Material> => {
   return {
     id: doc.id,
     materialName: data.materialName,
-    colorType: data.colorType,
+    hexColor: data.hexColor,
+    categorisedColor: data.categorisedColor,
     plasticType: data.plasticType,
     goodCount: data.goodCount,
     plasticImageUrl,

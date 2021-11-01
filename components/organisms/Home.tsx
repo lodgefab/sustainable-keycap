@@ -161,7 +161,7 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
                 <Link href={`/material/${material.id}`}>
                   <a>{material.materialName}</a>
                 </Link>
-                <p>{material.colorType}</p>
+                <p>{material.categorisedColor}</p>
                 <p>{material.plasticType}</p>
                 {/* 既にUpvote済み、もしくは未ログインの場合はUpvoteボタンを無効化する */}
                 <button
