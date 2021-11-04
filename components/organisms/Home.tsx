@@ -9,6 +9,7 @@ import { AuthContext } from '../../lib/auth'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
 import Slider from 'react-slick'
+import { getAuth } from 'firebase/auth'
 
 type Props = {
   materials: Material[]
@@ -18,7 +19,8 @@ type Props = {
 }
 
 export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMaterials, upvote }) => {
-  const currentUser = useContext(AuthContext)
+  const authStatus = useContext(AuthContext)
+  const { currentUser } = getAuth()
   const sliderSettings = {
     dots: true,
     infinite: true,
@@ -313,7 +315,7 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
                 ))}
 
                 {/* 登録ページへのリンクはログイン中のみ有効にする */}
-                {currentUser ? (
+                {authStatus === 'LOGGED_IN' && currentUser ? (
                   <Link href='/register'>
                     <a>素材を追加する</a>
                   </Link>
