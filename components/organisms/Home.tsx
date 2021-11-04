@@ -186,7 +186,7 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
           </MakingWrap>
         </MakingSection>
         <MoldSection id='mold' color={'transparent'}>
-          <Wrap>
+          <MoldWrap>
             <MoldLeft>
               <MoldSlider>
                 <Slider {...sliderSettings}>
@@ -212,7 +212,7 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
               <Divider />
               <Download href={'/'}>ダウンロードする</Download>
             </MoldRight>
-          </Wrap>
+          </MoldWrap>
         </MoldSection>
         <AboutSection id='aboutus' color={'transparent '}>
           <AboutWrap>
@@ -235,7 +235,7 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
                 alt={'Yahoo! LODGE'}
                 width={495}
                 height={360}
-                layout='fixed'
+                layout='responsive'
               />
             </AboutRight>
           </AboutWrap>
@@ -337,6 +337,9 @@ const Wrap = styled.div`
   /* flex-direction: row; */
   justify-content: center;
   align-items: flex-start;
+  ${media.mdsp} {
+    flex-direction: column;
+  }
 `
 
 const Divider = styled.div`
@@ -455,8 +458,8 @@ const WhyKeys = styled.div`
   grid-template-columns: repeat(2, 1fr);
   gap: 64px;
   ${media.sp} {
-    grid-template-rows: repeat(1, 1fr);
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    grid-template-columns: repeat(1, 1fr);
   }
 `
 
@@ -482,6 +485,10 @@ const WorkshopWrap = styled(Wrap)`
   gap: 64px;
   grid-template-rows: repeat(1, 1fr);
   grid-template-columns: repeat(2, 1fr);
+  ${media.mdsp} {
+    grid-template-rows: repeat(2, 1fr);
+    grid-template-columns: repeat(1, 1fr);
+  }
 `
 
 const WorkShopRight = styled.div``
@@ -588,8 +595,13 @@ const MakingScrollContents = styled.div`
 `
 
 const MoldSection = styled(Section)``
+const MoldWrap = styled(Wrap)``
 
-const MoldLeft = styled.div``
+const MoldLeft = styled.div`
+  ${media.mdsp} {
+    width: 100%;
+  }
+`
 
 const MoldRight = styled.div`
   margin: 0 0 0 64px;
@@ -647,6 +659,12 @@ const AboutLeft = styled.div`
 `
 const AboutRight = styled.div`
   position: relative;
+  ${media.lg} {
+    min-width: 495px;
+  }
+  ${media.mdsp} {
+    width: 100%;
+  }
   &:after {
     content: '';
     display: block;
@@ -677,6 +695,10 @@ const Filters = styled.ul`
   display: flex;
   flex-direction: columns;
   padding: 0 0 32px 0;
+  ${media.mdsp} {
+    width: 100%;
+    overflow: auto;
+  }
 `
 
 const Filter = styled.li<{ isSelected: boolean }>`
