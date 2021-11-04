@@ -178,3 +178,9 @@ export interface ResponseData {
   status: number
   message: string
 }
+
+export interface TranslationScript {
+  home: {
+    whyanycap: string
+  }
+}

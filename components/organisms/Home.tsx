@@ -10,6 +10,7 @@ import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
 import Slider from 'react-slick'
 import { getAuth } from 'firebase/auth'
+import { useTranslation } from 'next-i18next'
 
 type Props = {
   materials: Material[]
@@ -29,6 +30,8 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
     slidesToScroll: 1,
   }
   const [currentFilter, setCurrentFilter] = useState(0)
+  const { t } = useTranslation('translation', { keyPrefix: 'home' })
+
   return (
     <>
       <main>
@@ -73,7 +76,7 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
           <WHYWrap>
             <SectionTitleGroup>
               <SectionTitle>Why #ANYCAP ?</SectionTitle>
-              <SectionSubTitle>廃プラキーキャップのススメ</SectionSubTitle>
+              <SectionSubTitle>{t('whyAnycap.subtitle')}</SectionSubTitle>
             </SectionTitleGroup>
             <WhyKeys>
               <WhyKey>

@@ -4,6 +4,7 @@ import emotionReset from 'emotion-reset'
 import { color } from '../styles'
 import Layout from '../components/Layout'
 import { AuthProvider } from '../lib/auth'
+import { appWithTranslation } from 'next-i18next'
 
 function MyApp({ Component, pageProps }) {
   return (
@@ -36,4 +37,4 @@ function MyApp({ Component, pageProps }) {
   )
 }
 
-export default MyApp
+export default appWithTranslation(MyApp)
