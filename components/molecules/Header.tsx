@@ -60,10 +60,10 @@ const Wrap = styled.div`
   height: 100vh;
   background: transparent;
   z-index: ${zIndex.header};
-  ${media.mdsp`
-        height:44px;
-        width:100vw;
-    `}
+  ${media.mdsp} {
+    height: 44px;
+    width: 100vw;
+  }
 `
 
 const Container = styled.div`
@@ -74,9 +74,9 @@ const Container = styled.div`
   height: 100%;
   margin: 0 auto;
   font-family: ${font.inter.body2};
-  ${media.mdsp`
+  ${media.mdsp} {
     flex-direction: row;
-  `}
+  }
 `
 const Left = styled.div`
   display: flex;

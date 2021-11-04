@@ -16,7 +16,7 @@ export const color = {
     bague: '#F5F5F5',
     dark: '#333',
     white: '#fff',
-    blue: '#D8F0FF',
+    blue: '#EDF2F5',
   },
   utils: {
     error: '#FF3B30',
@@ -87,26 +87,10 @@ export const font = {
 } as const
 
 export const media = {
-  lg: (...args: any) => css`
-    @media (min-width: 1040px) {
-      ${css(...args)}
-    }
-  `,
-  md: (...args: any) => css`
-    @media (min-width: 480px) and (max-width: 1039px) {
-      ${css(...args)}
-    }
-  `,
-  mdsp: (...args: any) => css`
-    @media (max-width: 1039px) {
-      ${css(...args)}
-    }
-  `,
-  sp: (...args: any) => css`
-    @media (max-width: 479px) {
-      ${css(...args)}
-    }
-  `,
+  lg: '@media (min-width: 1040px)',
+  md: '@media (min-width: 480px) and (max-width: 1039px)',
+  mdsp: '@media (max-width: 1039px) ',
+  sp: '@media (max-width: 479px)',
 }
 
 export const curve = {

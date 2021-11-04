@@ -297,6 +297,7 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
                       id={material.id}
                       materialName={material.materialName}
                       colorType={material.colorType}
+                      celsius={material.celsius}
                       plasticType={material.plasticType}
                       goodCount={material.goodCount}
                       upvotableMaterials={upvotableMaterials}
@@ -367,9 +368,9 @@ const SectionSubTitle = styled.p`
 const Hero = styled(Section)`
   position: relative;
   height: calc(100vw * 2 / 3);
-  ${media.mdsp`
-    min-height:100vh;
-    `}
+  ${media.mdsp} {
+    min-height: 100vh;
+  }
 `
 const Title = styled.h1`
   position: absolute;
@@ -378,10 +379,10 @@ const Title = styled.h1`
   ${font.inter.h1};
   font-weight: bold;
   line-height: 200%;
-  ${media.mdsp`
-    position:relative;
+  ${media.mdsp} {
     ${font.inter.h2};
-  `}
+    line-height: 150%;
+  }
 `
 
 const VideoWrap = styled.div`
@@ -453,10 +454,10 @@ const WhyKeys = styled.div`
   grid-template-rows: repeat(2, 1fr);
   grid-template-columns: repeat(2, 1fr);
   gap: 64px;
-  ${media.sp`
-    grid-template-rows:repeat(1,1fr);
-    grid-template-columns:repeat(4,1fr);
-  `}
+  ${media.sp} {
+    grid-template-rows: repeat(1, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+  }
 `
 
 const WhyKey = styled.div`

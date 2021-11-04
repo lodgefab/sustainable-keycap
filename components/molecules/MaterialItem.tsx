@@ -11,6 +11,7 @@ type Props = {
   materialName: string
   colorType: ReactNode
   plasticType: string
+  celsius: number
   goodCount: number
   upvotableMaterials: string[]
   upvote: Function
@@ -22,6 +23,7 @@ export const MaterialItem: React.VFC<Props> = ({
   id,
   materialName,
   colorType,
+  celsius,
   plasticType,
   goodCount,
   upvotableMaterials,
@@ -58,7 +60,7 @@ export const MaterialItem: React.VFC<Props> = ({
             </InfoLine>
             <InfoLine>
               <p>加工温度</p>
-              <p>{plasticType}</p>
+              <p>{celsius}</p>
             </InfoLine>
           </Info>
           <UpvoteButtonWrap>
@@ -123,16 +125,16 @@ const InfoWrap = styled.div`
   display: flex;
   flex-direction: row;
 `
-const Info = styled.td`
+const Info = styled.tr`
   flex-grow: 1;
   margin: 0 16px 0 0;
 `
-const InfoLine = styled.tr`
+const InfoLine = styled.td`
   display: flex;
   justify-content: space-between;
   flex-direction: row;
   border-bottom: solid 1px ${color.content.dark};
-  &:first-child {
+  &:first-of-type {
     border-top: solid 1px ${color.content.dark};
   }
   p {
@@ -175,8 +177,7 @@ const UpvoteButton = styled.button<{ disabled: boolean }>`
     ${curve.button};
     border-radius: 50%;
     border: solid 2px ${color.content.dark};
-    background-color: ${(props) =>
-      props.disabled ? color.background.blue : color.background.white};
+    background-color: ${(props) => (props.disabled ? color.subColor.blue : color.background.white)};
     background-image: url('/images/icons/thumbs-up.svg');
     background-size: 20px;
     background-position: center center;

@@ -4,9 +4,7 @@ import { InternalFieldName } from 'react-hook-form/dist/types/fields'
 import { ChangeHandler, RefCallBack } from 'react-hook-form/dist/types/form'
 import ColorPicker from './ColorPicker'
 
-const Form = styled.form`
-  padding-top: 60px; // ヘッダーに隠れている部分が見えなくなってしまうのでその分下にずらすための暫定的な対応
-`
+const Form = styled.form``
 
 const FormItem = styled.div`
   margin: 20px auto;
