@@ -45,6 +45,13 @@ export const Header: React.VFC<Props> = ({ currentUser, authState, onLoginFunc, 
         )}
         {authState === 'NOT_LOGIN' && <button onClick={() => onLoginFunc()}>ログイン</button>}
         {/* authState === 'INITIALING' のときはなにも表示させない */}
+
+        <Link scroll={false} href='/' locale='ja'>
+          ja
+        </Link>
+        <Link scroll={false} href='/' locale='en'>
+          en
+        </Link>
       </Container>
     </Wrap>
   )
