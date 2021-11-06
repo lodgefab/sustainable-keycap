@@ -1,3 +1,5 @@
+const domain = process.env.VERCEL_URL || 'localhost:3000'
+
 module.exports = {
   i18n: {
     defaultNS: 'translation',
@@ -7,11 +9,11 @@ module.exports = {
   },
   domains: [
     {
-      domain: 'localhost:3000/en',
+      domain: `${domain}/en`,
       defaultLocale: 'en',
     },
     {
-      domain: 'localhost:3000',
+      domain: `${domain}`,
       defaultLocale: 'ja',
     },
   ],
