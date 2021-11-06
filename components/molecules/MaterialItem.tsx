@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react'
 import styled from '@emotion/styled'
-import { color, curve, font, zIndex } from '../../styles'
+import { color, curve, font, media, zIndex } from '../../styles'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -42,9 +42,9 @@ export const MaterialItem: React.VFC<Props> = ({
         <AvatarWrap>
           <Avatar>
             <Image
-              width={120}
-              height={120}
-              layout='fixed'
+              width={100}
+              height={100}
+              layout='intrinsic'
               src={keycapImageUrl}
               alt=' キーキャップ画像'
               objectFit='cover'
@@ -66,7 +66,10 @@ export const MaterialItem: React.VFC<Props> = ({
           <UpvoteButtonWrap>
             {/* 既にUpvote済み、もしくは未ログインの場合はUpvoteボタンを無効化する */}
             <UpvoteButton
-              onClick={() => upvote(id)}
+              onClick={(event) => {
+                event.stopPropagation()
+                upvote(id)
+              }}
               disabled={!upvotableMaterials.includes(id)}
             ></UpvoteButton>
             <span>{goodCount}</span>
@@ -99,18 +102,20 @@ const BG = styled(Image)``
 const Avatar = styled.div`
   position: absolute;
   left: 50%;
-  top: -50%;
-  transform: translate(-50%, 0);
+  top: 0%;
+  transform: translate(-50%, -50%);
   border: 2px solid ${color.primary};
   border-radius: 50%;
   overflow: hidden;
   background-color: ${color.background.white};
+  width: 100px;
+  height: 100px;
 `
 
 const AvatarWrap = styled.div`
   position: relative;
   width: 100%;
-  height: 100px;
+  height: 50px;
 `
 
 const Title = styled.h3`
@@ -118,16 +123,25 @@ const Title = styled.h3`
   padding: 0 16px;
   margin: 0 0 16px 0;
   color: ${color.content.dark};
+  ${media.mdsp} {
+    padding: 0 8px;
+  }
 `
 
 const InfoWrap = styled.div`
   padding: 0 16px;
   display: flex;
   flex-direction: row;
+  ${media.mdsp} {
+    padding: 0 8px;
+  }
 `
 const Info = styled.tr`
   flex-grow: 1;
   margin: 0 16px 0 0;
+  ${media.mdsp} {
+    margin: 0 8px 0 0;
+  }
 `
 const InfoLine = styled.td`
   display: flex;

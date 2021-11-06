@@ -42,12 +42,20 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
               ></iframe>
             </VideoPlayer>
             <VideoMask></VideoMask>
+            <Image
+              src={'/images/photos/004.jpg'}
+              width={400}
+              height={400}
+              objectFit='cover'
+              objectPosition='center center'
+              layout='responsive'
+            />
           </VideoWrap>
           <Title>
             プラゴミから
-            <br />
+            <DesktopBr />
             キーキャップを
-            <br />
+            <DesktopBr />
             作ろう
           </Title>
         </Hero>
@@ -103,16 +111,16 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
         </WHYSection>
         <WorkshopSection id='workshop' color={'transparent'}>
           <WorkshopWrap>
-            <WorkShopLeft>
+            <WorkShopImgWrap>
               <WorkShopImg src='/images/photos/006.jpg' />
-            </WorkShopLeft>
-            <WorkShopRight>
-              <SectionTitleGroup>
-                <SectionTitle>Workshop</SectionTitle>
-                <SectionSubTitle>ワークショップ</SectionSubTitle>
-              </SectionTitleGroup>
+            </WorkShopImgWrap>
+            <WorkShopSectionTitle>
+              <SectionTitle>Workshop</SectionTitle>
+              <SectionSubTitle>ワークショップ</SectionSubTitle>
+            </WorkShopSectionTitle>
+            <WorkShopSectionContents>
               <WorkshopDesc>
-                自分の好きな素材を持ち込んで、世界に１つだけの廃プラキーキャップを作るワークショップを開催しています。ご興味のある方は、下のコンタクトフォームよりご希望の人数をお知らせください
+                自分の好きな素材を持ち込んで、世界に１つだけの廃プラキーキャップを作るワークショップを開催しています。ご興味のある方は、下のボタンよりお申し込みください。
               </WorkshopDesc>
               <Program>
                 <ProgramLabel>プログラム例：</ProgramLabel>
@@ -136,7 +144,7 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
                 </Price>
                 <Button label={'参加する'} />
               </WorkshopInfo>
-            </WorkShopRight>
+            </WorkShopSectionContents>
           </WorkshopWrap>
         </WorkshopSection>
         <MakingSection id='making' color={'transparent'}>
@@ -187,7 +195,7 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
         </MakingSection>
         <MoldSection id='mold' color={'transparent'}>
           <MoldWrap>
-            <MoldLeft>
+            <MoldSliderWrap>
               <MoldSlider>
                 <Slider {...sliderSettings}>
                   <SlideImg src={'/images/photos/011.jpg'} />
@@ -196,12 +204,12 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
                   <SlideImg src={'/images/photos/011.jpg'} />
                 </Slider>
               </MoldSlider>
-            </MoldLeft>
-            <MoldRight>
-              <SectionTitleGroup>
-                <SectionTitle>Mold</SectionTitle>
-                <SectionSubTitle>金型</SectionSubTitle>
-              </SectionTitleGroup>
+            </MoldSliderWrap>
+            <MoldTitleWrap>
+              <SectionTitle>Mold</SectionTitle>
+              <SectionSubTitle>金型</SectionSubTitle>
+            </MoldTitleWrap>
+            <MoldContentsWrap>
               <MoldDesc>
                 金型を用意し、家庭用の射出成形機（ORIGINALMIND社製のINARIなど）を使えば、ご自身でキーキャップを作ることも可能です。
                 <br />
@@ -211,16 +219,16 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
               </MoldDesc>
               <Divider />
               <Download href={'/'}>ダウンロードする</Download>
-            </MoldRight>
+            </MoldContentsWrap>
           </MoldWrap>
         </MoldSection>
         <AboutSection id='aboutus' color={'transparent '}>
           <AboutWrap>
-            <AboutLeft>
-              <SectionTitleGroup>
-                <SectionTitle>About Us</SectionTitle>
-                <SectionSubTitle>わたしたちについて</SectionSubTitle>
-              </SectionTitleGroup>
+            <AboutTitleWrap>
+              <SectionTitle>About Us</SectionTitle>
+              <SectionSubTitle>わたしたちについて</SectionSubTitle>
+            </AboutTitleWrap>
+            <AboutContentsWrap>
               <p>
                 #ANYCAPは、ヤフー社員の自主制作チームToasterによって運営されており、オープンコラボレーションハブLODGEを拠点に活動しています。
                 <br />
@@ -228,8 +236,8 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
               </p>
               <AboutDivider />
               <Button label={'お問合わせ'} />
-            </AboutLeft>
-            <AboutRight>
+            </AboutContentsWrap>
+            <AboutImageWrap>
               <Image
                 src='/images/photos/012.jpg'
                 alt={'Yahoo! LODGE'}
@@ -237,7 +245,7 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
                 height={360}
                 layout='responsive'
               />
-            </AboutRight>
+            </AboutImageWrap>
           </AboutWrap>
         </AboutSection>
         <LibrarySection id='library' color={'transparent'}>
@@ -339,6 +347,7 @@ const Wrap = styled.div`
   align-items: flex-start;
   ${media.mdsp} {
     flex-direction: column;
+    padding: 0 32px;
   }
 `
 
@@ -347,12 +356,20 @@ const Divider = styled.div`
   height: 1px;
   background-color: ${color.background.dark};
 `
+const DesktopBr = styled.br`
+  ${media.md} {
+    display: none;
+  }
+`
 
 const SectionTitleGroup = styled.div`
   display: flex;
   flex-direction: column;
   text-align: left;
   margin: 0 0 64px 0;
+  ${media.mdsp} {
+    margin: 0 0 64px 0;
+  }
 `
 
 const SectionTitle = styled.h3`
@@ -370,9 +387,12 @@ const SectionSubTitle = styled.p`
 
 const Hero = styled(Section)`
   position: relative;
-  height: calc(100vw * 2 / 3);
-  ${media.mdsp} {
-    min-height: 100vh;
+  padding: 56px 0 0px 0;
+  ${media.lg} {
+    height: calc(100vw * 2 / 3);
+  }
+  ${media.sp} {
+    padding: 56px 0 0 0;
   }
 `
 const Title = styled.h1`
@@ -383,8 +403,19 @@ const Title = styled.h1`
   font-weight: bold;
   line-height: 200%;
   ${media.mdsp} {
+    position: relative;
+    left: 0;
+    top: 0;
+    margin: 32px 0 0 32px;
+
+    max-width: 990px;
     ${font.inter.h2};
     line-height: 150%;
+  }
+  ${media.md} {
+    margin: 128px auto 0;
+    padding: 0 32px;
+    ${font.inter.h1};
   }
 `
 
@@ -394,7 +425,18 @@ const VideoWrap = styled.div`
   left: 0;
   width: calc(100vw * 2 / 3);
   height: calc(100vw * 2 / 3);
-  background-color: tomato;
+  background-color: ${color.background.white};
+  overflow: hidden;
+  ${media.sp} {
+    position: relative;
+    width: calc(100vw - 32px);
+    height: calc(100vw - 32px);
+  }
+  ${media.md} {
+    position: relative;
+    width: calc(100vw - 128px);
+    height: calc(100vh * 2 / 3);
+  }
 `
 
 const VideoMask = styled.div`
@@ -405,6 +447,9 @@ const VideoMask = styled.div`
   bottom: 0;
   background-image: url('/images/mask.svg');
   background-size: cover;
+  ${media.mdsp} {
+    display: none;
+  }
 `
 
 const VideoPlayer = styled.div`
@@ -412,6 +457,9 @@ const VideoPlayer = styled.div`
   height: 100%;
   background: #333333;
   overflow: hidden;
+  ${media.mdsp} {
+    display: none;
+  }
   iframe {
     display: block;
     position: absolute;
@@ -420,16 +468,31 @@ const VideoPlayer = styled.div`
     transform: translate(-50%, -50%);
     width: calc(100vw * 2 / 3);
     height: calc(100vw * 2 / 3);
+    ${media.sp} {
+      width: calc(100vw - 32px);
+      height: calc(100vw - 32px);
+    }
   }
 `
 const ConceptSection = styled(Section)`
   padding: 0 0 128px 0;
+  ${media.mdsp} {
+    padding: 32px 0px 128px 0px;
+  }
 `
 
 const Message = styled.h2`
   ${font.inter.h3}
   line-height:200%;
   text-align: left;
+  ${media.mdsp} {
+    ${font.inter.subtitle1};
+    line-height: 200%;
+  }
+  ${media.md} {
+    ${font.inter.h3};
+    line-height: 200%;
+  }
 `
 
 const ConceptPhotos = styled.div`
@@ -439,11 +502,17 @@ const ConceptPhotos = styled.div`
   grid-template-rows: auto;
   width: 100%;
   overflow: auto;
+  padding: 0 32px;
 `
 
 const ConceptPhoto = styled.img`
   width: auto;
   height: 480px;
+  ${media.mdsp} {
+    width: 315px;
+    height: 420px;
+    object-fit: cover;
+  }
 `
 
 const WHYSection = styled(Section)``
@@ -469,10 +538,17 @@ const WhyKey = styled.div`
   img {
     width: 150px;
     height: auto;
+    ${media.mdsp} {
+      width: 100px;
+      margin: 0 0 16px 0;
+    }
   }
   h4 {
     ${font.inter.h3};
     margin: 0 0 16px 0;
+    ${media.mdsp} {
+      ${font.inter.subtitle1};
+    }
   }
   p {
     ${font.inter.article2};
@@ -483,16 +559,34 @@ const WorkshopSection = styled(Section)``
 const WorkshopWrap = styled(Wrap)`
   display: grid;
   gap: 64px;
-  grid-template-rows: repeat(1, 1fr);
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-areas:
+    'A B'
+    'A C';
   ${media.mdsp} {
-    grid-template-rows: repeat(2, 1fr);
-    grid-template-columns: repeat(1, 1fr);
+    width: 100%;
+    grid-template-areas:
+      'B'
+      'A'
+      'C';
+  }
+`
+const WorkShopSectionTitle = styled(SectionTitleGroup)`
+  grid-area: B;
+  margin: 0;
+  ${media.mdsp} {
+    margin: 0;
   }
 `
 
-const WorkShopRight = styled.div``
-const WorkShopLeft = styled.div``
+const WorkShopSectionContents = styled.div`
+  grid-area: C;
+`
+const WorkShopImgWrap = styled.div`
+  grid-area: A;
+  ${media.lg} {
+    width: 495px;
+  }
+`
 const WorkShopImg = styled.img`
   width: 100%;
 `
@@ -500,10 +594,11 @@ const WorkshopDesc = styled.p`
   text-align: left;
   ${font.inter.article1};
   color: ${color.content.dark};
+  margin: 0 0 32px 0;
 `
 const Program = styled.div`
   padding: 16px;
-  margin: 0 0 16px 0;
+  margin: 0 0 32px 0;
   background-color: ${color.background.blue};
   text-align: left;
   border-radius: 8px;
@@ -595,16 +690,37 @@ const MakingScrollContents = styled.div`
 `
 
 const MoldSection = styled(Section)``
-const MoldWrap = styled(Wrap)``
-
-const MoldLeft = styled.div`
+const MoldWrap = styled(Wrap)`
+  display: grid;
+  gap: 64px;
+  grid-template-areas:
+    'A B'
+    'A C';
   ${media.mdsp} {
     width: 100%;
+    grid-template-areas:
+      'B'
+      'A'
+      'C';
   }
 `
 
-const MoldRight = styled.div`
-  margin: 0 0 0 64px;
+const MoldSliderWrap = styled.div`
+  grid-area: A;
+  ${media.mdsp} {
+    width: 100%;
+    overflow: hidden;
+  }
+`
+const MoldTitleWrap = styled(SectionTitleGroup)`
+  grid-area: B;
+  margin: 0px;
+  ${media.mdsp} {
+    margin: 0;
+  }
+`
+const MoldContentsWrap = styled.div`
+  grid-area: C;
 `
 
 const MoldDesc = styled.p`
@@ -648,17 +764,41 @@ const Download = styled.a`
 
 const AboutSection = styled(Section)``
 
-const AboutWrap = styled(Wrap)``
-const AboutLeft = styled.div`
+const AboutWrap = styled(Wrap)`
+  display: grid;
+  gap: 64px;
+  grid-template-areas:
+    'B A'
+    'C A';
+  ${media.mdsp} {
+    width: 100%;
+    grid-template-areas:
+      'B'
+      'A'
+      'C';
+  }
+`
+const AboutTitleWrap = styled(SectionTitleGroup)`
+  grid-area: B;
+  margin: 0;
+  ${media.mdsp} {
+    margin: 0;
+  }
+`
+const AboutContentsWrap = styled.div`
+  grid-area: C;
   text-align: left;
-  margin: 0 64px 0 0;
   p {
     ${font.inter.article1};
     margin: 0 0 32px 0;
   }
+  ${media.mdsp} {
+    margin: 0;
+  }
 `
-const AboutRight = styled.div`
+const AboutImageWrap = styled.div`
   position: relative;
+  grid-area: A;
   ${media.lg} {
     min-width: 495px;
   }
@@ -698,6 +838,7 @@ const Filters = styled.ul`
   ${media.mdsp} {
     width: 100%;
     overflow: auto;
+    flex-wrap: wrap;
   }
 `
 
@@ -706,7 +847,7 @@ const Filter = styled.li<{ isSelected: boolean }>`
   background-color: ${(props) => (props.isSelected ? color.primary : color.background.white)};
   color: ${(props) => (props.isSelected ? color.content.white : color.background.dark)};
   padding: 8px;
-  margin: 0 16px 0 0;
+  margin: 0 16px 16px 0;
   border-radius: 4px;
   border: 2px solid ${color.primary};
   ${font.courier.subtitle2};
@@ -745,4 +886,8 @@ const MaterialGrid = styled.div`
   gap: 32px;
   width: 100%;
   margin: 0 0 32px 0;
+  ${media.sp} {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
 `

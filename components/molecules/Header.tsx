@@ -54,16 +54,16 @@ export const Header: React.VFC<Props> = ({ currentUser, authState, onLoginFunc, 
         <Left>
           <Logo to='hero' smooth={true} duration={500}></Logo>
           <PageLinks>
-            <PageLink to='workshop' smooth={true} duration={500} offset={-100}>
+            <PageLink to='workshop' smooth={true} duration={500} offset={72}>
               Workshop
             </PageLink>
-            <PageLink to='mold' smooth={true} duration={500} offset={-100}>
+            <PageLink to='mold' smooth={true} duration={500} offset={72}>
               Mold
             </PageLink>
-            <PageLink to='aboutus' smooth={true} duration={500} offset={-100}>
+            <PageLink to='aboutus' smooth={true} duration={500} offset={72}>
               AboutUs
             </PageLink>
-            <PageLink to='library' smooth={true} duration={500} offset={-100}>
+            <PageLink to='library' smooth={true} duration={500} offset={72}>
               Library
             </PageLink>
             <Link passHref href={'https://www.instagram.com/vernacular_cookbook/'}>
@@ -90,16 +90,16 @@ export const Header: React.VFC<Props> = ({ currentUser, authState, onLoginFunc, 
           <HamburgerMenu onClick={() => setMenuOpen(!isMenuOpen)} onBlur={handleMenuBlur}>
             {isMenuOpen && (
               <MenuLists>
-                <MenuList to='workshop' smooth={true} duration={500} offset={-100}>
+                <MenuList to='workshop' smooth={true} duration={500} offset={72}>
                   Workshop
                 </MenuList>
-                <MenuList to='mold' smooth={true} duration={500} offset={-100}>
+                <MenuList to='mold' smooth={true} duration={500} offset={72}>
                   Mold
                 </MenuList>
-                <MenuList to='aboutus' smooth={true} duration={500} offset={-100}>
+                <MenuList to='aboutus' smooth={true} duration={500} offset={72}>
                   AboutUs
                 </MenuList>
-                <MenuList to='library' smooth={true} duration={500} offset={-100}>
+                <MenuList to='library' smooth={true} duration={500} offset={72}>
                   Library
                 </MenuList>
                 <Link passHref href={'https://www.instagram.com/vernacular_cookbook/'}>
@@ -127,7 +127,7 @@ const Wrap = styled.div`
     left: 0;
     height: 56px;
     width: 100%;
-    padding: 0 16px;
+    padding: 0 32px;
   }
 `
 
@@ -227,8 +227,8 @@ const TranslateButton = styled.button<{ isJa: boolean }>`
 
 const LoggedInIcon = styled.button<{ bgURL: string | null }>`
   position: relative;
-  width: 44px;
-  height: 44px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   border: solid 2px ${color.primary};
   background-color: ${color.subColor.blue};
@@ -259,8 +259,8 @@ const AvatarMenu = styled.a`
 `
 const LoggedOutIcon = styled.button`
   position: relative;
-  width: 44px;
-  height: 44px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   border: 2px solid ${color.primary};
   background-color: ${color.background.white};
@@ -287,6 +287,9 @@ const HamburgerMenu = styled.button`
   background-position: center;
   background-size: 32px 32px;
   background-repeat: no-repeat;
+  ${media.lg} {
+    display: none;
+  }
 `
 
 const MenuLists = styled.ul`

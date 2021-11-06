@@ -60,7 +60,7 @@ const Front = styled.span`
   width: 100%;
   height: 100%;
   border-radius: 4px;
-  background-color: ${color.background.blue};
+  background-color: ${color.subColor.blue};
   border: 2px solid ${color.primary};
   z-index: ${zIndex.behind};
 `
