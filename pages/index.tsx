@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { NextPage } from 'next'
+import { InferGetStaticPropsType, NextPage } from 'next'
 import { Home } from '../components/organisms/Home'
 import React, { useContext, useEffect, useState } from 'react'
 import { Material } from '../types'
@@ -10,8 +10,19 @@ import { MaterialsApiResponse } from './api/materials'
 import Axios from 'axios'
 import { UpvoteApiResponse } from './api/upvote'
 import { getAuth } from 'firebase/auth'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
-export const Index: NextPage = () => {
+type Props = InferGetStaticPropsType<typeof getStaticProps>
+
+export const getStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale)),
+    },
+  }
+}
+
+export const Index: NextPage<Props> = (_) => {
   const authState = useContext(AuthContext)
   const currentUser = getAuth().currentUser
 

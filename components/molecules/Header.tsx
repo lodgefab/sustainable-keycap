@@ -6,6 +6,7 @@ import { User } from 'firebase/auth'
 import { AuthStatus } from '../../lib/auth'
 import { Link as Scroll } from 'react-scroll'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 interface Props {
   currentUser: User | null
@@ -15,6 +16,13 @@ interface Props {
 }
 
 export const Header: React.VFC<Props> = ({ currentUser, authState, onLoginFunc, onLogoutFunc }) => {
+  const router = useRouter()
+  const { pathname, asPath, query } = router
+
+  const changeLanguage = (nextLanguage: string) => {
+    router.push({ pathname, query }, asPath, { locale: nextLanguage, scroll: false })
+  }
+
   return (
     <Wrap>
       <Container>
@@ -45,6 +53,21 @@ export const Header: React.VFC<Props> = ({ currentUser, authState, onLoginFunc, 
         )}
         {authState === 'NOT_LOGIN' && <button onClick={() => onLoginFunc()}>ログイン</button>}
         {/* authState === 'INITIALING' のときはなにも表示させない */}
+
+        <button
+          onClick={() => {
+            changeLanguage('ja')
+          }}
+        >
+          ja
+        </button>
+        <button
+          onClick={() => {
+            changeLanguage('en')
+          }}
+        >
+          en
+        </button>
       </Container>
     </Wrap>
   )
