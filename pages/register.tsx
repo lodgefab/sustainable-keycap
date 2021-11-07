@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { NextPage } from 'next'
+import { InferGetStaticPropsType, NextPage } from 'next'
 import React, { useContext, useState } from 'react'
 import { Editor } from '../components/organisms/Editor'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
@@ -10,10 +10,19 @@ import Axios from 'axios'
 import { useRouter } from 'next/router'
 import { AuthContext, login } from '../lib/auth'
 import { getAuth } from 'firebase/auth'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
-interface Props {}
+type Props = InferGetStaticPropsType<typeof getStaticProps>
 
-export const Register: NextPage<Props> = (props) => {
+export const getStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['translation'])),
+    },
+  }
+}
+
+export const Register: NextPage<Props> = (_) => {
   const authState = useContext(AuthContext)
   const currentUser = getAuth().currentUser
   const router = useRouter()
