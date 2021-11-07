@@ -3,7 +3,7 @@ import styled from '@emotion/styled'
 import { InternalFieldName } from 'react-hook-form/dist/types/fields'
 import { ChangeHandler, RefCallBack } from 'react-hook-form/dist/types/form'
 import ColorPicker from './ColorPicker'
-import { color, font, media } from '../../styles'
+import { color, font, media, zIndex } from '../../styles'
 import Image from 'next/image'
 import { Button } from '../atoms/Button'
 
@@ -63,6 +63,10 @@ export const Editor: React.VFC<Props> = ({
     setColorPickerVisibility(true)
   }
 
+  /**
+   * 画像をアップした際にプレビューを表示する
+   */
+
   return (
     <>
       <FormHeading>
@@ -70,8 +74,8 @@ export const Editor: React.VFC<Props> = ({
         <p>素材を追加する</p>
       </FormHeading>
       <Form onClick={onColorFormBeInActive} onFocus={onColorFormBeInActive}>
-        <MaterialWrap>
-          <label htmlFor='plastic-image'>廃プラ画像を追加</label>
+        <MaterialWrap bgURL={`${inputTagAttributes.plasticImage}`}>
+          <label htmlFor='plastic-image'></label>
           <input
             type='file'
             id='plastic-image'
@@ -84,7 +88,7 @@ export const Editor: React.VFC<Props> = ({
           )}
         </MaterialWrap>
         <KeyUploadWrap>
-          <label htmlFor='keycap-image'>キーキャップ画像を追加</label>
+          <label htmlFor='keycap-image'></label>
           <input
             type='file'
             id='keycap-image'
@@ -145,11 +149,12 @@ export const Editor: React.VFC<Props> = ({
 
           <FormItem>
             <Label htmlFor='note'>備考（制作する際のポイントなど）</Label>
-            <Textarea id='note' {...inputTagAttributes.note} />
+            <Textarea id='note' {...inputTagAttributes.note} rows={5} />
             {errorMessage.note && <ErrorMessage key='note'>{errorMessage.note}</ErrorMessage>}
           </FormItem>
-
-          <Button type='button' label='登録する' onClick={onClickSubmit} disabled={!canSubmit} />
+          <ButtonWrap>
+            <Button type='button' label='登録する' onClick={onClickSubmit} disabled={!canSubmit} />
+          </ButtonWrap>
         </InputWrap>
       </Form>
     </>
@@ -178,7 +183,8 @@ const FormHeading = styled.div`
   }
 `
 
-const MaterialWrap = styled.div`
+const MaterialWrap = styled.div<{ bgURL: string }>`
+  position: relative;
   width: 100%;
   height: 180px;
   input {
@@ -187,12 +193,22 @@ const MaterialWrap = styled.div`
     height: 100%;
     background-color: ${color.background.bague};
     cursor: pointer;
+    background-image: url(${(props) => props.bgURL});
   }
   label {
+    display: block;
     position: absolute;
-    top: 0;
-    left: 0;
-    visibility: hidden;
+    top: 8px;
+    right: 8px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: ${color.content.white};
+    background-image: url('/images/icons/camera.svg');
+    background-position: center center;
+    background-repeat: no-repeat;
+    border: 1px solid ${color.content.light};
+    cursor: pointer;
   }
 `
 
@@ -201,7 +217,21 @@ const KeyUploadWrap = styled.div`
   width: 100%;
   height: 100px;
   label {
-    text-indent: -9999px;
+    display: block;
+    position: absolute;
+    bottom: 0;
+    right: 50%;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: ${color.content.white};
+    background-image: url('/images/icons/camera.svg');
+    background-position: center center;
+    background-repeat: no-repeat;
+    border: 1px solid ${color.content.light};
+    cursor: pointer;
+    z-index: ${zIndex.default};
+    transform: translateX(100px);
   }
   input {
     position: absolute;
@@ -213,8 +243,12 @@ const KeyUploadWrap = styled.div`
     border-radius: 50%;
     border: solid 2px ${color.primary};
     cursor: pointer;
-    /* background-color: ${color.background.bague}; */
-    /* text-indent: -9999px; */
+    background-color: ${color.background.bague};
+    background-image: url('/images/icons/image.svg');
+    background-position: center center;
+    background-size: 82px 82px;
+    background-repeat: no-repeat;
+    text-indent: -9999px;
   }
 `
 
@@ -256,12 +290,24 @@ const Input = styled.input`
   background-color: ${color.background.blue};
 `
 const Select = styled.select`
+  position: relative;
   display: block;
   background-color: ${color.background.blue};
   border: 0px;
   border-radius: 4px;
   min-height: 32px;
   width: 100%;
+  padding: 0 16px;
+  appearance: none;
+  :after {
+    content: '';
+    display: block;
+    width: 16px;
+    height: 16px;
+    background-image: url('/images/icons/triangle.svg');
+    background-size: cover;
+    background-position: center;
+  }
 `
 
 const Textarea = styled.textarea`
@@ -271,15 +317,22 @@ const Textarea = styled.textarea`
   border-radius: 4px;
   min-height: 32px;
   width: 100%;
+  padding: 0 16px;
+  resize: vertical;
 `
 
 const ColorPickerWrapper = styled.div`
   position: absolute;
   background: #ffffff;
   z-index: 1;
-  top: 40px;
+  top: 60px;
 `
 
 const ErrorMessage = styled.p`
   color: #ff0000;
+`
+const ButtonWrap = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
 `
