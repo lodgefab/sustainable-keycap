@@ -29,8 +29,12 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
     slidesToShow: 1,
     slidesToScroll: 1,
   }
-  const [currentFilter, setCurrentFilter] = useState<CategorisedColorType>('red')
+  const [currentFilter, setCurrentFilter] = useState<CategorisedColorType | null>(null)
   const { t } = useTranslation('translation', { keyPrefix: 'home' })
+
+  const updateFilter = (newFilter: CategorisedColorType) => {
+    setCurrentFilter(currentFilter === newFilter ? null : newFilter)
+  }
 
   return (
     <>
@@ -250,37 +254,34 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
             {materials.length > 0 && ( // 何らかの理由で素材リストが取れなかった時はsection全体を非表示にする
               <>
                 <Filters className='filter'>
-                  <Filter
-                    isSelected={currentFilter === 'red'}
-                    onClick={() => setCurrentFilter('red')}
-                  >
+                  <Filter isSelected={currentFilter === 'red'} onClick={() => updateFilter('red')}>
                     <Palette isSelected={currentFilter === 'red'} color={color.subColor.red} />
                     Red
                   </Filter>
                   <Filter
                     isSelected={currentFilter === 'blue'}
-                    onClick={() => setCurrentFilter('blue')}
+                    onClick={() => updateFilter('blue')}
                   >
                     <Palette isSelected={currentFilter === 'blue'} color={color.subColor.blue} />
                     Blue
                   </Filter>
                   <Filter
                     isSelected={currentFilter === 'green'}
-                    onClick={() => setCurrentFilter('green')}
+                    onClick={() => updateFilter('green')}
                   >
                     <Palette isSelected={currentFilter === 'green'} color={color.subColor.green} />
                     Green
                   </Filter>
                   <Filter
                     isSelected={currentFilter === 'black'}
-                    onClick={() => setCurrentFilter('black')}
+                    onClick={() => updateFilter('black')}
                   >
                     <Palette isSelected={currentFilter === 'black'} color={color.subColor.dark} />
                     Black
                   </Filter>
                   <Filter
                     isSelected={currentFilter === 'white'}
-                    onClick={() => setCurrentFilter('white')}
+                    onClick={() => updateFilter('white')}
                   >
                     <Palette isSelected={currentFilter === 'white'} color={color.content.white} />
                     White
@@ -288,7 +289,10 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
                 </Filters>
 
                 {materials
-                  .filter((material) => material.categorisedColor === currentFilter)
+                  .filter(
+                    (material) =>
+                      currentFilter === null || material.categorisedColor === currentFilter
+                  )
                   .map((material) => (
                     <div className='material' key={`material-${material.id}`}>
                       <Image
