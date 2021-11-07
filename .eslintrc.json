@@ -6,6 +6,9 @@
     "plugin:import/typescript",
     "prettier" // Prettierと競合するESLintの検査項目を無効化するために追加している。必ずextendsの最後に置く
   ],
+  "plugins": [
+    "unused-imports"
+  ],
   "settings": {
     "import/parsers": {
       "@typescript-eslint/parser": [".ts", ".tsx"]
@@ -36,6 +39,9 @@
           "order": "asc"
         }
       }
-    ]
+    ],
+
+    // 未使用のimport文は残しておかない
+    "unused-imports/no-unused-imports": "warn"
   }
 }
