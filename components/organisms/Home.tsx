@@ -4,7 +4,7 @@ import { color, font, media, zIndex } from '../../styles'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '../atoms/Button'
-import { Material } from '../../types'
+import { CategorisedColorType, Material } from '../../types'
 import { AuthContext } from '../../lib/auth'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
@@ -29,8 +29,12 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
     slidesToShow: 1,
     slidesToScroll: 1,
   }
-  const [currentFilter, setCurrentFilter] = useState(0)
+  const [currentFilter, setCurrentFilter] = useState<CategorisedColorType | null>(null)
   const { t } = useTranslation('translation', { keyPrefix: 'home' })
+
+  const updateFilter = (newFilter: CategorisedColorType) => {
+    setCurrentFilter(currentFilter === newFilter ? null : newFilter)
+  }
 
   return (
     <>
@@ -250,72 +254,74 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
             {materials.length > 0 && ( // 何らかの理由で素材リストが取れなかった時はsection全体を非表示にする
               <>
                 <Filters className='filter'>
-                  <Filter isSelected={currentFilter == 0 ? true : false}>
-                    <Palette
-                      isSelected={currentFilter == 0 ? true : false}
-                      color={color.subColor.red}
-                    ></Palette>
+                  <Filter isSelected={currentFilter === 'red'} onClick={() => updateFilter('red')}>
+                    <Palette isSelected={currentFilter === 'red'} color={color.subColor.red} />
                     Red
                   </Filter>
-                  <Filter isSelected={currentFilter == 1 ? true : false}>
-                    <Palette
-                      isSelected={currentFilter == 1 ? true : false}
-                      color={color.subColor.blue}
-                    ></Palette>
+                  <Filter
+                    isSelected={currentFilter === 'blue'}
+                    onClick={() => updateFilter('blue')}
+                  >
+                    <Palette isSelected={currentFilter === 'blue'} color={color.subColor.blue} />
                     Blue
                   </Filter>
-                  <Filter isSelected={currentFilter == 2 ? true : false}>
-                    <Palette
-                      isSelected={currentFilter == 2 ? true : false}
-                      color={color.subColor.green}
-                    ></Palette>
+                  <Filter
+                    isSelected={currentFilter === 'green'}
+                    onClick={() => updateFilter('green')}
+                  >
+                    <Palette isSelected={currentFilter === 'green'} color={color.subColor.green} />
                     Green
                   </Filter>
-                  <Filter isSelected={currentFilter == 3 ? true : false}>
-                    <Palette
-                      isSelected={currentFilter == 3 ? true : false}
-                      color={color.subColor.dark}
-                    ></Palette>
+                  <Filter
+                    isSelected={currentFilter === 'black'}
+                    onClick={() => updateFilter('black')}
+                  >
+                    <Palette isSelected={currentFilter === 'black'} color={color.subColor.dark} />
                     Black
                   </Filter>
-                  <Filter isSelected={currentFilter == 4 ? true : false}>
-                    <Palette
-                      isSelected={currentFilter == 4 ? true : false}
-                      color={color.content.white}
-                    ></Palette>
+                  <Filter
+                    isSelected={currentFilter === 'white'}
+                    onClick={() => updateFilter('white')}
+                  >
+                    <Palette isSelected={currentFilter === 'white'} color={color.content.white} />
                     White
                   </Filter>
                 </Filters>
 
-                {materials.map((material) => (
-                  <div className='material' key={`material-${material.id}`}>
-                    <Image
-                      width={100}
-                      height={50}
-                      src={material.plasticImageUrl}
-                      alt='素材プラスチック画像'
-                    />
-                    <Image
-                      width={50}
-                      height={50}
-                      src={material.keycapImageUrl}
-                      alt='キーキャップ画像'
-                    />
-                    <Link href={`/material/${material.id}`}>
-                      <a>{material.materialName}</a>
-                    </Link>
-                    <p>{material.colorType}</p>
-                    <p>{material.plasticType}</p>
-                    {/* 既にUpvote済み、もしくは未ログインの場合はUpvoteボタンを無効化する */}
-                    <button
-                      onClick={() => upvote(material.id)}
-                      disabled={!upvotableMaterials.includes(material.id)}
-                    >
-                      Upvote
-                    </button>
-                    <p>{material.goodCount}</p>
-                  </div>
-                ))}
+                {materials
+                  .filter(
+                    (material) =>
+                      currentFilter === null || material.categorisedColor === currentFilter
+                  )
+                  .map((material) => (
+                    <div className='material' key={`material-${material.id}`}>
+                      <Image
+                        width={100}
+                        height={50}
+                        src={material.plasticImageUrl}
+                        alt='素材プラスチック画像'
+                      />
+                      <Image
+                        width={50}
+                        height={50}
+                        src={material.keycapImageUrl}
+                        alt='キーキャップ画像'
+                      />
+                      <Link href={`/material/${material.id}`}>
+                        <a>{material.materialName}</a>
+                      </Link>
+                      <p>{material.colorType}</p>
+                      <p>{material.plasticType}</p>
+                      {/* 既にUpvote済み、もしくは未ログインの場合はUpvoteボタンを無効化する */}
+                      <button
+                        onClick={() => upvote(material.id)}
+                        disabled={!upvotableMaterials.includes(material.id)}
+                      >
+                        Upvote
+                      </button>
+                      <p>{material.goodCount}</p>
+                    </div>
+                  ))}
 
                 {/* 登録ページへのリンクはログイン中のみ有効にする */}
                 {authStatus === 'LOGGED_IN' && currentUser ? (
