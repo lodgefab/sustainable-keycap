@@ -29,305 +29,301 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
   }
   const [currentFilter, setCurrentFilter] = useState(0)
   return (
-    <>
-      <main>
-        <Hero id='hero' color={'transparent'}>
-          <VideoWrap>
-            <VideoPlayer>
-              <iframe
-                src='https://www.youtube.com/embed/bfleByM49CM?autoplay=1&mute=1&playsinline=1&loop=1&playlist=bfleByM49CM&controls=0&disablekb=1'
-                frameBorder='0'
-                allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture'
-                allowFullScreen
-              ></iframe>
-            </VideoPlayer>
-            <VideoMask></VideoMask>
+    <main>
+      <Hero id='hero' color={'transparent'}>
+        <VideoWrap>
+          <VideoPlayer>
+            <iframe
+              src='https://www.youtube.com/embed/bfleByM49CM?autoplay=1&mute=1&playsinline=1&loop=1&playlist=bfleByM49CM&controls=0&disablekb=1'
+              frameBorder='0'
+              allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture'
+              allowFullScreen
+            ></iframe>
+          </VideoPlayer>
+          <VideoMask></VideoMask>
+          <Image
+            src={'/images/photos/004.jpg'}
+            width={400}
+            height={400}
+            objectFit='cover'
+            objectPosition='center center'
+            layout='responsive'
+          />
+        </VideoWrap>
+        <Title>
+          プラゴミから
+          <DesktopBr />
+          キーキャップを
+          <DesktopBr />
+          作ろう
+        </Title>
+      </Hero>
+      <ConceptSection id='concept' color={'transparent'}>
+        <Wrap>
+          <Message>
+            #ANYCAPは、廃棄プラスチックを使ってキーキャップを自作するオープンソースコミュニティです。
+            <br />
+            <br />
+            家庭やオフィスで出るプラゴミを原材料としたキーキャップを製作し、手法やデータを公開することを通じて、仲間の輪を広げる活動を行なっています。
+          </Message>
+        </Wrap>
+      </ConceptSection>
+      <ConceptPhotos>
+        <ConceptPhoto src='/images/photos/001.jpg' />
+        <ConceptPhoto src='/images/photos/002.jpg' />
+        <ConceptPhoto src='/images/photos/003.jpg' />
+        <ConceptPhoto src='/images/photos/004.jpg' />
+        <ConceptPhoto src='/images/photos/005.jpg' />
+      </ConceptPhotos>
+      <WHYSection id='why' color={'transparent'}>
+        <WHYWrap>
+          <SectionTitleGroup>
+            <SectionTitle>Why #ANYCAP ?</SectionTitle>
+            <SectionSubTitle>廃プラキーキャップのススメ</SectionSubTitle>
+          </SectionTitleGroup>
+          <WhyKeys>
+            <WhyKey>
+              <img src='/images/icons/point001.svg' />
+              <h4>一般的なキーキャップ規格に準拠</h4>
+              <p>
+                Cherry,
+                DSAなど、一般的な自作キーボード規格に則ったキー形状のため、お使いのキーボードにそのまま組み込みやすいです
+              </p>
+            </WhyKey>
+            <WhyKey>
+              <img src='/images/icons/point002.svg' />
+              <h4>コスト抑えめ</h4>
+              <p>廃材を用いるので、原材料の費用が安く済みます</p>
+            </WhyKey>
+            <WhyKey>
+              <img src='/images/icons/point003.svg' />
+              <h4>自分の好きな色・素材にこだわれる</h4>
+              <p>自分が本当にキーボードに欲しい色、欲しい素材で作ることができます</p>
+            </WhyKey>
+            <WhyKey>
+              <img src='/images/icons/point004.svg' />
+              <h4>オープンソース</h4>
+              <p>金型や作り方の情報を公開しています</p>
+            </WhyKey>
+          </WhyKeys>
+        </WHYWrap>
+      </WHYSection>
+      <WorkshopSection id='workshop' color={'transparent'}>
+        <WorkshopWrap>
+          <WorkShopImgWrap>
+            <WorkShopImg src='/images/photos/006.jpg' />
+          </WorkShopImgWrap>
+          <WorkShopSectionTitle>
+            <SectionTitle>Workshop</SectionTitle>
+            <SectionSubTitle>ワークショップ</SectionSubTitle>
+          </WorkShopSectionTitle>
+          <WorkShopSectionContents>
+            <WorkshopDesc>
+              自分の好きな素材を持ち込んで、世界に１つだけの廃プラキーキャップを作るワークショップを開催しています。ご興味のある方は、下のボタンよりお申し込みください。
+            </WorkshopDesc>
+            <Program>
+              <ProgramLabel>プログラム例：</ProgramLabel>
+              <ProgramDesc>
+                10分 導入・作業説明
+                <br />
+                30分 素材の破砕作業
+                <br />
+                30分 射出成形
+                <br />
+                20分 まとめ・撮影タイム
+                <br />
+                <br />
+                場所：ガーデンテラス紀尾井町17F　ヤフーLODGE内
+              </ProgramDesc>
+            </Program>
+            <Divider />
+            <WorkshopInfo>
+              <Price>
+                1200円<span>（材料費・実費）</span>
+              </Price>
+              <Button label={'参加する'} />
+            </WorkshopInfo>
+          </WorkShopSectionContents>
+        </WorkshopWrap>
+      </WorkshopSection>
+      <MakingSection id='making' color={'transparent'}>
+        <MakingWrap>
+          <SectionTitleGroup>
+            <SectionTitle>Making #ANYCAP</SectionTitle>
+            <SectionSubTitle>廃プラキーキャップができるまで</SectionSubTitle>
+          </SectionTitleGroup>
+          <MakingScrollWrap>
+            <MakingScrollContents>
+              <MakingItem>
+                <MakingItemImg src={'/images/photos/007.jpg'} />
+                <h3>
+                  <span>01.</span>素材をさがす
+                </h3>
+                <p>
+                  キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
+                </p>
+              </MakingItem>
+              <MakingItem>
+                <MakingItemImg src={'/images/photos/008.jpg'} />
+                <h3>
+                  <span>02.</span>破砕する
+                </h3>
+                <p>集めた素材を砕いて、5mm角程度の大きさにします。</p>
+              </MakingItem>
+              <MakingItem>
+                <MakingItemImg src={'/images/photos/009.jpg'} />
+                <h3>
+                  <span>03.</span>金型を用意する
+                </h3>
+                <p>
+                  キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
+                </p>
+              </MakingItem>
+              <MakingItem>
+                <MakingItemImg src={'/images/photos/010.jpg'} />
+                <h3>
+                  <span>04.</span>金型を用意する
+                </h3>
+                <p>
+                  キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
+                </p>
+              </MakingItem>
+            </MakingScrollContents>
+          </MakingScrollWrap>
+        </MakingWrap>
+      </MakingSection>
+      <MoldSection id='mold' color={'transparent'}>
+        <MoldWrap>
+          <MoldSliderWrap>
+            <MoldSlider>
+              <Slider {...sliderSettings}>
+                <SlideImg src={'/images/photos/011.jpg'} />
+                <SlideImg src={'/images/photos/011.jpg'} />
+                <SlideImg src={'/images/photos/011.jpg'} />
+                <SlideImg src={'/images/photos/011.jpg'} />
+              </Slider>
+            </MoldSlider>
+          </MoldSliderWrap>
+          <MoldTitleWrap>
+            <SectionTitle>Mold</SectionTitle>
+            <SectionSubTitle>金型</SectionSubTitle>
+          </MoldTitleWrap>
+          <MoldContentsWrap>
+            <MoldDesc>
+              金型を用意し、家庭用の射出成形機（ORIGINALMIND社製のINARIなど）を使えば、ご自身でキーキャップを作ることも可能です。
+              <br />
+              より多くの方に活動に参加してもらいたいという思いから、金型の3Dデータを公開しています。
+              <br />
+              ご興味のある方は、下記のコンタクトフォームよりお問い合わせください
+            </MoldDesc>
+            <Divider />
+            <Download href={'/'}>ダウンロードする</Download>
+          </MoldContentsWrap>
+        </MoldWrap>
+      </MoldSection>
+      <AboutSection id='aboutus' color={'transparent '}>
+        <AboutWrap>
+          <AboutTitleWrap>
+            <SectionTitle>About Us</SectionTitle>
+            <SectionSubTitle>わたしたちについて</SectionSubTitle>
+          </AboutTitleWrap>
+          <AboutContentsWrap>
+            <p>
+              #ANYCAPは、ヤフー社員の自主制作チームToasterによって運営されており、オープンコラボレーションハブLODGEを拠点に活動しています。
+              <br />
+              #ANYCAPプロジェクトは、協業いただける企業・団体・個人のみなさまをお待ちしております。
+            </p>
+            <AboutDivider />
+            <Button label={'お問合わせ'} />
+          </AboutContentsWrap>
+          <AboutImageWrap>
             <Image
-              src={'/images/photos/004.jpg'}
-              width={400}
-              height={400}
-              objectFit='cover'
-              objectPosition='center center'
+              src='/images/photos/012.jpg'
+              alt={'Yahoo! LODGE'}
+              width={495}
+              height={360}
               layout='responsive'
             />
-          </VideoWrap>
-          <Title>
-            プラゴミから
-            <DesktopBr />
-            キーキャップを
-            <DesktopBr />
-            作ろう
-          </Title>
-        </Hero>
-        <ConceptSection id='concept' color={'transparent'}>
-          <Wrap>
-            <Message>
-              #ANYCAPは、廃棄プラスチックを使ってキーキャップを自作するオープンソースコミュニティです。
-              <br />
-              <br />
-              家庭やオフィスで出るプラゴミを原材料としたキーキャップを製作し、手法やデータを公開することを通じて、仲間の輪を広げる活動を行なっています。
-            </Message>
-          </Wrap>
-        </ConceptSection>
-        <ConceptPhotos>
-          <ConceptPhoto src='/images/photos/001.jpg' />
-          <ConceptPhoto src='/images/photos/002.jpg' />
-          <ConceptPhoto src='/images/photos/003.jpg' />
-          <ConceptPhoto src='/images/photos/004.jpg' />
-          <ConceptPhoto src='/images/photos/005.jpg' />
-        </ConceptPhotos>
-        <WHYSection id='why' color={'transparent'}>
-          <WHYWrap>
-            <SectionTitleGroup>
-              <SectionTitle>Why #ANYCAP ?</SectionTitle>
-              <SectionSubTitle>廃プラキーキャップのススメ</SectionSubTitle>
-            </SectionTitleGroup>
-            <WhyKeys>
-              <WhyKey>
-                <img src='/images/icons/point001.svg' />
-                <h4>一般的なキーキャップ規格に準拠</h4>
-                <p>
-                  Cherry,
-                  DSAなど、一般的な自作キーボード規格に則ったキー形状のため、お使いのキーボードにそのまま組み込みやすいです
-                </p>
-              </WhyKey>
-              <WhyKey>
-                <img src='/images/icons/point002.svg' />
-                <h4>コスト抑えめ</h4>
-                <p>廃材を用いるので、原材料の費用が安く済みます</p>
-              </WhyKey>
-              <WhyKey>
-                <img src='/images/icons/point003.svg' />
-                <h4>自分の好きな色・素材にこだわれる</h4>
-                <p>自分が本当にキーボードに欲しい色、欲しい素材で作ることができます</p>
-              </WhyKey>
-              <WhyKey>
-                <img src='/images/icons/point004.svg' />
-                <h4>オープンソース</h4>
-                <p>金型や作り方の情報を公開しています</p>
-              </WhyKey>
-            </WhyKeys>
-          </WHYWrap>
-        </WHYSection>
-        <WorkshopSection id='workshop' color={'transparent'}>
-          <WorkshopWrap>
-            <WorkShopImgWrap>
-              <WorkShopImg src='/images/photos/006.jpg' />
-            </WorkShopImgWrap>
-            <WorkShopSectionTitle>
-              <SectionTitle>Workshop</SectionTitle>
-              <SectionSubTitle>ワークショップ</SectionSubTitle>
-            </WorkShopSectionTitle>
-            <WorkShopSectionContents>
-              <WorkshopDesc>
-                自分の好きな素材を持ち込んで、世界に１つだけの廃プラキーキャップを作るワークショップを開催しています。ご興味のある方は、下のボタンよりお申し込みください。
-              </WorkshopDesc>
-              <Program>
-                <ProgramLabel>プログラム例：</ProgramLabel>
-                <ProgramDesc>
-                  10分 導入・作業説明
-                  <br />
-                  30分 素材の破砕作業
-                  <br />
-                  30分 射出成形
-                  <br />
-                  20分 まとめ・撮影タイム
-                  <br />
-                  <br />
-                  場所：ガーデンテラス紀尾井町17F　ヤフーLODGE内
-                </ProgramDesc>
-              </Program>
-              <Divider />
-              <WorkshopInfo>
-                <Price>
-                  1200円<span>（材料費・実費）</span>
-                </Price>
-                <Button label={'参加する'} />
-              </WorkshopInfo>
-            </WorkShopSectionContents>
-          </WorkshopWrap>
-        </WorkshopSection>
-        <MakingSection id='making' color={'transparent'}>
-          <MakingWrap>
-            <SectionTitleGroup>
-              <SectionTitle>Making #ANYCAP</SectionTitle>
-              <SectionSubTitle>廃プラキーキャップができるまで</SectionSubTitle>
-            </SectionTitleGroup>
-            <MakingScrollWrap>
-              <MakingScrollContents>
-                <MakingItem>
-                  <MakingItemImg src={'/images/photos/007.jpg'} />
-                  <h3>
-                    <span>01.</span>素材をさがす
-                  </h3>
-                  <p>
-                    キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
-                  </p>
-                </MakingItem>
-                <MakingItem>
-                  <MakingItemImg src={'/images/photos/008.jpg'} />
-                  <h3>
-                    <span>02.</span>破砕する
-                  </h3>
-                  <p>集めた素材を砕いて、5mm角程度の大きさにします。</p>
-                </MakingItem>
-                <MakingItem>
-                  <MakingItemImg src={'/images/photos/009.jpg'} />
-                  <h3>
-                    <span>03.</span>金型を用意する
-                  </h3>
-                  <p>
-                    キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
-                  </p>
-                </MakingItem>
-                <MakingItem>
-                  <MakingItemImg src={'/images/photos/010.jpg'} />
-                  <h3>
-                    <span>04.</span>金型を用意する
-                  </h3>
-                  <p>
-                    キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
-                  </p>
-                </MakingItem>
-              </MakingScrollContents>
-            </MakingScrollWrap>
-          </MakingWrap>
-        </MakingSection>
-        <MoldSection id='mold' color={'transparent'}>
-          <MoldWrap>
-            <MoldSliderWrap>
-              <MoldSlider>
-                <Slider {...sliderSettings}>
-                  <SlideImg src={'/images/photos/011.jpg'} />
-                  <SlideImg src={'/images/photos/011.jpg'} />
-                  <SlideImg src={'/images/photos/011.jpg'} />
-                  <SlideImg src={'/images/photos/011.jpg'} />
-                </Slider>
-              </MoldSlider>
-            </MoldSliderWrap>
-            <MoldTitleWrap>
-              <SectionTitle>Mold</SectionTitle>
-              <SectionSubTitle>金型</SectionSubTitle>
-            </MoldTitleWrap>
-            <MoldContentsWrap>
-              <MoldDesc>
-                金型を用意し、家庭用の射出成形機（ORIGINALMIND社製のINARIなど）を使えば、ご自身でキーキャップを作ることも可能です。
-                <br />
-                より多くの方に活動に参加してもらいたいという思いから、金型の3Dデータを公開しています。
-                <br />
-                ご興味のある方は、下記のコンタクトフォームよりお問い合わせください
-              </MoldDesc>
-              <Divider />
-              <Download href={'/'}>ダウンロードする</Download>
-            </MoldContentsWrap>
-          </MoldWrap>
-        </MoldSection>
-        <AboutSection id='aboutus' color={'transparent '}>
-          <AboutWrap>
-            <AboutTitleWrap>
-              <SectionTitle>About Us</SectionTitle>
-              <SectionSubTitle>わたしたちについて</SectionSubTitle>
-            </AboutTitleWrap>
-            <AboutContentsWrap>
-              <p>
-                #ANYCAPは、ヤフー社員の自主制作チームToasterによって運営されており、オープンコラボレーションハブLODGEを拠点に活動しています。
-                <br />
-                #ANYCAPプロジェクトは、協業いただける企業・団体・個人のみなさまをお待ちしております。
-              </p>
-              <AboutDivider />
-              <Button label={'お問合わせ'} />
-            </AboutContentsWrap>
-            <AboutImageWrap>
-              <Image
-                src='/images/photos/012.jpg'
-                alt={'Yahoo! LODGE'}
-                width={495}
-                height={360}
-                layout='responsive'
-              />
-            </AboutImageWrap>
-          </AboutWrap>
-        </AboutSection>
-        <LibrarySection id='library' color={'transparent'}>
-          <LibraryWrap>
-            <SectionTitleGroup>
-              <SectionTitle>Library</SectionTitle>
-              <SectionSubTitle>ライブラリ</SectionSubTitle>
-            </SectionTitleGroup>
-            <LibraryDesc>
-              みんなが見つけたキーキャップに使えそうな素材とそのレポートです。実際に作ってみたものがあればどんどう投稿していってみましょう！いいねの多い人気素材は実際に販売されることがあるかも...?!
-            </LibraryDesc>
-            {materials.length > 0 && ( // 何らかの理由で素材リストが取れなかった時はsection全体を非表示にする
-              <>
-                <Filters className='filter'>
-                  <Filter isSelected={currentFilter == 0 ? true : false}>
-                    <Palette
-                      isSelected={currentFilter == 0 ? true : false}
-                      color={color.subColor.red}
-                    ></Palette>
-                    Red
-                  </Filter>
-                  <Filter isSelected={currentFilter == 1 ? true : false}>
-                    <Palette
-                      isSelected={currentFilter == 1 ? true : false}
-                      color={color.subColor.blue}
-                    ></Palette>
-                    Blue
-                  </Filter>
-                  <Filter isSelected={currentFilter == 2 ? true : false}>
-                    <Palette
-                      isSelected={currentFilter == 2 ? true : false}
-                      color={color.subColor.green}
-                    ></Palette>
-                    Green
-                  </Filter>
-                  <Filter isSelected={currentFilter == 3 ? true : false}>
-                    <Palette
-                      isSelected={currentFilter == 3 ? true : false}
-                      color={color.subColor.dark}
-                    ></Palette>
-                    Black
-                  </Filter>
-                  <Filter isSelected={currentFilter == 4 ? true : false}>
-                    <Palette
-                      isSelected={currentFilter == 4 ? true : false}
-                      color={color.content.white}
-                    ></Palette>
-                    White
-                  </Filter>
-                </Filters>
-                <MaterialGrid>
-                  {materials.map((material) => (
-                    <MaterialItem
-                      key={`material-${material.id}`}
-                      plasticImageUrl={material.plasticImageUrl}
-                      keycapImageUrl={material.keycapImageUrl}
-                      id={material.id}
-                      materialName={material.materialName}
-                      colorType={material.colorType}
-                      celsius={material.celsius}
-                      plasticType={material.plasticType}
-                      goodCount={material.goodCount}
-                      upvotableMaterials={upvotableMaterials}
-                      upvote={upvote}
-                    />
-                  ))}
-                </MaterialGrid>
+          </AboutImageWrap>
+        </AboutWrap>
+      </AboutSection>
+      <LibrarySection id='library' color={'transparent'}>
+        <LibraryWrap>
+          <SectionTitleGroup>
+            <SectionTitle>Library</SectionTitle>
+            <SectionSubTitle>ライブラリ</SectionSubTitle>
+          </SectionTitleGroup>
+          <LibraryDesc>
+            みんなが見つけたキーキャップに使えそうな素材とそのレポートです。実際に作ってみたものがあればどんどう投稿していってみましょう！いいねの多い人気素材は実際に販売されることがあるかも...?!
+          </LibraryDesc>
+          {materials.length > 0 && ( // 何らかの理由で素材リストが取れなかった時はsection全体を非表示にする
+            <>
+              <Filters className='filter'>
+                <Filter isSelected={currentFilter == 0 ? true : false}>
+                  <Palette
+                    isSelected={currentFilter == 0 ? true : false}
+                    color={color.subColor.red}
+                  ></Palette>
+                  Red
+                </Filter>
+                <Filter isSelected={currentFilter == 1 ? true : false}>
+                  <Palette
+                    isSelected={currentFilter == 1 ? true : false}
+                    color={color.subColor.blue}
+                  ></Palette>
+                  Blue
+                </Filter>
+                <Filter isSelected={currentFilter == 2 ? true : false}>
+                  <Palette
+                    isSelected={currentFilter == 2 ? true : false}
+                    color={color.subColor.green}
+                  ></Palette>
+                  Green
+                </Filter>
+                <Filter isSelected={currentFilter == 3 ? true : false}>
+                  <Palette
+                    isSelected={currentFilter == 3 ? true : false}
+                    color={color.subColor.dark}
+                  ></Palette>
+                  Black
+                </Filter>
+                <Filter isSelected={currentFilter == 4 ? true : false}>
+                  <Palette
+                    isSelected={currentFilter == 4 ? true : false}
+                    color={color.content.white}
+                  ></Palette>
+                  White
+                </Filter>
+              </Filters>
+              <MaterialGrid>
+                {materials.map((material) => (
+                  <MaterialItem
+                    key={`material-${material.id}`}
+                    plasticImageUrl={material.plasticImageUrl}
+                    keycapImageUrl={material.keycapImageUrl}
+                    id={material.id}
+                    materialName={material.materialName}
+                    colorType={material.colorType}
+                    celsius={material.celsius}
+                    plasticType={material.plasticType}
+                    goodCount={material.goodCount}
+                    upvotableMaterials={upvotableMaterials}
+                    upvote={upvote}
+                  />
+                ))}
+              </MaterialGrid>
 
-                {/* 登録ページへのリンクはログイン中のみ有効にする */}
-                {currentUser ? (
-                  <Button label={'素材を追加する'} href='/register' />
-                ) : (
-                  <Button label={'素材を追加する'} disabled />
-                )}
-              </>
-            )}
-          </LibraryWrap>
-        </LibrarySection>
-      </main>
-
-      <footer>{/* TODO: 書く */}</footer>
-    </>
+              {/* 登録ページへのリンクはログイン中のみ有効にする */}
+              {currentUser ? (
+                <Button label={'素材を追加する'} href='/register' />
+              ) : (
+                <Button label={'素材を追加する'} disabled />
+              )}
+            </>
+          )}
+        </LibraryWrap>
+      </LibrarySection>
+    </main>
   )
 }
 

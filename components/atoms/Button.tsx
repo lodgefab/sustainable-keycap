@@ -1,6 +1,6 @@
 import styled from '@emotion/styled'
 import Image from 'next/image'
-import React from 'react'
+import React, { MouseEventHandler } from 'react'
 import { color, curve, font, zIndex } from '../../styles'
 
 type Props = {
@@ -8,7 +8,7 @@ type Props = {
   iconPath?: string
   disabled?: boolean
   className?: string
-  onClick?: () => any
+  onClick?: () => any | MouseEventHandler<HTMLButtonElement>
   href?: string
 }
 
