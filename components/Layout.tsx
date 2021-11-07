@@ -5,7 +5,7 @@ import { Header } from './molecules/Header'
 import { Footer } from './molecules/Footer'
 import { AuthContext, login, logout } from '../lib/auth'
 import { getAuth } from 'firebase/auth'
-import CookieModule from './organisms/CookieConsent'
+import CookieConsent from './organisms/CookieConsent'
 
 type Props = {
   children?: ReactNode
@@ -25,7 +25,7 @@ const Layout = ({ children }: Props) => {
       />
       {children}
       <Footer />
-      <CookieModule />
+      <CookieConsent />
     </Container>
   )
 }

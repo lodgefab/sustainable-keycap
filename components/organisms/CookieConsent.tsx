@@ -14,7 +14,7 @@ const Wrapper = styled.div<{ isVisible: boolean }>`
 
 const COOKIE_NAME = 'cookieConsent'
 
-const CookieModule: React.VFC = () => {
+const CookieConsent: React.VFC = () => {
   const [isVisible, setVisibility] = useState<boolean>(false)
   const { t } = useTranslation('translation', { keyPrefix: 'global.cookieConsent' })
 
@@ -55,4 +55,4 @@ const CookieModule: React.VFC = () => {
   )
 }
 
-export default CookieModule
+export default CookieConsent
