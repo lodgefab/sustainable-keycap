@@ -1,3 +1,5 @@
+const path = require('path')
+
 const domain = process.env.VERCEL_URL || 'localhost:3000'
 
 module.exports = {
@@ -7,6 +9,7 @@ module.exports = {
     defaultLocale: 'ja',
     locales: ['ja', 'en'],
   },
+  localePath: path.resolve('./public/locales'),
   domains: [
     {
       domain: `${domain}/en`,
