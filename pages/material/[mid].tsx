@@ -1,5 +1,10 @@
 import Head from 'next/head'
-import { NextPage } from 'next'
+import {
+  GetServerSideProps,
+  InferGetServerSidePropsType,
+  InferGetStaticPropsType,
+  NextPage,
+} from 'next'
 import React, { useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { Material } from '../../types'
@@ -10,10 +15,20 @@ import { getAuth } from 'firebase/auth'
 import { MaterialApiResponse } from '../api/materials/[materialId]'
 import { fetchMaterialWithAuth } from '../../lib/helper'
 import { UpvoteApiResponse } from '../api/upvote'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
-interface Props {}
+type Props = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export const MaterialDetailPage: NextPage<Props> = () => {
+export const getServerSideProps: GetServerSideProps = async ({ query, locale }) => {
+  // const materialId = query.mid
+  return {
+    props: {
+      ...(await serverSideTranslations(locale || 'ja')),
+    },
+  }
+}
+
+export const MaterialDetailPage: NextPage<Props> = (_) => {
   const router = useRouter()
   const authState = useContext(AuthContext)
   const { currentUser } = getAuth()
