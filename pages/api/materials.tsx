@@ -1,9 +1,9 @@
-import { NextApiRequest, NextApiResponse } from 'next'
-import { FirestoreMaterialDocument, HTTP_STATUS, Material } from '../../types'
-import { getSampleMaterialData } from '../../lib/helper'
-import { initAdminFirebase } from '../../lib/admin-firebase'
-import * as admin from 'firebase-admin'
 import dayjs from 'dayjs'
+import admin from 'firebase-admin'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { initAdminFirebase } from '../../lib/admin-firebase'
+import { getSampleMaterialData } from '../../lib/helper'
+import { FirestoreMaterialDocument, HTTP_STATUS, Material } from '../../types'
 
 export interface MaterialsApiResponse {
   message: string

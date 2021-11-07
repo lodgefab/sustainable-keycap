@@ -1,10 +1,10 @@
-import React, { ReactNode, useContext } from 'react'
 import styled from '@emotion/styled'
-import { color } from '../styles'
-import { Header } from './molecules/Header'
-import { Footer } from './molecules/Footer'
-import { AuthContext, login, logout } from '../lib/auth'
 import { getAuth } from 'firebase/auth'
+import React, { ReactNode, useContext } from 'react'
+import { AuthContext, login, logout } from '../lib/auth'
+import { color } from '../styles'
+import { Footer } from './molecules/Footer'
+import { Header } from './molecules/Header'
 import CookieConsent from './organisms/CookieConsent'
 
 type Props = {

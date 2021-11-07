@@ -1,21 +1,21 @@
-import Head from 'next/head'
+import axios from 'axios'
+import { getAuth } from 'firebase/auth'
 import {
   GetServerSideProps,
   InferGetServerSidePropsType,
   InferGetStaticPropsType,
   NextPage,
 } from 'next'
-import React, { useContext, useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
-import { Material } from '../../types'
-import { MaterialProfile } from '../../components/organisms/MaterialProfile'
-import axios from 'axios'
-import { AuthContext } from '../../lib/auth'
-import { getAuth } from 'firebase/auth'
-import { MaterialApiResponse } from '../api/materials/[materialId]'
-import { fetchMaterialWithAuth } from '../../lib/helper'
-import { UpvoteApiResponse } from '../api/upvote'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import React, { useContext, useEffect, useState } from 'react'
+import { MaterialProfile } from '../../components/organisms/MaterialProfile'
+import { AuthContext } from '../../lib/auth'
+import { fetchMaterialWithAuth } from '../../lib/helper'
+import { Material } from '../../types'
+import { MaterialApiResponse } from '../api/materials/[materialId]'
+import { UpvoteApiResponse } from '../api/upvote'
 
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>
 
@@ -76,6 +76,7 @@ export const MaterialDetailPage: NextPage<Props> = (_) => {
         } catch (e) {
           console.log(e)
           if (axios.isAxiosError(e) && e.response) {
+            // TODO: 書く
           }
           setIsFound(false)
         } finally {

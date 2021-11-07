@@ -1,10 +1,10 @@
-import React from 'react'
 import styled from '@emotion/styled'
+import React from 'react'
 import { color } from '../../styles'
 
 type Props = {}
 
-export const Footer: React.VFC<Props> = ({}) => {
+export const Footer: React.VFC<Props> = () => {
   return (
     <Wrap>
       <Container>

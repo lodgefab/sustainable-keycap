@@ -7,8 +7,8 @@ import {
   User,
   onAuthStateChanged,
 } from 'firebase/auth'
-import React, { createContext, useEffect, useState } from 'react'
 import Router from 'next/router'
+import React, { createContext, useEffect, useState } from 'react'
 
 const firebaseConfig = {
   apiKey: 'AIzaSyB7rR9HaUvlCIs2TrxFO49vuxPAliHF6ao',

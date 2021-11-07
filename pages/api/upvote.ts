@@ -1,7 +1,7 @@
+import admin from 'firebase-admin'
 import { NextApiRequest, NextApiResponse } from 'next'
-import * as admin from 'firebase-admin'
-import { FirestoreMaterialDocument, HTTP_STATUS } from '../../types'
 import { initAdminFirebase } from '../../lib/admin-firebase'
+import { FirestoreMaterialDocument, HTTP_STATUS } from '../../types'
 
 export interface UpvoteApiResponse {
   message: string

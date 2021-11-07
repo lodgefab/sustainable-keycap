@@ -1,16 +1,15 @@
-import Head from 'next/head'
-import { InferGetStaticPropsType, NextPage } from 'next'
-import { Home } from '../components/organisms/Home'
-import React, { useContext, useEffect, useState } from 'react'
-import { Material } from '../types'
 import axios from 'axios'
+import { getAuth } from 'firebase/auth'
+import { InferGetStaticPropsType, NextPage } from 'next'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import Head from 'next/head'
+import React, { useContext, useEffect, useState } from 'react'
+import { Home } from '../components/organisms/Home'
 import { AuthContext } from '../lib/auth'
 import { fetchMaterialsWithAuth } from '../lib/helper'
+import { Material } from '../types'
 import { MaterialsApiResponse } from './api/materials'
-import Axios from 'axios'
 import { UpvoteApiResponse } from './api/upvote'
-import { getAuth } from 'firebase/auth'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 
@@ -50,7 +49,7 @@ export const Index: NextPage<Props> = (_) => {
           setMaterials(data)
           setUpvotableMaterials([])
         } catch (e) {
-          if (Axios.isAxiosError(e) && e.response) {
+          if (axios.isAxiosError(e) && e.response) {
             console.log(e)
           }
           console.log(e)

@@ -1,7 +1,7 @@
+import styled from '@emotion/styled'
+import Cookies from 'js-cookie'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import Cookies from 'js-cookie'
-import styled from '@emotion/styled'
 
 const Wrapper = styled.div<{ isVisible: boolean }>`
   display: ${(props) => (props.isVisible ? 'block' : 'none')};

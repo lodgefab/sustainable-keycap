@@ -1,4 +1,7 @@
+import admin from 'firebase-admin'
+import multer from 'multer'
 import { NextApiRequest, NextApiResponse } from 'next'
+import { getAdminFirestoreDb, initAdminFirebase } from '../../lib/admin-firebase'
 import {
   categoriseColor,
   ensureRegisterRequestIsValid,
@@ -6,9 +9,6 @@ import {
   isErrorResponse,
   respondAsInternalServerError,
 } from '../../lib/helper'
-import multer from 'multer'
-import * as admin from 'firebase-admin'
-import { getAdminFirestoreDb, initAdminFirebase } from '../../lib/admin-firebase'
 import { FirestoreMaterialDocument, HTTP_STATUS } from '../../types'
 
 const upload = multer({

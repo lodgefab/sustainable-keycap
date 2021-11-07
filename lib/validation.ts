@@ -1,5 +1,5 @@
-import { hexColorTypeItems, plasticTypeItems } from '../types'
 import * as yup from 'yup'
+import { hexColorTypeItems, plasticTypeItems } from '../types'
 
 /**
  * 素材登録フォームのバリデーション要件

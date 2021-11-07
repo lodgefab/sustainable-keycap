@@ -1,7 +1,7 @@
-import React from 'react'
 import styled from '@emotion/styled'
-import { Material } from '../../types'
 import Image from 'next/image'
+import React from 'react'
+import { Material } from '../../types'
 
 const Article = styled.article`
   padding-top: 60px; // ヘッダーに隠れている部分が見えなくなってしまうのでその分下にずらすための暫定的な対応

@@ -1,10 +1,10 @@
 import { css, Global } from '@emotion/react'
-import React from 'react'
 import emotionReset from 'emotion-reset'
-import { color } from '../styles'
+import { appWithTranslation } from 'next-i18next'
+import React from 'react'
 import Layout from '../components/Layout'
 import { AuthProvider } from '../lib/auth'
-import { appWithTranslation } from 'next-i18next'
+import { color } from '../styles'
 
 function MyApp({ Component, pageProps }) {
   return (

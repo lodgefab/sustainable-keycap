@@ -1,12 +1,12 @@
-import React from 'react'
 import styled from '@emotion/styled'
 // import LogoImg from '../../images/logo.png'
-import { color, font, media, zIndex } from '../../styles'
 import { User } from 'firebase/auth'
-import { AuthStatus } from '../../lib/auth'
-import { Link as Scroll } from 'react-scroll'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import React from 'react'
+import { Link as Scroll } from 'react-scroll'
+import { AuthStatus } from '../../lib/auth'
+import { color, font, media, zIndex } from '../../styles'
 
 interface Props {
   currentUser: User | null

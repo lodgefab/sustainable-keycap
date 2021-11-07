@@ -1,4 +1,17 @@
 import {
+  collection,
+  doc,
+  DocumentData,
+  getDoc,
+  getDocs,
+  getFirestore,
+  QueryDocumentSnapshot,
+  SnapshotOptions,
+} from 'firebase/firestore'
+import { getDownloadURL, getStorage, listAll, ref } from 'firebase/storage'
+import hexRgb from 'hex-rgb'
+import { NextApiRequest, NextApiResponse } from 'next'
+import {
   CategorisedColorType,
   categorisedColorTypeItems,
   FirestoreMaterialDocument,
@@ -10,19 +23,6 @@ import {
   ResponseData,
 } from '../types'
 import { firebaseClientApp, getCurrentUser } from './auth'
-import {
-  collection,
-  doc,
-  DocumentData,
-  getDoc,
-  getDocs,
-  getFirestore,
-  QueryDocumentSnapshot,
-  SnapshotOptions,
-} from 'firebase/firestore'
-import { getDownloadURL, getStorage, listAll, ref } from 'firebase/storage'
-import { NextApiRequest, NextApiResponse } from 'next'
-import hexRgb from 'hex-rgb'
 
 export const getSampleMaterialData: () => Material[] = () => {
   return [
