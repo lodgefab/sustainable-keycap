@@ -6,6 +6,7 @@ import { Footer } from './molecules/Footer'
 import { AuthContext, login, logout } from '../lib/auth'
 import { getAuth } from 'firebase/auth'
 import { useWindowSize } from '../utils/useWindowSize'
+import CookieConsent from './organisms/CookieConsent'
 
 type Props = {
   children?: ReactNode
@@ -24,6 +25,8 @@ const Layout = ({ children }: Props) => {
         onLogoutFunc={logout}
       />
       {children}
+      <Footer />
+      <CookieConsent />
     </Container>
   )
 }

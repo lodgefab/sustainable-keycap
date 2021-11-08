@@ -6,6 +6,7 @@ import { User } from 'firebase/auth'
 import { AuthStatus } from '../../lib/auth'
 import { Link as Scroll } from 'react-scroll'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 interface Props {
   currentUser: User | null
@@ -17,7 +18,7 @@ interface Props {
 export const Header: React.VFC<Props> = ({ currentUser, authState, onLoginFunc, onLogoutFunc }) => {
   const [isLoginMenuOpen, setLoginMenuOpen] = useState(false)
   const [isMenuOpen, setMenuOpen] = useState(false)
-
+  const [isJa, setLocale] = useState(true)
   const handleLoginMenuBlur = (e) => {
     // firefox onBlur issue workaround
     if (
@@ -47,6 +48,12 @@ export const Header: React.VFC<Props> = ({ currentUser, authState, onLoginFunc, 
       }, 100)
     }
   }
+  const router = useRouter()
+  const { pathname, asPath, query } = router
+
+  const changeLanguage = (nextLanguage: string) => {
+    router.push({ pathname, query }, asPath, { locale: nextLanguage, scroll: false })
+  }
 
   return (
     <Wrap>
@@ -72,7 +79,15 @@ export const Header: React.VFC<Props> = ({ currentUser, authState, onLoginFunc, 
           </PageLinks>
         </Left>
         <Right>
-          <TranslateButton isJa={true} />
+          <TranslateButton
+            isJa={isJa}
+            onClick={() => {
+              isJa
+                ? (changeLanguage('en'), setLocale(false))
+                : (changeLanguage('ja'), setLocale(true))
+            }}
+          />
+
           {/* TODO: 認証方法を明記する */}
           {authState === 'LOGGED_IN' && currentUser && (
             <LoggedInIcon

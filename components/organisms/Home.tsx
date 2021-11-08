@@ -4,7 +4,7 @@ import { color, font, media, zIndex } from '../../styles'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '../atoms/Button'
-import { Material } from '../../types'
+import { CategorisedColorType, Material } from '../../types'
 import { AuthContext } from '../../lib/auth'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
@@ -16,6 +16,8 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
+import { getAuth } from 'firebase/auth'
+import { useTranslation } from 'next-i18next'
 
 type Props = {
   materials: Material[]
@@ -25,7 +27,8 @@ type Props = {
 }
 
 export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMaterials, upvote }) => {
-  const currentUser = useContext(AuthContext)
+  const authStatus = useContext(AuthContext)
+  const { currentUser } = getAuth()
   const sliderSettings = {
     dots: true,
     infinite: true,
@@ -95,7 +98,13 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
     setBodyHeight()
   }, [size.height])
 
-  const [currentFilter, setCurrentFilter] = useState(0)
+  const [currentFilter, setCurrentFilter] = useState<CategorisedColorType | null>(null)
+  const { t } = useTranslation('translation', { keyPrefix: 'home' })
+
+  const updateFilter = (newFilter: CategorisedColorType) => {
+    setCurrentFilter(currentFilter === newFilter ? null : newFilter)
+  }
+
   return (
     <AllWrap>
       <div ref={containerRef}>
@@ -148,7 +157,7 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
           <WHYWrap>
             <SectionTitleGroup>
               <SectionTitle>Why #ANYCAP ?</SectionTitle>
-              <SectionSubTitle>廃プラキーキャップのススメ</SectionSubTitle>
+              <SectionSubTitle>{t('whyAnycap.subtitle')}</SectionSubTitle>
             </SectionTitleGroup>
             <WhyKeys>
               <WhyKey>
@@ -328,62 +337,64 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
             {materials.length > 0 && ( // 何らかの理由で素材リストが取れなかった時はsection全体を非表示にする
               <>
                 <Filters className='filter'>
-                  <Filter isSelected={currentFilter == 0 ? true : false}>
-                    <Palette
-                      isSelected={currentFilter == 0 ? true : false}
-                      color={color.subColor.red}
-                    ></Palette>
+                  <Filter isSelected={currentFilter === 'red'} onClick={() => updateFilter('red')}>
+                    <Palette isSelected={currentFilter === 'red'} color={color.subColor.red} />
                     Red
                   </Filter>
-                  <Filter isSelected={currentFilter == 1 ? true : false}>
-                    <Palette
-                      isSelected={currentFilter == 1 ? true : false}
-                      color={color.subColor.blue}
-                    ></Palette>
+                  <Filter
+                    isSelected={currentFilter === 'blue'}
+                    onClick={() => updateFilter('blue')}
+                  >
+                    <Palette isSelected={currentFilter === 'blue'} color={color.subColor.blue} />
                     Blue
                   </Filter>
-                  <Filter isSelected={currentFilter == 2 ? true : false}>
-                    <Palette
-                      isSelected={currentFilter == 2 ? true : false}
-                      color={color.subColor.green}
-                    ></Palette>
+                  <Filter
+                    isSelected={currentFilter === 'green'}
+                    onClick={() => updateFilter('green')}
+                  >
+                    <Palette isSelected={currentFilter === 'green'} color={color.subColor.green} />
                     Green
                   </Filter>
-                  <Filter isSelected={currentFilter == 3 ? true : false}>
-                    <Palette
-                      isSelected={currentFilter == 3 ? true : false}
-                      color={color.subColor.dark}
-                    ></Palette>
+                  <Filter
+                    isSelected={currentFilter === 'black'}
+                    onClick={() => updateFilter('black')}
+                  >
+                    <Palette isSelected={currentFilter === 'black'} color={color.subColor.dark} />
                     Black
                   </Filter>
-                  <Filter isSelected={currentFilter == 4 ? true : false}>
-                    <Palette
-                      isSelected={currentFilter == 4 ? true : false}
-                      color={color.content.white}
-                    ></Palette>
+                  <Filter
+                    isSelected={currentFilter === 'white'}
+                    onClick={() => updateFilter('white')}
+                  >
+                    <Palette isSelected={currentFilter === 'white'} color={color.content.white} />
                     White
                   </Filter>
                 </Filters>
                 <MaterialGrid>
-                  {materials.map((material) => (
-                    <MaterialItem
-                      key={`material-${material.id}`}
-                      plasticImageUrl={material.plasticImageUrl}
-                      keycapImageUrl={material.keycapImageUrl}
-                      id={material.id}
-                      materialName={material.materialName}
-                      colorType={material.colorType}
-                      celsius={material.celsius}
-                      plasticType={material.plasticType}
-                      goodCount={material.goodCount}
-                      upvotableMaterials={upvotableMaterials}
-                      upvote={upvote}
-                    />
-                  ))}
+                  {materials
+                    .filter(
+                      (material) =>
+                        currentFilter === null || material.categorisedColor === currentFilter
+                    )
+                    .map((material) => (
+                      <MaterialItem
+                        key={`material-${material.id}`}
+                        plasticImageUrl={material.plasticImageUrl}
+                        keycapImageUrl={material.keycapImageUrl}
+                        id={material.id}
+                        materialName={material.materialName}
+                        colorType={material.colorType}
+                        celsius={material.celsius}
+                        plasticType={material.plasticType}
+                        goodCount={material.goodCount}
+                        upvotableMaterials={upvotableMaterials}
+                        upvote={upvote}
+                      />
+                    ))}
                 </MaterialGrid>
 
                 {/* 登録ページへのリンクはログイン中のみ有効にする */}
-                {currentUser ? (
+                {authStatus === 'LOGGED_IN' && currentUser ? (
                   <Button label={'素材を追加する'} href='/register' />
                 ) : (
                   <Button label={'素材を追加する'} disabled />
