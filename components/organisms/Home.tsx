@@ -56,10 +56,12 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
 
   // prev と currentのスクロール量の差分を徐々に無くしていく
   const smoothScroll = useCallback(() => {
+    if (containerRef.current === null) return
+
     data.curr = window.scrollY
     data.prev += (data.curr - data.prev) * data.ease
     data.rounded = Math.round(data.prev * 100) / 100
-    containerRef.current!.style.transform = `translateY(-${data.rounded}px)`
+    containerRef.current.style.transform = `translateY(-${data.rounded}px)`
     requestAnimationFrame(() => smoothScroll())
   }, [data])
 

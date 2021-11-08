@@ -30,7 +30,7 @@ export const MaterialItem: React.VFC<Props> = ({
   upvote,
 }) => {
   return (
-    <Link href={'/'} passHref>
+    <Link href={`/material/${id}`} passHref>
       <Container className='material'>
         <BG
           width={100}
