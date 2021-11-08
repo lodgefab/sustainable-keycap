@@ -22,11 +22,18 @@ import { useTranslation } from 'next-i18next'
 type Props = {
   materials: Material[]
   setGoodCount: (materialId: string, count: number) => void
-  upvotableMaterials: string[]
+  canUpvote: boolean
+  upvotedMaterialsId: string[]
   upvote: Function
 }
 
-export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMaterials, upvote }) => {
+export const Home: React.VFC<Props> = ({
+  materials,
+  setGoodCount,
+  canUpvote,
+  upvotedMaterialsId,
+  upvote,
+}) => {
   const authStatus = useContext(AuthContext)
   const { currentUser } = getAuth()
   const sliderSettings = {
@@ -390,7 +397,13 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
                         celsius={material.celsius}
                         plasticType={material.plasticType}
                         goodCount={material.goodCount}
-                        upvotableMaterials={upvotableMaterials}
+                        upvoteButtonState={
+                          canUpvote
+                            ? upvotedMaterialsId.includes(material.id)
+                              ? 'UPVOTED'
+                              : 'NOT_UPVOTED'
+                            : 'NOT_PERMITTED'
+                        }
                         upvote={upvote}
                       />
                     ))}
