@@ -4,6 +4,10 @@ import { color, curve, font, media, zIndex } from '../../styles'
 import Link from 'next/link'
 import Image from 'next/image'
 
+// いいねボタンの状態を表すType
+// 'NOT_UPVOTED' => いいね前 / 'UPVOTED' => いいね済 / 'NOT_PERMITTED' => 未ログインなのでいいね操作が許可されていない
+type UpvoteButtonState = 'NOT_UPVOTED' | 'UPVOTED' | 'NOT_PERMITTED'
+
 type Props = {
   plasticImageUrl: string
   keycapImageUrl: string
@@ -13,7 +17,7 @@ type Props = {
   plasticType: string
   celsius: number
   goodCount: number
-  upvotableMaterials: string[]
+  upvoteButtonState: UpvoteButtonState
   upvote: Function
 }
 
@@ -26,7 +30,7 @@ export const MaterialItem: React.VFC<Props> = ({
   celsius,
   plasticType,
   goodCount,
-  upvotableMaterials,
+  upvoteButtonState,
   upvote,
 }) => {
   return (
@@ -70,8 +74,8 @@ export const MaterialItem: React.VFC<Props> = ({
                 event.stopPropagation()
                 upvote(id)
               }}
-              disabled={!upvotableMaterials.includes(id)}
-            ></UpvoteButton>
+              disabled={upvoteButtonState === 'UPVOTED' || upvoteButtonState === 'NOT_PERMITTED'}
+            />
             <span>{goodCount}</span>
           </UpvoteButtonWrap>
         </InfoWrap>
