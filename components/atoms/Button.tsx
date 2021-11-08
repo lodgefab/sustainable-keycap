@@ -8,7 +8,7 @@ type Props = {
   iconPath?: string
   disabled?: boolean
   className?: string
-  onClick?: () => any | MouseEventHandler<HTMLButtonElement>
+  onClick?: MouseEventHandler<HTMLButtonElement>
   href?: string
 }
 
@@ -42,7 +42,7 @@ export const Button: React.FC<Props> = ({
       <Back />
     </AnchorButton>
   ) : (
-    <ButtonBase onClick={onClick} className={className}>
+    <ButtonBase type='button' onClick={onClick} className={className}>
       {iconPath && (
         <IconContainer>
           <Image src={iconPath} layout={'fixed'} width={24} height={24} alt='icon' />

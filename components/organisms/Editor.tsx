@@ -153,7 +153,7 @@ export const Editor: React.VFC<Props> = ({
             {errorMessage.note && <ErrorMessage key='note'>{errorMessage.note}</ErrorMessage>}
           </FormItem>
           <ButtonWrap>
-            <Button type='button' label='登録する' onClick={onClickSubmit} disabled={!canSubmit} />
+            <Button label='登録する' onClick={onClickSubmit} disabled={!canSubmit} />
           </ButtonWrap>
         </InputWrap>
       </Form>
