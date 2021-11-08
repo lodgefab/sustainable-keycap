@@ -38,7 +38,11 @@ export const Register: NextPage<Props> = (_) => {
   const {
     register,
     handleSubmit,
-    formState: { errors, dirtyFields },
+    formState: {
+      errors, // 各入力項目に対して検出されたエラーメッセージが格納されたオブジェクト
+      dirtyFields, // ユーザーによる入力が発生した入力項目を管理したオブジェクト
+      isSubmitted, // ユーザーが登録ボタンを押したかどうか
+    },
   } = methods
 
   /**
@@ -116,13 +120,22 @@ export const Register: NextPage<Props> = (_) => {
 
   // バリデーションした結果、各入力項目にエラーがあった場合はここでフロントに表示させるエラーメッセージを設定する
   const errorsPresented = {
-    plasticImage: dirtyFields.plasticImage === true ? errors.plasticImage?.message || null : null,
-    keycapImage: dirtyFields.keycapImage === true ? errors.keycapImage?.message || null : null,
-    materialName: dirtyFields.materialName === true ? errors.materialName?.message || null : null,
-    hexColor: dirtyFields.hexColor === true ? errors.hexColor?.message || null : null,
-    plasticType: dirtyFields.plasticType === true ? errors.plasticType?.message || null : null,
-    celsius: dirtyFields.celsius === true ? errors.celsius?.message || null : null,
-    note: dirtyFields.note === true ? errors.note?.message || null : null,
+    plasticImage:
+      isSubmitted || dirtyFields.plasticImage === true
+        ? errors.plasticImage?.message || null
+        : null,
+    keycapImage:
+      isSubmitted || dirtyFields.keycapImage === true ? errors.keycapImage?.message || null : null,
+    materialName:
+      isSubmitted || dirtyFields.materialName === true
+        ? errors.materialName?.message || null
+        : null,
+    hexColor:
+      isSubmitted || dirtyFields.hexColor === true ? errors.hexColor?.message || null : null,
+    plasticType:
+      isSubmitted || dirtyFields.plasticType === true ? errors.plasticType?.message || null : null,
+    celsius: isSubmitted || dirtyFields.celsius === true ? errors.celsius?.message || null : null,
+    note: isSubmitted || dirtyFields.note === true ? errors.note?.message || null : null,
   }
 
   // 送信ボタンを押せるかどうか（入力にエラーが残っている場合は押せなくする）
