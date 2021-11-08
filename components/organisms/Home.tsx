@@ -56,6 +56,7 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
 
   // prev と currentのスクロール量の差分を徐々に無くしていく
   const smoothScroll = useCallback(() => {
+    // next/linkでページ遷移を行う際、切り替え直前にcontainerRefがnullになるタイミングが発生するので条件分岐する
     if (containerRef.current === null) return
 
     data.curr = window.scrollY
