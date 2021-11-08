@@ -6,6 +6,7 @@ import ColorPicker from './ColorPicker'
 import { color, font, media, zIndex } from '../../styles'
 import Image from 'next/image'
 import { Button } from '../atoms/Button'
+import { useFormContext } from 'react-hook-form'
 
 type InputTagAttributes<T extends React.HTMLAttributes<HTMLElement>> = T & {
   onChange: ChangeHandler
@@ -49,6 +50,8 @@ export const Editor: React.VFC<Props> = ({
   canSubmit,
 }) => {
   const [isColorPickerVisible, setColorPickerVisibility] = useState<boolean>(false)
+  const { watch } = useFormContext()
+  const currentColor = watch('hexColor')
 
   /**
    * フォームのどこかをクリックした時にカラーピッカーを非表示にする
@@ -116,13 +119,14 @@ export const Editor: React.VFC<Props> = ({
 
           <FormItem onClick={onColorFormBeActive}>
             <Label htmlFor='color-type'>色の系統</Label>
-            <Input
+            <ColorInput
               type='text'
               id='color-type'
               {...inputTagAttributes.hexColor}
               readOnly
               onFocus={onColorFormBeActive}
             />
+            {currentColor && <ColorSample color={currentColor} />}
             {errorMessage.hexColor && (
               <ErrorMessage key='hexColor-error'>{errorMessage.hexColor}</ErrorMessage>
             )}
@@ -294,6 +298,23 @@ const Input = styled.input`
   border-radius: 4px;
   background-color: ${color.background.blue};
 `
+
+const ColorSample = styled.div<{ color: string }>`
+  position: absolute;
+  top: 32px;
+  left: 10px;
+  border: 1px solid grey;
+  width: 20px;
+  height: 20px;
+  background-color: ${({ color }) => color};
+  border-radius: 50%;
+  pointer-events: none;
+`
+
+const ColorInput = styled(Input)`
+  padding-left: 40px;
+`
+
 const Select = styled.select`
   position: relative;
   display: block;
