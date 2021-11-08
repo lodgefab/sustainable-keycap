@@ -1,7 +1,7 @@
 import { css } from '@emotion/css'
 
 export const color = {
-  primary: '#294446',
+  primary: '#333333',
   secondary: '#CBA4A0',
   white: '#fff',
   subColor: {
@@ -87,30 +87,15 @@ export const font = {
 } as const
 
 export const media = {
-  lg: (...args: any) => css`
-    @media (min-width: 1040px) {
-      ${css(...args)}
-    }
-  `,
-  md: (...args: any) => css`
-    @media (min-width: 480px) and (max-width: 1039px) {
-      ${css(...args)}
-    }
-  `,
-  mdsp: (...args: any) => css`
-    @media (max-width: 1039px) {
-      ${css(...args)}
-    }
-  `,
-  sp: (...args: any) => css`
-    @media (max-width: 479px) {
-      ${css(...args)}
-    }
-  `,
+  lg: '@media (min-width: 1040px)',
+  md: '@media (min-width: 480px) and (max-width: 1039px)',
+  mdsp: '@media (max-width: 1039px) ',
+  sp: '@media (max-width: 479px)',
 }
 
 export const curve = {
-  button: 'transition: all .3s 0s ease-out;',
+  button: 'transition: all .1s 0s ease-out;',
+  card: 'transition: all .3s 0s ease-out;',
   fade: 'transition: all .6s 0s ease-out;',
 } as const
 

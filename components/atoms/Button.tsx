@@ -1,6 +1,6 @@
 import styled from '@emotion/styled'
 import Image from 'next/image'
-import React from 'react'
+import React, { MouseEventHandler } from 'react'
 import { color, curve, font, zIndex } from '../../styles'
 
 type Props = {
@@ -8,10 +8,18 @@ type Props = {
   iconPath?: string
   disabled?: boolean
   className?: string
-  onClick?: () => any
+  onClick?: MouseEventHandler<HTMLButtonElement>
+  href?: string
 }
 
-export const Button: React.FC<Props> = ({ label, onClick, iconPath, className, disabled }) => {
+export const Button: React.FC<Props> = ({
+  label,
+  onClick,
+  iconPath,
+  className,
+  disabled,
+  href,
+}) => {
   if (disabled) {
     return (
       <Disabled onClick={onClick} className={className} disabled>
@@ -19,11 +27,25 @@ export const Button: React.FC<Props> = ({ label, onClick, iconPath, className, d
       </Disabled>
     )
   }
-  return (
-    <ButtonBase onClick={onClick} className={className}>
+  {
+    /* hrefの有無によって、aタグとhrefタグを使い分ける */
+  }
+  return href ? (
+    <AnchorButton className={className} href={href}>
       {iconPath && (
         <IconContainer>
-          <Image src={iconPath} layout={'fixed'} width={24} height={24} />
+          <Image src={iconPath} layout={'fixed'} width={24} height={24} alt='icon' />
+        </IconContainer>
+      )}
+      {label}
+      <Front />
+      <Back />
+    </AnchorButton>
+  ) : (
+    <ButtonBase type='button' onClick={onClick} className={className}>
+      {iconPath && (
+        <IconContainer>
+          <Image src={iconPath} layout={'fixed'} width={24} height={24} alt='icon' />
         </IconContainer>
       )}
       {label}
@@ -38,7 +60,7 @@ const Front = styled.span`
   width: 100%;
   height: 100%;
   border-radius: 4px;
-  background-color: ${color.background.blue};
+  background-color: ${color.subColor.blue};
   border: 2px solid ${color.primary};
   z-index: ${zIndex.behind};
 `
@@ -90,4 +112,29 @@ const Disabled = styled(ButtonBase)`
 const IconContainer = styled.div`
   padding-right: 8px;
   display: flex;
+`
+const AnchorButton = styled.a`
+  cursor: pointer;
+  position: relative;
+  ${font.inter.button}
+  padding:0 32px;
+  height: 44px;
+  line-height: 44px;
+  border-radius: 4px;
+  border: 0px solid ${color.primary};
+  color: ${color.primary};
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  z-index: ${zIndex.default};
+  overflow: visible;
+  text-decoration: none;
+  &:hover {
+    ${Back} {
+      top: 0px;
+      left: 0px;
+    }
+  }
 `

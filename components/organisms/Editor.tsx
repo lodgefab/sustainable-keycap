@@ -3,26 +3,9 @@ import styled from '@emotion/styled'
 import { InternalFieldName } from 'react-hook-form/dist/types/fields'
 import { ChangeHandler, RefCallBack } from 'react-hook-form/dist/types/form'
 import ColorPicker from './ColorPicker'
-
-const Form = styled.form`
-  padding-top: 60px; // ヘッダーに隠れている部分が見えなくなってしまうのでその分下にずらすための暫定的な対応
-`
-
-const FormItem = styled.div`
-  margin: 20px auto;
-  position: relative;
-`
-
-const ColorPickerWrapper = styled.div`
-  position: absolute;
-  background: #ffffff;
-  z-index: 1;
-  top: 40px;
-`
-
-const ErrorMessage = styled.p`
-  color: #ff0000;
-`
+import { color, font, media, zIndex } from '../../styles'
+import Image from 'next/image'
+import { Button } from '../atoms/Button'
 
 type InputTagAttributes<T extends React.HTMLAttributes<HTMLElement>> = T & {
   onChange: ChangeHandler
@@ -80,91 +63,276 @@ export const Editor: React.VFC<Props> = ({
     setColorPickerVisibility(true)
   }
 
+  /**
+   * 画像をアップした際にプレビューを表示する
+   */
+
   return (
-    <Form onClick={onColorFormBeInActive} onFocus={onColorFormBeInActive}>
-      <FormItem>
-        <label htmlFor='plastic-image'>廃プラ画像を追加</label>
-        <input
-          type='file'
-          id='plastic-image'
-          accept='image/png, image/jpeg'
-          required
-          {...inputTagAttributes.plasticImage}
-        />
-        {errorMessage.plasticImage && (
-          <ErrorMessage key='plasticImage-error'>{errorMessage.plasticImage}</ErrorMessage>
-        )}
-      </FormItem>
+    <>
+      <FormHeading>
+        <a href='' />
+        <p>素材を追加する</p>
+      </FormHeading>
+      <Form onClick={onColorFormBeInActive} onFocus={onColorFormBeInActive}>
+        <MaterialWrap bgURL={`${inputTagAttributes.plasticImage}`}>
+          <label htmlFor='plastic-image'></label>
+          <input
+            type='file'
+            id='plastic-image'
+            accept='image/png, image/jpeg'
+            required
+            {...inputTagAttributes.plasticImage}
+          />
+          {errorMessage.plasticImage && (
+            <ErrorMessage key='plasticImage-error'>{errorMessage.plasticImage}</ErrorMessage>
+          )}
+        </MaterialWrap>
+        <KeyUploadWrap>
+          <label htmlFor='keycap-image'></label>
+          <input
+            type='file'
+            id='keycap-image'
+            accept='image/png, image/jpeg'
+            required
+            {...inputTagAttributes.keycapImage}
+          />
+          {errorMessage.keycapImage && (
+            <ErrorMessage key='keycapImage-error'>{errorMessage.keycapImage}</ErrorMessage>
+          )}
+        </KeyUploadWrap>
+        <InputWrap>
+          <FormItem>
+            <Label htmlFor='material-name'>素材の名前</Label>
+            <Input type='text' id='material-name' required {...inputTagAttributes.materialName} />
+            {errorMessage.materialName && (
+              <ErrorMessage key='materialName-error'>{errorMessage.materialName}</ErrorMessage>
+            )}
+          </FormItem>
 
-      <FormItem>
-        <label htmlFor='keycap-image'>キーキャップ画像を追加</label>
-        <input
-          type='file'
-          id='keycap-image'
-          accept='image/png, image/jpeg'
-          required
-          {...inputTagAttributes.keycapImage}
-        />
-        {errorMessage.keycapImage && (
-          <ErrorMessage key='keycapImage-error'>{errorMessage.keycapImage}</ErrorMessage>
-        )}
-      </FormItem>
+          <FormItem onClick={onColorFormBeActive}>
+            <Label htmlFor='color-type'>色の系統</Label>
+            <Input
+              type='text'
+              id='color-type'
+              {...inputTagAttributes.hexColor}
+              readOnly
+              onFocus={onColorFormBeActive}
+            />
+            {errorMessage.hexColor && (
+              <ErrorMessage key='hexColor-error'>{errorMessage.hexColor}</ErrorMessage>
+            )}
+            <ColorPickerWrapper style={{ display: isColorPickerVisible ? 'block' : 'none' }}>
+              <ColorPicker />
+            </ColorPickerWrapper>
+          </FormItem>
 
-      <FormItem>
-        <label htmlFor='material-name'>素材の名前</label>
-        <input type='text' id='material-name' required {...inputTagAttributes.materialName} />
-        {errorMessage.materialName && (
-          <ErrorMessage key='materialName-error'>{errorMessage.materialName}</ErrorMessage>
-        )}
-      </FormItem>
+          <FormItem>
+            <Label htmlFor='plastic-type'>プラスチックの種類</Label>
+            <Select id='plastic-type' required {...inputTagAttributes.plasticType}>
+              <option value=''>選択してください</option>
+              <option value='PP'>PP（ポリプロピレン）</option>
+              <option value='PE'>PE（ポリエチレン）</option>
+              <option value='PS'>PS（ポリスチレン）</option>
+            </Select>
+            {errorMessage.plasticType && (
+              <ErrorMessage key='plasticType-error'>{errorMessage.plasticType}</ErrorMessage>
+            )}
+          </FormItem>
 
-      <FormItem onClick={onColorFormBeActive}>
-        <label htmlFor='color-type'>色の系統</label>
-        <input
-          type='text'
-          id='color-type'
-          {...inputTagAttributes.hexColor}
-          readOnly
-          onFocus={onColorFormBeActive}
-        />
-        {errorMessage.hexColor && (
-          <ErrorMessage key='hexColor-error'>{errorMessage.hexColor}</ErrorMessage>
-        )}
-        <ColorPickerWrapper style={{ display: isColorPickerVisible ? 'block' : 'none' }}>
-          <ColorPicker />
-        </ColorPickerWrapper>
-      </FormItem>
+          <FormItem>
+            <Label htmlFor='celsius'>設定温度</Label>
+            <Input type='text' id='celsius' required {...inputTagAttributes.celsius} />
+            {errorMessage.celsius && (
+              <ErrorMessage key='celsius-error'>{errorMessage.celsius}</ErrorMessage>
+            )}
+          </FormItem>
 
-      <FormItem>
-        <label htmlFor='plastic-type'>プラスチックの種類</label>
-        <select id='plastic-type' required {...inputTagAttributes.plasticType}>
-          <option value=''>選択してください</option>
-          <option value='PP'>PP（ポリプロピレン）</option>
-          <option value='PE'>PE（ポリエチレン）</option>
-          <option value='PS'>PS（ポリスチレン）</option>
-        </select>
-        {errorMessage.plasticType && (
-          <ErrorMessage key='plasticType-error'>{errorMessage.plasticType}</ErrorMessage>
-        )}
-      </FormItem>
-
-      <FormItem>
-        <label htmlFor='celsius'>設定温度</label>
-        <input type='text' id='celsius' required {...inputTagAttributes.celsius} />
-        {errorMessage.celsius && (
-          <ErrorMessage key='celsius-error'>{errorMessage.celsius}</ErrorMessage>
-        )}
-      </FormItem>
-
-      <FormItem>
-        <label htmlFor='note'>備考（制作する際のポイントなど）</label>
-        <textarea id='note' {...inputTagAttributes.note} />
-        {errorMessage.note && <ErrorMessage key='note'>{errorMessage.note}</ErrorMessage>}
-      </FormItem>
-
-      <button type='button' onClick={onClickSubmit} disabled={!canSubmit}>
-        登録する
-      </button>
-    </Form>
+          <FormItem>
+            <Label htmlFor='note'>備考（制作する際のポイントなど）</Label>
+            <Textarea id='note' {...inputTagAttributes.note} rows={5} />
+            {errorMessage.note && <ErrorMessage key='note'>{errorMessage.note}</ErrorMessage>}
+          </FormItem>
+          <ButtonWrap>
+            <Button label='登録する' onClick={onClickSubmit} disabled={!canSubmit} />
+          </ButtonWrap>
+        </InputWrap>
+      </Form>
+    </>
   )
 }
+
+const FormHeading = styled.div`
+  width: 100%;
+  height: 56px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  border-bottom: solid 0.5px ${color.content.light};
+  padding: 0 32px;
+  p {
+    color: ${color.content.dark};
+    margin: 0 0 0 16px;
+    ${font.inter.subtitle1};
+  }
+  a {
+    background-image: url('/images/icons/close.svg');
+    background-size: cover;
+    background-position: center center;
+    width: 24px;
+    height: 24px;
+  }
+`
+
+const MaterialWrap = styled.div<{ bgURL: string }>`
+  position: relative;
+  width: 100%;
+  height: 180px;
+  input {
+    text-indent: -9999px;
+    width: 100%;
+    height: 100%;
+    background-color: ${color.background.bague};
+    cursor: pointer;
+    background-image: url(${(props) => props.bgURL});
+  }
+  label {
+    display: block;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: ${color.content.white};
+    background-image: url('/images/icons/camera.svg');
+    background-position: center center;
+    background-repeat: no-repeat;
+    border: 1px solid ${color.content.light};
+    cursor: pointer;
+  }
+`
+
+const KeyUploadWrap = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100px;
+  label {
+    display: block;
+    position: absolute;
+    bottom: 0;
+    right: 50%;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: ${color.content.white};
+    background-image: url('/images/icons/camera.svg');
+    background-position: center center;
+    background-repeat: no-repeat;
+    border: 1px solid ${color.content.light};
+    cursor: pointer;
+    z-index: ${zIndex.default};
+    transform: translateX(100px);
+  }
+  input {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border: solid 2px ${color.primary};
+    cursor: pointer;
+    background-color: ${color.background.bague};
+    background-image: url('/images/icons/image.svg');
+    background-position: center center;
+    background-size: 82px 82px;
+    background-repeat: no-repeat;
+    text-indent: -9999px;
+  }
+`
+
+const InputWrap = styled.div`
+  ${media.lg} {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+  ${media.mdsp} {
+    width: 100%;
+    padding: 0 32px;
+  }
+`
+
+const Form = styled.form`
+  width: 100%;
+  margin: 0 0 128px 0;
+`
+
+const FormItem = styled.div`
+  margin: 0 0 32px 0;
+  position: relative;
+`
+
+const Label = styled.label`
+  display: inline-block;
+  ${font.inter.label};
+  color: ${color.content.dark};
+  margin: 0 0 8px 0;
+`
+
+const Input = styled.input`
+  display: block;
+  min-height: 32px;
+  width: 100%;
+  padding: 0 16px;
+  border: 0px;
+  border-radius: 4px;
+  background-color: ${color.background.blue};
+`
+const Select = styled.select`
+  position: relative;
+  display: block;
+  background-color: ${color.background.blue};
+  border: 0px;
+  border-radius: 4px;
+  min-height: 32px;
+  width: 100%;
+  padding: 0 16px;
+  appearance: none;
+  :after {
+    content: '';
+    display: block;
+    width: 16px;
+    height: 16px;
+    background-image: url('/images/icons/triangle.svg');
+    background-size: cover;
+    background-position: center;
+  }
+`
+
+const Textarea = styled.textarea`
+  display: block;
+  background-color: ${color.background.blue};
+  border: 0px;
+  border-radius: 4px;
+  min-height: 32px;
+  width: 100%;
+  padding: 0 16px;
+  resize: vertical;
+`
+
+const ColorPickerWrapper = styled.div`
+  position: absolute;
+  background: #ffffff;
+  z-index: 1;
+  top: 60px;
+`
+
+const ErrorMessage = styled.p`
+  color: #ff0000;
+`
+const ButtonWrap = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+`
