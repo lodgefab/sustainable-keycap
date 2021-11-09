@@ -88,7 +88,7 @@ export const Register: NextPage<Props> = (_) => {
   }, [watchKeycapImageUrl])
 
   /**
-   * 設定温度を入力するフォームで数字以外の入力を弾くためのフィルタリング処理
+   * 設定温度を入力するフォームで数字以外のキー入力を弾くためのフィルタリング処理
    */
   const filterCelsiusInput = (
     event: React.KeyboardEvent<HTMLInputElement> | React.CompositionEvent<HTMLInputElement>
@@ -106,6 +106,14 @@ export const Register: NextPage<Props> = (_) => {
   }
 
   /**
+   * 設定温度を入力するフォームで数字以外の文字が挿入された時に自動で削除する処理
+   * （キー入力ではなく、フォーム補完を使って値を入れた場合も反応する）
+   */
+  const preprocessCelsiusValue = (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.target.value = event.target.value.replace(/\D/g, '')
+  }
+
+  /**
    * react-hook-formを用いてフォーム入力を制御するために各Inputタグに設定するAttribute
    */
   const inputTagAttributes = {
@@ -116,7 +124,11 @@ export const Register: NextPage<Props> = (_) => {
     plasticType: register('plasticType', { required: true }),
     celsius: {
       onKeyPress: filterCelsiusInput,
-      ...register('celsius', { required: true, setValueAs: (v) => v.replace(/\D/g, '') }),
+      ...register('celsius', {
+        required: true,
+        setValueAs: (v) => v.replace(/\D/g, ''),
+        onChange: preprocessCelsiusValue,
+      }),
     },
     note: register('note'),
   }
