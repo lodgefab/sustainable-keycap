@@ -345,3 +345,27 @@ export const respondAsInternalServerError = (res: NextApiResponse) => {
     message: 'サーバーエラーにより素材データの登録ができませんでした。',
   })
 }
+
+/**
+ * 画像ファイルをBase64形式にエンコードする
+ * @param imageBlob 画像ファイル
+ */
+export const readAsDataURL = async (imageBlob: File): Promise<string | ArrayBuffer> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+
+    reader.addEventListener(
+      'load',
+      () => {
+        if (reader.result) {
+          resolve(reader.result)
+        } else {
+          reject('Failed to convert File to object URL.')
+        }
+      },
+      { once: true }
+    )
+
+    reader.readAsDataURL(imageBlob)
+  })
+}
