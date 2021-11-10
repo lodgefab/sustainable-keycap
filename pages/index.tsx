@@ -11,6 +11,7 @@ import Axios from 'axios'
 import { UpvoteApiResponse } from './api/upvote'
 import { getAuth } from 'firebase/auth'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { DispatchPageReadyContext } from '../utils/pageLoadEventContext'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 
@@ -28,6 +29,11 @@ export const Index: NextPage<Props> = (_) => {
 
   const [upvotableMaterials, setUpvotableMaterials] = useState<string[]>([])
   const [materials, setMaterials] = useState<Material[]>([])
+
+  const dispatchPageReady = useContext(DispatchPageReadyContext)
+
+  // 素材データの読み込みが完了してかどうかを表すboolean
+  const isPageLoaded = materials.length > 0
 
   // 認証の初期化が完了し、ログイン状態が変化した時にキーキャップ素材データを取得する処理
   useEffect(() => {
@@ -60,6 +66,13 @@ export const Index: NextPage<Props> = (_) => {
       }
     })()
   }, [currentUser, authState])
+
+  // 素材データの読み込みが完了してページの表示に必要なデータが揃った時の処理
+  useEffect(() => {
+    if (isPageLoaded) {
+      dispatchPageReady()
+    }
+  }, [dispatchPageReady, isPageLoaded])
 
   /**
    * 表示されているいいねの数を変更する
