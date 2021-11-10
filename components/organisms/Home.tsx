@@ -70,22 +70,69 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
   }, [data])
 
   const setAnimation = () => {
-    const animationObj = {
-      duration: 0.6,
-      y: 80,
-      opacity: 0,
+    const animationFromHeading = {
+      y: '150%',
+      rotate: 15,
     }
-
-    gsap.from(conceptImgRef.current, {
-      scrollTrigger: {
-        trigger: conceptImgRef.current!,
-        start: 'top bottom',
-        scrub: true,
-        // onEnter: () => {}, //スクロールイン時
-        // onEnterBack: () => {}, //スクロールバック時
-        // markers: true // マーカー表示
+    const animationToHeading = {
+      y: '0%',
+      rotate: 0,
+      stagger: 0.04,
+    }
+    gsap.fromTo(
+      conceptImgRef.current,
+      {
+        autoAlpha: 0,
+        y: 80,
       },
-      ...animationObj,
+      {
+        autoAlpha: 1,
+        y: 0,
+        scrollTrigger: {
+          trigger: conceptImgRef.current!,
+          start: 'top center',
+          // onEnter: () => {}, //スクロールイン時
+          // onEnterBack: () => {}, //スクロールバック時
+          // markers: true // マーカー表示
+        },
+      }
+    )
+
+    gsap.set('.headline_why', { ...animationFromHeading }) //Workshopセクション
+    ScrollTrigger.batch('.headline_why', {
+      onEnter: (batch) => gsap.to(batch, { ...animationToHeading }),
+      start: 'top 50%',
+      once: true, //この指定によって１度だけアニメーションされる
+    })
+    gsap.set('.headline_workshop', { ...animationFromHeading }) //Workshopセクション
+    ScrollTrigger.batch('.headline_workshop', {
+      onEnter: (batch) => gsap.to(batch, { ...animationToHeading }),
+      start: 'top 50%',
+      once: true, //この指定によって１度だけアニメーションされる
+    })
+    gsap.set('.headline_making', { ...animationFromHeading }) //Makingセクション
+    ScrollTrigger.batch('.headline_making', {
+      onEnter: (batch) => gsap.to(batch, { ...animationToHeading }),
+      start: 'top 50%',
+      once: true, //この指定によって１度だけアニメーションされる
+    })
+    gsap.set('.headline_mold', { ...animationFromHeading }) //Moldセクション
+    ScrollTrigger.batch('.headline_mold', {
+      onEnter: (batch) => gsap.to(batch, { ...animationToHeading }),
+      start: 'top 50%',
+      once: true, //この指定によって１度だけアニメーションされる
+    })
+    gsap.set('.headline_about', { ...animationFromHeading }) //AboutUsセクション
+    ScrollTrigger.batch('.headline_about', {
+      onEnter: (batch) => gsap.to(batch, { ...animationToHeading }),
+      start: 'top 50%',
+      once: true, //この指定によって１度だけアニメーションされる
+    })
+    gsap.set('.headline_library', { ...animationFromHeading }) //Libraryセクション
+    ScrollTrigger.batch('.headline_library', {
+      onEnter: (batch) => gsap.to(batch, { ...animationToHeading }),
+      start: 'top 50%',
+      once: true, //この指定によって１度だけアニメーションされる
     })
 
     // gsap.to(".parallax", { //パララックスコード
@@ -98,6 +145,7 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
   }
 
   const StartOnLoadAnimation = () => {
+    //読み込み完了時にLoaderをフェードアウト
     gsap
       .timeline({ defaults: { duration: 1.6, ease: 'expo' } })
       .from('.loader', {
@@ -107,7 +155,16 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
         opacity: 0,
       })
     gsap
-      .timeline({ defaults: { duration: 0.8, ease: 'expo', delay: 1.2 } })
+      .timeline({ defaults: { duration: 0.1, ease: 'expo', delay: 3 } })
+      .from('.loader', {
+        display: 'flex',
+      })
+      .to('.loader', {
+        display: 'none',
+      })
+    //ロード時にキーキャップが出現する
+    gsap
+      .timeline({ defaults: { duration: 0.8, ease: 'expo', delay: 1.0 } })
       .set('.key', {
         opacity: 0,
         y: '150%',
@@ -115,7 +172,23 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
       .to('.key', {
         opacity: 1,
         y: '0%',
-        stagger: 0.07,
+        stagger: {
+          each: 0.08,
+          from: 'start',
+        },
+      })
+    //ロード時に文字が出現する
+    gsap.killTweensOf('.titleline')
+    gsap
+      .timeline({ defaults: { duration: 1.2, ease: 'expo', delay: 1.0 } })
+      .set('.titleline', {
+        y: '150%',
+        rotate: 15,
+      })
+      .to('.titleline', {
+        y: '0%',
+        rotate: 0,
+        stagger: 0.04,
       })
   }
 
@@ -231,18 +304,21 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
             />
           </VideoWrap>
           <Title>
-            <span>プラゴミから</span>
-            <DesktopBr />
-            <span>キーキャップを</span>
-            <DesktopBr />
-            <span>作ろう</span>
+            <span>
+              <h1 className={'titleline'}>プラゴミから</h1>
+            </span>
+            <span>
+              <h1 className={'titleline'}>キーキャップを</h1>
+            </span>
+            <span>
+              <h1 className={'titleline'}>作ろう</h1>
+            </span>
           </Title>
         </Hero>
         <ConceptSection id='concept' color={'transparent'}>
           <Wrap>
             <Message>
               #ANYCAPは、廃棄プラスチックを使ってキーキャップを自作するオープンソースコミュニティです。
-              <br />
               <br />
               家庭やオフィスで出るプラゴミを原材料としたキーキャップを製作し、手法やデータを公開することを通じて、仲間の輪を広げる活動を行なっています。
             </Message>
@@ -258,8 +334,14 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
         <WHYSection id='why' color={'transparent'}>
           <WHYWrap>
             <SectionTitleGroup>
-              <SectionTitle>Why #ANYCAP ?</SectionTitle>
-              <SectionSubTitle>{t('whyAnycap.subtitle')}</SectionSubTitle>
+              <span>
+                <SectionTitle className={'headline_why'}>Why #ANYCAP ?</SectionTitle>
+              </span>
+              <span>
+                <SectionSubTitle className={'headline_why'}>
+                  {t('whyAnycap.subtitle')}
+                </SectionSubTitle>
+              </span>
             </SectionTitleGroup>
             <WhyKeys>
               <WhyKey>
@@ -294,8 +376,12 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
               <WorkShopImg src='/images/photos/006.jpg' />
             </WorkShopImgWrap>
             <WorkShopSectionTitle>
-              <SectionTitle>Workshop</SectionTitle>
-              <SectionSubTitle>ワークショップ</SectionSubTitle>
+              <span>
+                <SectionTitle className={'headline_workshop'}>Workshop</SectionTitle>
+              </span>
+              <span>
+                <SectionSubTitle className={'headline_workshop'}>ワークショップ</SectionSubTitle>
+              </span>
             </WorkShopSectionTitle>
             <WorkShopSectionContents>
               <WorkshopDesc>
@@ -329,8 +415,14 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
         <MakingSection id='making' color={'transparent'}>
           <MakingWrap>
             <SectionTitleGroup>
-              <SectionTitle>Making #ANYCAP</SectionTitle>
-              <SectionSubTitle>廃プラキーキャップができるまで</SectionSubTitle>
+              <span>
+                <SectionTitle className={'headline_making'}>Making #ANYCAP</SectionTitle>
+              </span>
+              <span>
+                <SectionSubTitle className={'headline_making'}>
+                  廃プラキーキャップができるまで
+                </SectionSubTitle>
+              </span>
             </SectionTitleGroup>
             <MakingScrollWrap>
               <MakingScrollContents>
@@ -385,8 +477,12 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
               </MoldSlider>
             </MoldSliderWrap>
             <MoldTitleWrap>
-              <SectionTitle>Mold</SectionTitle>
-              <SectionSubTitle>金型</SectionSubTitle>
+              <span>
+                <SectionTitle className={'headline_mold'}>Mold</SectionTitle>
+              </span>
+              <span>
+                <SectionSubTitle className={'headline_mold'}>金型</SectionSubTitle>
+              </span>
             </MoldTitleWrap>
             <MoldContentsWrap>
               <MoldDesc>
@@ -404,8 +500,12 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
         <AboutSection id='aboutus' color={'transparent '}>
           <AboutWrap>
             <AboutTitleWrap>
-              <SectionTitle>About Us</SectionTitle>
-              <SectionSubTitle>わたしたちについて</SectionSubTitle>
+              <span>
+                <SectionTitle className={'headline_about'}>About Us</SectionTitle>
+              </span>
+              <span>
+                <SectionSubTitle className={'headline_about'}>わたしたちについて</SectionSubTitle>
+              </span>
             </AboutTitleWrap>
             <AboutContentsWrap>
               <p>
@@ -430,8 +530,12 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
         <LibrarySection id='library' color={'transparent'}>
           <LibraryWrap>
             <SectionTitleGroup>
-              <SectionTitle>Library</SectionTitle>
-              <SectionSubTitle>ライブラリ</SectionSubTitle>
+              <span>
+                <SectionTitle className={'headline_library'}>Library</SectionTitle>
+              </span>
+              <span>
+                <SectionSubTitle className={'headline_library'}>ライブラリ</SectionSubTitle>
+              </span>
             </SectionTitleGroup>
             <LibraryDesc>
               みんなが見つけたキーキャップに使えそうな素材とそのレポートです。実際に作ってみたものがあればどんどう投稿していってみましょう！いいねの多い人気素材は実際に販売されることがあるかも...?!
@@ -559,19 +663,29 @@ const SectionTitleGroup = styled.div`
   ${media.mdsp} {
     margin: 0 0 64px 0;
   }
+
+  span {
+    overflow: hidden;
+    display: block;
+    line-height: 1;
+  }
 `
 
 const SectionTitle = styled.h3`
+  display: inline-block;
   ${font.courier.h2};
   color: ${color.content.dark};
   text-align: left;
   margin: 0 0 8px 0;
+  transform-origin: 0% 50%;
 `
 
 const SectionSubTitle = styled.p`
+  display: inline-block;
   ${font.inter.label};
   color: ${color.content.dark};
   text-align: left;
+  transform-origin: 0% 50%;
 `
 
 const Hero = styled(Section)`
@@ -584,30 +698,42 @@ const Hero = styled(Section)`
     padding: 56px 0 0 0;
   }
 `
-const Title = styled.h1`
+const Title = styled.div`
   position: absolute;
   left: calc(100vw * 2 / 3);
-  top: 30%;
+  top: 36%;
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(1, 1fr);
+  grid-template-rows: repeat(3, 1fr);
   ${font.inter.h1};
   font-weight: bold;
-  line-height: 200%;
-  span {
-    overflow: hidden;
-  }
+  line-height: 180%;
+
   ${media.mdsp} {
     position: relative;
     left: 0;
     top: 0;
     margin: 32px 0 0 32px;
-
     max-width: 990px;
     ${font.inter.h2};
     line-height: 150%;
   }
   ${media.md} {
-    margin: 128px auto 0;
+    margin: 64px auto 0;
     padding: 0 32px;
     ${font.inter.h1};
+  }
+
+  h1 {
+    display: inline-block;
+    transform-origin: 0% 50%;
+  }
+
+  span {
+    display: block;
+    line-height: 1;
+    overflow: hidden;
   }
 `
 
@@ -683,6 +809,9 @@ const BGKeys = styled.div`
   transform: rotate3d(0, 0, 1, -20deg);
   opacity: 1;
   z-index: ${zIndex.base};
+  ${media.mdsp} {
+    display: none;
+  }
 `
 
 const BGKey = styled.div<{ src: string; gridRow: number; gridColumn }>`
