@@ -82,12 +82,35 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
       },
       ...animationObj,
     })
+
+    // gsap.to(".parallax", { //パララックスコード
+    //   scrollTrigger: {
+    //     scrub: true
+    //   },
+    //   y: (i, target) => -ScrollTrigger.maxScroll(window) * target.dataset.speed,
+    //   ease: "none"
+    // });
+  }
+
+  const StartOnLoadAnimation = () => {
+    gsap
+      .timeline({ defaults: { duration: 2, ease: 'expo' } })
+      .set('.key', {
+        opacity: 0,
+        y: '150%',
+      })
+      .to('.key', {
+        opacity: 1,
+        y: '0%',
+        stagger: 0.1,
+      })
   }
 
   useEffect(() => {
     if (process.browser) {
       gsap.registerPlugin(ScrollTrigger)
       setAnimation()
+      StartOnLoadAnimation()
     }
   }, [])
 
@@ -112,6 +135,68 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
     <AllWrap>
       <div ref={containerRef}>
         <Hero id='hero' color={'transparent'}>
+          <BGKeys className={'parallax'} data-speed='.4'>
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key001.jpg'}
+              gridRow={5}
+              gridColumn={40}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key002.jpg'}
+              gridRow={11}
+              gridColumn={48}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key003.jpg'}
+              gridRow={18}
+              gridColumn={-8}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key004.jpg'}
+              gridRow={25}
+              gridColumn={36}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key005.jpg'}
+              gridRow={29}
+              gridColumn={44}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key006.jpg'}
+              gridRow={30}
+              gridColumn={26}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key000.jpg'}
+              gridRow={7}
+              gridColumn={30}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key001.jpg'}
+              gridRow={40}
+              gridColumn={13}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key002.jpg'}
+              gridRow={24}
+              gridColumn={13}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key003.jpg'}
+              gridRow={32}
+              gridColumn={1}
+            />
+          </BGKeys>
           <VideoWrap>
             <VideoPlayer>
               <iframe
@@ -138,18 +223,6 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
             <DesktopBr />
             作ろう
           </Title>
-          <BGKeys>
-            <BGKey src={'/images/photos/key001.jpg'} gridRow={5} gridColumn={40} />
-            <BGKey src={'/images/photos/key002.jpg'} gridRow={11} gridColumn={48} />
-            <BGKey src={'/images/photos/key003.jpg'} gridRow={18} gridColumn={-8} />
-            <BGKey src={'/images/photos/key004.jpg'} gridRow={25} gridColumn={36} />
-            <BGKey src={'/images/photos/key005.jpg'} gridRow={29} gridColumn={44} />
-            <BGKey src={'/images/photos/key006.jpg'} gridRow={30} gridColumn={26} />
-            <BGKey src={'/images/photos/key000.jpg'} gridRow={7} gridColumn={30} />
-            <BGKey src={'/images/photos/key001.jpg'} gridRow={40} gridColumn={13} />
-            <BGKey src={'/images/photos/key002.jpg'} gridRow={24} gridColumn={13} />
-            <BGKey src={'/images/photos/key003.jpg'} gridRow={32} gridColumn={1} />
-          </BGKeys>
         </Hero>
         <ConceptSection id='concept' color={'transparent'}>
           <Wrap>
@@ -430,6 +503,7 @@ const AllWrap = styled.main`
   height: 100%;
   width: 100%;
   overflow: hidden;
+  z-index: ${zIndex.base};
 `
 
 const Section = styled.section<{ color: string }>`
@@ -528,6 +602,7 @@ const VideoWrap = styled.div`
   height: calc(100vw * 2 / 3);
   background-color: ${color.background.white};
   overflow: hidden;
+  z-index: ${zIndex.behind};
   ${media.sp} {
     position: relative;
     width: calc(100vw - 32px);
@@ -558,6 +633,7 @@ const VideoPlayer = styled.div`
   height: 100%;
   background: #ffffff;
   overflow: hidden;
+
   ${media.mdsp} {
     display: none;
   }
@@ -613,6 +689,7 @@ const Message = styled.h2`
   ${font.inter.h3}
   line-height:200%;
   text-align: left;
+  z-index: ${zIndex.default};
   ${media.mdsp} {
     ${font.inter.subtitle1};
     line-height: 200%;
