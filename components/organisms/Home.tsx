@@ -14,6 +14,7 @@ import { useWindowSize } from '../../utils/useWindowSize'
 import { Footer } from '../molecules/Footer'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
+import { Loader } from '../molecules/Loader'
 
 gsap.registerPlugin(ScrollTrigger)
 import { getAuth } from 'firebase/auth'
@@ -44,7 +45,6 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
   // containerRef : ヌルッとスクロールアニメーション
   // その他のRef : スクロール連動アニメーション
   const containerRef = useRef<HTMLDivElement>(null)
-
   const conceptImgRef = useRef<HTMLDivElement>(null)
 
   const size = useWindowSize()
@@ -63,7 +63,9 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
     data.curr = window.scrollY
     data.prev += (data.curr - data.prev) * data.ease
     data.rounded = Math.round(data.prev * 100) / 100
-    containerRef.current!.style.transform = `translateY(-${data.rounded}px)`
+    if (containerRef.current !== null) {
+      containerRef.current!.style.transform = `translateY(-${data.rounded}px)`
+    }
     requestAnimationFrame(() => smoothScroll())
   }, [data])
 
@@ -97,7 +99,15 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
 
   const StartOnLoadAnimation = () => {
     gsap
-      .timeline({ defaults: { duration: 2, ease: 'expo' } })
+      .timeline({ defaults: { duration: 1.6, ease: 'expo' } })
+      .from('.loader', {
+        opacity: 1,
+      })
+      .to('.loader', {
+        opacity: 0,
+      })
+    gsap
+      .timeline({ defaults: { duration: 0.8, ease: 'expo', delay: 1.2 } })
       .set('.key', {
         opacity: 0,
         y: '150%',
@@ -105,7 +115,7 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
       .to('.key', {
         opacity: 1,
         y: '0%',
-        stagger: 0.1,
+        stagger: 0.07,
       })
   }
 
@@ -136,6 +146,7 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
 
   return (
     <AllWrap>
+      <Loader />
       <div ref={containerRef}>
         <Hero id='hero' color={'transparent'}>
           <BGKeys className={'parallax'} data-speed='.4'>
@@ -220,11 +231,11 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
             />
           </VideoWrap>
           <Title>
-            プラゴミから
+            <span>プラゴミから</span>
             <DesktopBr />
-            キーキャップを
+            <span>キーキャップを</span>
             <DesktopBr />
-            作ろう
+            <span>作ろう</span>
           </Title>
         </Hero>
         <ConceptSection id='concept' color={'transparent'}>
@@ -580,6 +591,9 @@ const Title = styled.h1`
   ${font.inter.h1};
   font-weight: bold;
   line-height: 200%;
+  span {
+    overflow: hidden;
+  }
   ${media.mdsp} {
     position: relative;
     left: 0;
