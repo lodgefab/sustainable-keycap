@@ -29,6 +29,8 @@ type Props = {
 export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMaterials, upvote }) => {
   const authStatus = useContext(AuthContext)
   const { currentUser } = getAuth()
+
+  //▼▼▼▼▼▼▼▼演出処理開始 ▼▼▼▼▼▼▼//
   const sliderSettings = {
     dots: true,
     infinite: true,
@@ -36,7 +38,6 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
     slidesToShow: 1,
     slidesToScroll: 1,
   }
-
   // containerRef : ヌルッとスクロールアニメーション
   // その他のRef : スクロール連動アニメーション
   const containerRef = useRef<HTMLDivElement>(null)
@@ -65,15 +66,15 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
 
   const setAnimation = () => {
     const animationObj = {
-      duration: 0.8,
-      y: -80,
+      duration: 0.6,
+      y: 80,
       opacity: 0,
     }
 
     gsap.from(conceptImgRef.current, {
       scrollTrigger: {
         trigger: conceptImgRef.current!,
-        start: 'bottom 90%',
+        start: 'top bottom',
         scrub: true,
         // onEnter: () => {}, //スクロールイン時
         // onEnterBack: () => {}, //スクロールバック時
@@ -97,6 +98,8 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
   useEffect(() => {
     setBodyHeight()
   }, [size.height])
+
+  //▲▲▲▲▲▲▲▲▲▲▲ 演出処理終了 ▲▲▲▲▲▲▲▲▲▲▲//
 
   const [currentFilter, setCurrentFilter] = useState<CategorisedColorType | null>(null)
   const { t } = useTranslation('translation', { keyPrefix: 'home' })
@@ -135,6 +138,18 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
             <DesktopBr />
             作ろう
           </Title>
+          <BGKeys>
+            <BGKey src={'/images/photos/key001.jpg'} gridRow={5} gridColumn={40} />
+            <BGKey src={'/images/photos/key002.jpg'} gridRow={11} gridColumn={48} />
+            <BGKey src={'/images/photos/key003.jpg'} gridRow={18} gridColumn={-8} />
+            <BGKey src={'/images/photos/key004.jpg'} gridRow={25} gridColumn={36} />
+            <BGKey src={'/images/photos/key005.jpg'} gridRow={29} gridColumn={44} />
+            <BGKey src={'/images/photos/key006.jpg'} gridRow={30} gridColumn={26} />
+            <BGKey src={'/images/photos/key000.jpg'} gridRow={7} gridColumn={30} />
+            <BGKey src={'/images/photos/key001.jpg'} gridRow={40} gridColumn={13} />
+            <BGKey src={'/images/photos/key002.jpg'} gridRow={24} gridColumn={13} />
+            <BGKey src={'/images/photos/key003.jpg'} gridRow={32} gridColumn={1} />
+          </BGKeys>
         </Hero>
         <ConceptSection id='concept' color={'transparent'}>
           <Wrap>
@@ -541,7 +556,7 @@ const VideoMask = styled.div`
 const VideoPlayer = styled.div`
   position: relative;
   height: 100%;
-  background: #333333;
+  background: #ffffff;
   overflow: hidden;
   ${media.mdsp} {
     display: none;
@@ -560,8 +575,35 @@ const VideoPlayer = styled.div`
     }
   }
 `
+
+const BGKeys = styled.div`
+  position: absolute;
+  width: 100vw;
+  height: 100vw;
+  top: 0%;
+  left: 10%;
+  display: grid;
+  grid-template-columns: repeat(50, 2%);
+  grid-template-rows: repeat(50, 2%);
+  --grid-row: 1;
+  --grid-column: 1;
+  transform: rotate3d(0, 0, 1, -20deg);
+  opacity: 1;
+  z-index: ${zIndex.base};
+`
+
+const BGKey = styled.div<{ src: string; gridRow: number; gridColumn }>`
+  grid-area: ${(props) => props.gridRow} / ${(props) => props.gridColumn} / span 12 / span 5;
+  will-change: transform;
+  width: 120px;
+  height: 120px;
+  background-image: url(${(props) => props.src});
+  background-size: cover;
+`
+
 const ConceptSection = styled(Section)`
   padding: 0 0 128px 0;
+  overflow: hidden;
   ${media.mdsp} {
     padding: 32px 0px 128px 0px;
   }
@@ -587,7 +629,7 @@ const ConceptPhotos = styled.div`
   grid-template-columns: repeat(5, 1fr);
   grid-template-rows: auto;
   width: 100%;
-  overflow: auto;
+  overflow: visible;
   padding: 0 32px;
 `
 

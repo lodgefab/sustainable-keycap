@@ -19,6 +19,7 @@ function MyApp({ Component, pageProps }) {
           body {
             font-family: 'Montserrat', sans-serif;
             color: ${color.content.dark};
+            overscroll-behavior-y: none;
           }
           *,
           *::after,
