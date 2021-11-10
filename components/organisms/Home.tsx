@@ -18,6 +18,7 @@ import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
 gsap.registerPlugin(ScrollTrigger)
 import { getAuth } from 'firebase/auth'
 import { useTranslation } from 'next-i18next'
+import { UsePageLoadEventContext } from '../../utils/pageLoadEventContext'
 
 type Props = {
   materials: Material[]
@@ -29,6 +30,8 @@ type Props = {
 export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMaterials, upvote }) => {
   const authStatus = useContext(AuthContext)
   const { currentUser } = getAuth()
+
+  const usePageLoadEvent = useContext(UsePageLoadEventContext)
 
   //▼▼▼▼▼▼▼▼演出処理開始 ▼▼▼▼▼▼▼//
   const sliderSettings = {
@@ -106,13 +109,13 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
       })
   }
 
-  useEffect(() => {
+  usePageLoadEvent(() => {
     if (process.browser) {
       gsap.registerPlugin(ScrollTrigger)
       setAnimation()
       StartOnLoadAnimation()
     }
-  }, [])
+  })
 
   useEffect(() => {
     requestAnimationFrame(() => smoothScroll())
