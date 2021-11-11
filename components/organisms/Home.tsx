@@ -279,12 +279,6 @@ export const Home: React.VFC<Props> = ({
             />
             <BGKey
               className={'key'}
-              src={'/images/photos/key001.jpg'}
-              gridRow={40}
-              gridColumn={13}
-            />
-            <BGKey
-              className={'key'}
               src={'/images/photos/key002.jpg'}
               gridRow={24}
               gridColumn={13}
@@ -621,7 +615,7 @@ export const Home: React.VFC<Props> = ({
                 {authStatus === 'LOGGED_IN' && currentUser ? (
                   <Button label={'素材を追加する'} href='/register' />
                 ) : (
-                  <Button label={'素材を追加する'} disabled />
+                  <Button label={'ログインしてください'} disabled />
                 )}
               </>
             )}
@@ -804,7 +798,7 @@ const VideoPlayer = styled.div`
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: calc(100vw * 2 / 3);
+    width: calc(100vw * 2 / 3 * 16 / 9);
     height: calc(100vw * 2 / 3);
     ${media.sp} {
       width: calc(100vw - 32px);
