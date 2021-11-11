@@ -61,6 +61,7 @@ export const Header: React.VFC<Props> = ({ currentUser, authState, onLoginFunc, 
     <Wrap>
       <Container>
         <Left>
+          {/* トップページではページ内スクロールとして機能し、トップページ以外ではページ遷移として機能する */}
           {pathname === '/' && (
             <Logo
               onClick={() => Scroll.scroller.scrollTo('hero', { smooth: true, duration: 500 })}
