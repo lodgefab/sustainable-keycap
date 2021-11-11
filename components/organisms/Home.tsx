@@ -194,6 +194,8 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
 
   usePageLoadEvent(() => {
     if (process.browser) {
+      setBodyHeight()
+      console.log('pageLoad')
       gsap.registerPlugin(ScrollTrigger)
       setAnimation()
       StartOnLoadAnimation()
@@ -856,13 +858,15 @@ const ConceptPhotos = styled.div`
   padding: 0 32px;
 `
 
-const ConceptPhoto = styled.img`
-  width: auto;
+const ConceptPhoto = styled.div<{ src: string }>`
+  width: 640px;
   height: 480px;
+  background-image: url(${(props) => props.src});
+  background-size: cover;
   ${media.mdsp} {
     width: 315px;
     height: 420px;
-    object-fit: cover;
+    background-size: cover;
   }
 `
 
