@@ -49,6 +49,7 @@ export const Register: NextPage<Props> = (_) => {
     register,
     watch,
     handleSubmit,
+    setValue,
     formState: {
       errors, // 各入力項目に対して検出されたエラーメッセージが格納されたオブジェクト
       dirtyFields, // ユーザーによる入力が発生した入力項目を管理したオブジェクト
@@ -103,6 +104,20 @@ export const Register: NextPage<Props> = (_) => {
       return false
     }
     return true
+  }
+
+  const resetImage = (image: 'plasticImage' | 'keycapImage') => {
+    if (image === 'plasticImage') {
+      // @ts-ignore
+      // file inputのリセットには空文字列を指定する必要があるが、型定義的には期待しているのはFileListであり競合するのでts-ignoreする
+      setValue('plasticImage', '')
+      setPlasticImageObjectUrl(null)
+    } else {
+      // @ts-ignore
+      // file inputのリセットには空文字列を指定する必要があるが、型定義的には期待しているのはFileListであり競合するのでts-ignoreする
+      setValue('keycapImage', '')
+      setKeycapImageObjectUrl(null)
+    }
   }
 
   /**
@@ -210,6 +225,7 @@ export const Register: NextPage<Props> = (_) => {
               plasticImage: plasticImageObjectUrl,
               keycapImage: keycapImageObjectUrl,
             }}
+            resetImage={resetImage}
             /* handleSubmitでバリデーションを行った後、エラーが無ければexecuteSubmitが実行される */
             onClickSubmit={handleSubmit(executeSubmit)}
             canSubmit={canSubmit}
