@@ -7,6 +7,7 @@ import { color, font, media, zIndex } from '../../styles'
 import Image from 'next/image'
 import { Button } from '../atoms/Button'
 import { useFormContext } from 'react-hook-form'
+import Link from 'next/link'
 
 type InputTagAttributes<T extends React.HTMLAttributes<HTMLElement>> = T & {
   onChange: ChangeHandler
@@ -78,7 +79,9 @@ export const Editor: React.VFC<Props> = ({
   return (
     <>
       <FormHeading>
-        <a href='' />
+        <Link href='/' passHref={true}>
+          <a />
+        </Link>
         <p>素材を追加する</p>
       </FormHeading>
       <Form onClick={onColorFormBeInActive} onFocus={onColorFormBeInActive}>
