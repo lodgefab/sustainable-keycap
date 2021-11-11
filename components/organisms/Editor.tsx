@@ -89,7 +89,10 @@ export const Editor: React.VFC<Props> = ({
         <p>素材を追加する</p>
       </FormHeading>
       <Form onClick={onColorFormBeInActive} onFocus={onColorFormBeInActive}>
-        <MaterialWrap bgURL={`${previews.plasticImage || inputTagAttributes.plasticImage}`}>
+        <MaterialWrap
+          isFilled={false}
+          bgURL={`${previews.plasticImage || inputTagAttributes.plasticImage}`}
+        >
           <label htmlFor='plastic-image'></label>
           <input
             type='file'
@@ -105,7 +108,10 @@ export const Editor: React.VFC<Props> = ({
             <ErrorMessage key='plasticImage-error'>{errorMessage.plasticImage}</ErrorMessage>
           )}
         </MaterialWrap>
-        <KeyUploadWrap imgURL={`${previews.keycapImage || '/images/icons/image.svg'}`}>
+        <KeyUploadWrap
+          isFilled={true}
+          imgURL={`${previews.keycapImage || '/images/icons/image.svg'}`}
+        >
           <label htmlFor='keycap-image'></label>
           <input
             type='file'
@@ -191,6 +197,10 @@ const FormHeading = styled.div`
   align-items: center;
   border-bottom: solid 0.5px ${color.content.light};
   padding: 0 32px;
+  ${media.mdsp} {
+    padding: 56px 32px 0;
+    height: 112px;
+  }
   p {
     color: ${color.content.dark};
     margin: 0 0 0 16px;
@@ -205,7 +215,7 @@ const FormHeading = styled.div`
   }
 `
 
-const MaterialWrap = styled.div<{ bgURL: string }>`
+const MaterialWrap = styled.div<{ bgURL: string; isFilled: boolean }>`
   position: relative;
   width: 100%;
   height: 180px;
@@ -226,11 +236,15 @@ const MaterialWrap = styled.div<{ bgURL: string }>`
     height: 44px;
     border-radius: 50%;
     background-color: ${color.content.white};
-    background-image: url('/images/icons/camera.svg');
+    background-image: url(${(props) =>
+      props.isFilled ? '/images/icons/close.svg' : '/images/icons/camera.svg'});
     background-position: center center;
     background-repeat: no-repeat;
     border: 1px solid ${color.content.light};
     cursor: pointer;
+    ${media.lg} {
+      right: 64px;
+    }
   }
 
   button {
@@ -240,7 +254,7 @@ const MaterialWrap = styled.div<{ bgURL: string }>`
   }
 `
 
-const KeyUploadWrap = styled.div<{ imgURL: string }>`
+const KeyUploadWrap = styled.div<{ imgURL: string; isFilled: boolean }>`
   position: relative;
   width: 100%;
   height: 100px;
@@ -253,7 +267,8 @@ const KeyUploadWrap = styled.div<{ imgURL: string }>`
     height: 44px;
     border-radius: 50%;
     background-color: ${color.content.white};
-    background-image: url('/images/icons/camera.svg');
+    background-image: url(${(props) =>
+      props.isFilled ? '/images/icons/close.svg' : '/images/icons/camera.svg'});
     background-position: center center;
     background-repeat: no-repeat;
     border: 1px solid ${color.content.light};
@@ -285,7 +300,6 @@ const KeyUploadWrap = styled.div<{ imgURL: string }>`
     left: 0;
   }
 `
-
 const InputWrap = styled.div`
   ${media.lg} {
     max-width: 640px;
