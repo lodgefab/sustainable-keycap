@@ -49,6 +49,7 @@ export const Register: NextPage<Props> = (_) => {
     register,
     watch,
     handleSubmit,
+    setValue,
     formState: {
       errors, // 各入力項目に対して検出されたエラーメッセージが格納されたオブジェクト
       dirtyFields, // ユーザーによる入力が発生した入力項目を管理したオブジェクト
@@ -88,7 +89,7 @@ export const Register: NextPage<Props> = (_) => {
   }, [watchKeycapImageUrl])
 
   /**
-   * 設定温度を入力するフォームで数字以外の入力を弾くためのフィルタリング処理
+   * 設定温度を入力するフォームで数字以外のキー入力を弾くためのフィルタリング処理
    */
   const filterCelsiusInput = (
     event: React.KeyboardEvent<HTMLInputElement> | React.CompositionEvent<HTMLInputElement>
@@ -105,6 +106,28 @@ export const Register: NextPage<Props> = (_) => {
     return true
   }
 
+  const resetImage = (image: 'plasticImage' | 'keycapImage') => {
+    if (image === 'plasticImage') {
+      // @ts-ignore
+      // file inputのリセットには空文字列を指定する必要があるが、型定義的には期待しているのはFileListであり競合するのでts-ignoreする
+      setValue('plasticImage', '')
+      setPlasticImageObjectUrl(null)
+    } else {
+      // @ts-ignore
+      // file inputのリセットには空文字列を指定する必要があるが、型定義的には期待しているのはFileListであり競合するのでts-ignoreする
+      setValue('keycapImage', '')
+      setKeycapImageObjectUrl(null)
+    }
+  }
+
+  /**
+   * 設定温度を入力するフォームで数字以外の文字が挿入された時に自動で削除する処理
+   * （キー入力ではなく、フォーム補完を使って値を入れた場合も反応する）
+   */
+  const preprocessCelsiusValue = (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.target.value = event.target.value.replace(/\D/g, '')
+  }
+
   /**
    * react-hook-formを用いてフォーム入力を制御するために各Inputタグに設定するAttribute
    */
@@ -116,7 +139,11 @@ export const Register: NextPage<Props> = (_) => {
     plasticType: register('plasticType', { required: true }),
     celsius: {
       onKeyPress: filterCelsiusInput,
-      ...register('celsius', { required: true, setValueAs: (v) => v.replace(/\D/g, '') }),
+      ...register('celsius', {
+        required: true,
+        setValueAs: (v) => v.replace(/\D/g, ''),
+        onChange: preprocessCelsiusValue,
+      }),
     },
     note: register('note'),
   }
@@ -210,6 +237,7 @@ export const Register: NextPage<Props> = (_) => {
               plasticImage: plasticImageObjectUrl,
               keycapImage: keycapImageObjectUrl,
             }}
+            resetImage={resetImage}
             /* handleSubmitでバリデーションを行った後、エラーが無ければexecuteSubmitが実行される */
             onClickSubmit={handleSubmit(executeSubmit)}
             canSubmit={canSubmit}

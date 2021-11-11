@@ -39,6 +39,7 @@ interface Props {
     keycapImage: string | ArrayBuffer | null
     plasticImage: string | ArrayBuffer | null
   }
+  resetImage: (image: 'plasticImage' | 'keycapImage') => void
   onClickSubmit: React.MouseEventHandler<HTMLButtonElement>
   canSubmit: boolean
 }
@@ -47,12 +48,15 @@ export const Editor: React.VFC<Props> = ({
   inputTagAttributes,
   errorMessage,
   previews,
+  resetImage,
   onClickSubmit,
   canSubmit,
 }) => {
   const [isColorPickerVisible, setColorPickerVisibility] = useState<boolean>(false)
   const { watch } = useFormContext()
   const currentColor = watch('hexColor')
+  const currentPlasticImage = watch('plasticImage')
+  const currentKeycapImage = watch('keycapImage')
 
   /**
    * フォームのどこかをクリックした時にカラーピッカーを非表示にする
@@ -79,7 +83,7 @@ export const Editor: React.VFC<Props> = ({
   return (
     <>
       <FormHeading>
-        <Link href={`/`} passHref>
+        <Link href='/' passHref={true}>
           <a />
         </Link>
         <p>素材を追加する</p>
@@ -97,6 +101,9 @@ export const Editor: React.VFC<Props> = ({
             required
             {...inputTagAttributes.plasticImage}
           />
+          {currentPlasticImage?.length > 0 && (
+            <button onClick={() => resetImage('plasticImage')}>x</button>
+          )}
           {errorMessage.plasticImage && (
             <ErrorMessage key='plasticImage-error'>{errorMessage.plasticImage}</ErrorMessage>
           )}
@@ -113,6 +120,9 @@ export const Editor: React.VFC<Props> = ({
             required
             {...inputTagAttributes.keycapImage}
           />
+          {currentKeycapImage?.length > 0 && (
+            <button onClick={() => resetImage('keycapImage')}>x</button>
+          )}
           {errorMessage.keycapImage && (
             <ErrorMessage key='keycapImage-error'>{errorMessage.keycapImage}</ErrorMessage>
           )}
@@ -236,6 +246,12 @@ const MaterialWrap = styled.div<{ bgURL: string; isFilled: boolean }>`
       right: 64px;
     }
   }
+
+  button {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
 `
 
 const KeyUploadWrap = styled.div<{ imgURL: string; isFilled: boolean }>`
@@ -277,8 +293,13 @@ const KeyUploadWrap = styled.div<{ imgURL: string; isFilled: boolean }>`
     background-repeat: no-repeat;
     text-indent: -9999px;
   }
-`
 
+  button {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+`
 const InputWrap = styled.div`
   ${media.lg} {
     max-width: 640px;

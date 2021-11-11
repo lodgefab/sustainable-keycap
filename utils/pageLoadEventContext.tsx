@@ -1,4 +1,4 @@
-import React, { createContext, Reducer, useEffect, useReducer } from 'react'
+import React, { createContext, Reducer, useCallback, useEffect, useReducer } from 'react'
 
 type PageLoadState = 'loading' | 'ready'
 
@@ -35,11 +35,13 @@ export const PageLoadEventProvider: React.FC = ({ children }) => {
    * @param callback 実行したい関数
    */
   const usePageLoadEvent = (callback: () => void) => {
-    useEffect(() => {
+    const func = useCallback(() => {
       if (pageLoadState === 'ready') {
         callback()
       }
-    }, [callback])
+    }, [pageLoadState])
+
+    useEffect(func, [func])
   }
 
   return (

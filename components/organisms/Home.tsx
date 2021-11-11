@@ -15,11 +15,13 @@ import { Footer } from '../molecules/Footer'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
 import { Loader } from '../molecules/Loader'
-
-gsap.registerPlugin(ScrollTrigger)
+import Scroll from 'react-scroll'
 import { getAuth } from 'firebase/auth'
 import { useTranslation } from 'next-i18next'
 import { UsePageLoadEventContext } from '../../utils/pageLoadEventContext'
+import { useRouter } from 'next/router'
+
+gsap.registerPlugin(ScrollTrigger)
 
 type Props = {
   materials: Material[]
@@ -37,9 +39,9 @@ export const Home: React.VFC<Props> = ({
   upvote,
 }) => {
   const authStatus = useContext(AuthContext)
-  const { currentUser } = getAuth()
-
   const usePageLoadEvent = useContext(UsePageLoadEventContext)
+  const { query } = useRouter()
+  const { currentUser } = getAuth()
 
   //▼▼▼▼▼▼▼▼演出処理開始 ▼▼▼▼▼▼▼//
   const sliderSettings = {
@@ -205,10 +207,20 @@ export const Home: React.VFC<Props> = ({
   usePageLoadEvent(() => {
     if (process.browser) {
       setBodyHeight()
-      console.log('pageLoad')
       gsap.registerPlugin(ScrollTrigger)
       setAnimation()
       StartOnLoadAnimation()
+      if (
+        typeof query['to'] === 'string' &&
+        ['workshop', 'mold', 'aboutus', 'library'].includes(query['to'])
+      ) {
+        Scroll.scroller.scrollTo(query['to'], {
+          smooth: true,
+          delay: 1000,
+          duration: 500,
+          offset: 72,
+        })
+      }
     }
   })
 
