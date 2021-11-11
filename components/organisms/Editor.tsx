@@ -6,6 +6,7 @@ import ColorPicker from './ColorPicker'
 import { color, font, media, zIndex } from '../../styles'
 import Image from 'next/image'
 import { Button } from '../atoms/Button'
+import { useFormContext } from 'react-hook-form'
 
 type InputTagAttributes<T extends React.HTMLAttributes<HTMLElement>> = T & {
   onChange: ChangeHandler
@@ -33,6 +34,10 @@ interface Props {
     celsius: string | null
     note: string | null
   }
+  previews: {
+    keycapImage: string | ArrayBuffer | null
+    plasticImage: string | ArrayBuffer | null
+  }
   onClickSubmit: React.MouseEventHandler<HTMLButtonElement>
   canSubmit: boolean
 }
@@ -40,10 +45,13 @@ interface Props {
 export const Editor: React.VFC<Props> = ({
   inputTagAttributes,
   errorMessage,
+  previews,
   onClickSubmit,
   canSubmit,
 }) => {
   const [isColorPickerVisible, setColorPickerVisibility] = useState<boolean>(false)
+  const { watch } = useFormContext()
+  const currentColor = watch('hexColor')
 
   /**
    * フォームのどこかをクリックした時にカラーピッカーを非表示にする
@@ -74,7 +82,7 @@ export const Editor: React.VFC<Props> = ({
         <p>素材を追加する</p>
       </FormHeading>
       <Form onClick={onColorFormBeInActive} onFocus={onColorFormBeInActive}>
-        <MaterialWrap bgURL={`${inputTagAttributes.plasticImage}`}>
+        <MaterialWrap bgURL={`${previews.plasticImage || inputTagAttributes.plasticImage}`}>
           <label htmlFor='plastic-image'></label>
           <input
             type='file'
@@ -87,7 +95,7 @@ export const Editor: React.VFC<Props> = ({
             <ErrorMessage key='plasticImage-error'>{errorMessage.plasticImage}</ErrorMessage>
           )}
         </MaterialWrap>
-        <KeyUploadWrap>
+        <KeyUploadWrap imgURL={`${previews.keycapImage || '/images/icons/image.svg'}`}>
           <label htmlFor='keycap-image'></label>
           <input
             type='file'
@@ -111,13 +119,14 @@ export const Editor: React.VFC<Props> = ({
 
           <FormItem onClick={onColorFormBeActive}>
             <Label htmlFor='color-type'>色の系統</Label>
-            <Input
+            <ColorInput
               type='text'
               id='color-type'
               {...inputTagAttributes.hexColor}
               readOnly
               onFocus={onColorFormBeActive}
             />
+            {currentColor && <ColorSample color={currentColor} />}
             {errorMessage.hexColor && (
               <ErrorMessage key='hexColor-error'>{errorMessage.hexColor}</ErrorMessage>
             )}
@@ -212,7 +221,7 @@ const MaterialWrap = styled.div<{ bgURL: string }>`
   }
 `
 
-const KeyUploadWrap = styled.div`
+const KeyUploadWrap = styled.div<{ imgURL: string }>`
   position: relative;
   width: 100%;
   height: 100px;
@@ -244,7 +253,7 @@ const KeyUploadWrap = styled.div`
     border: solid 2px ${color.primary};
     cursor: pointer;
     background-color: ${color.background.bague};
-    background-image: url('/images/icons/image.svg');
+    background-image: url(${({ imgURL }) => imgURL});
     background-position: center center;
     background-size: 82px 82px;
     background-repeat: no-repeat;
@@ -289,6 +298,23 @@ const Input = styled.input`
   border-radius: 4px;
   background-color: ${color.background.blue};
 `
+
+const ColorSample = styled.div<{ color: string }>`
+  position: absolute;
+  top: 32px;
+  left: 10px;
+  border: 1px solid grey;
+  width: 20px;
+  height: 20px;
+  background-color: ${({ color }) => color};
+  border-radius: 50%;
+  pointer-events: none;
+`
+
+const ColorInput = styled(Input)`
+  padding-left: 40px;
+`
+
 const Select = styled.select`
   position: relative;
   display: block;

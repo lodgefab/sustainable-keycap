@@ -24,11 +24,18 @@ import { UsePageLoadEventContext } from '../../utils/pageLoadEventContext'
 type Props = {
   materials: Material[]
   setGoodCount: (materialId: string, count: number) => void
-  upvotableMaterials: string[]
+  canUpvote: boolean
+  upvotedMaterialsId: string[]
   upvote: Function
 }
 
-export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMaterials, upvote }) => {
+export const Home: React.VFC<Props> = ({
+  materials,
+  setGoodCount,
+  canUpvote,
+  upvotedMaterialsId,
+  upvote,
+}) => {
   const authStatus = useContext(AuthContext)
   const { currentUser } = getAuth()
 
@@ -60,6 +67,9 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
 
   // prev と currentのスクロール量の差分を徐々に無くしていく
   const smoothScroll = useCallback(() => {
+    // next/linkでページ遷移を行う際、切り替え直前にcontainerRefがnullになるタイミングが発生するので条件分岐する
+    if (containerRef.current === null) return
+
     data.curr = window.scrollY
     data.prev += (data.curr - data.prev) * data.ease
     data.rounded = Math.round(data.prev * 100) / 100
@@ -595,7 +605,13 @@ export const Home: React.VFC<Props> = ({ materials, setGoodCount, upvotableMater
                         celsius={material.celsius}
                         plasticType={material.plasticType}
                         goodCount={material.goodCount}
-                        upvotableMaterials={upvotableMaterials}
+                        upvoteButtonState={
+                          canUpvote
+                            ? upvotedMaterialsId.includes(material.id)
+                              ? 'UPVOTED'
+                              : 'NOT_UPVOTED'
+                            : 'NOT_PERMITTED'
+                        }
                         upvote={upvote}
                       />
                     ))}

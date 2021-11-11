@@ -27,7 +27,7 @@ export const Index: NextPage<Props> = (_) => {
   const authState = useContext(AuthContext)
   const currentUser = getAuth().currentUser
 
-  const [upvotableMaterials, setUpvotableMaterials] = useState<string[]>([])
+  const [upvotedMaterials, setUpvotedMaterials] = useState<string[]>([])
   const [materials, setMaterials] = useState<Material[]>([])
 
   const dispatchPageReady = useContext(DispatchPageReadyContext)
@@ -42,9 +42,9 @@ export const Index: NextPage<Props> = (_) => {
       if (authState === 'LOGGED_IN' && currentUser) {
         const fetchResult = await fetchMaterialsWithAuth()
         setMaterials(fetchResult.materials)
-        setUpvotableMaterials(
+        setUpvotedMaterials(
           fetchResult.materials
-            .filter((material) => !fetchResult.alreadyUpvoted.includes(material.id))
+            .filter((material) => fetchResult.alreadyUpvoted.includes(material.id))
             .map((material) => material.id)
         )
       } else if (authState === 'NOT_LOGIN') {
@@ -54,7 +54,7 @@ export const Index: NextPage<Props> = (_) => {
             .then((res) => res.data)
           data = response.materials!
           setMaterials(data)
-          setUpvotableMaterials([])
+          setUpvotedMaterials([])
         } catch (e) {
           if (Axios.isAxiosError(e) && e.response) {
             console.log(e)
@@ -96,7 +96,7 @@ export const Index: NextPage<Props> = (_) => {
    */
   const upvote = async (materialId: string) => {
     // 二重送信・既にUpvote済みの素材に対する再送信の防止
-    if (!upvotableMaterials.includes(materialId)) {
+    if (upvotedMaterials.includes(materialId)) {
       return
     }
 
@@ -105,7 +105,7 @@ export const Index: NextPage<Props> = (_) => {
       return
     }
 
-    setUpvotableMaterials(upvotableMaterials.filter((item) => item !== materialId))
+    setUpvotedMaterials([materialId, ...upvotedMaterials])
 
     const idToken = await currentUser.getIdToken(true)
 
@@ -144,7 +144,8 @@ export const Index: NextPage<Props> = (_) => {
       <Home
         materials={materials || []}
         setGoodCount={setGoodCount}
-        upvotableMaterials={upvotableMaterials}
+        canUpvote={authState === 'LOGGED_IN'}
+        upvotedMaterialsId={upvotedMaterials}
         upvote={upvote}
       />
     </>

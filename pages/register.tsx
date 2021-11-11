@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import { InferGetStaticPropsType, NextPage } from 'next'
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Editor } from '../components/organisms/Editor'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { RegisterForm } from '../types'
@@ -11,6 +11,7 @@ import { useRouter } from 'next/router'
 import { AuthContext, login } from '../lib/auth'
 import { getAuth } from 'firebase/auth'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { readAsDataURL } from '../lib/helper'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 
@@ -28,6 +29,15 @@ export const Register: NextPage<Props> = (_) => {
   const router = useRouter()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
+  // フォームで選択されたプラスチック画像のBase64文字列を管理するState
+  const [plasticImageObjectUrl, setPlasticImageObjectUrl] = useState<string | ArrayBuffer | null>(
+    null
+  )
+  // フォームで選択されたキーキャップ画像のBase64文字列を管理するState
+  const [keycapImageObjectUrl, setKeycapImageObjectUrl] = useState<string | ArrayBuffer | null>(
+    null
+  )
+
   const methods = useForm<RegisterForm>({
     mode: 'all',
     resolver: yupResolver(schema, {
@@ -37,9 +47,45 @@ export const Register: NextPage<Props> = (_) => {
   })
   const {
     register,
+    watch,
     handleSubmit,
-    formState: { errors, dirtyFields },
+    formState: {
+      errors, // 各入力項目に対して検出されたエラーメッセージが格納されたオブジェクト
+      dirtyFields, // ユーザーによる入力が発生した入力項目を管理したオブジェクト
+      isSubmitted, // ユーザーが登録ボタンを押したかどうか
+    },
   } = methods
+
+  const watchPlasticImageUrl = watch('plasticImage')
+  const watchKeycapImageUrl = watch('keycapImage')
+
+  /**
+   * フォームでプラスチック画像が選択された時に、その画像をプレビュー表示するためにBase64形式に変換してStateに保存する
+   */
+  useEffect(() => {
+    ;(async () => {
+      if (watchPlasticImageUrl === undefined || watchPlasticImageUrl.length === 0) {
+        return
+      } else {
+        const objectUrl = await readAsDataURL(watchPlasticImageUrl[0])
+        setPlasticImageObjectUrl(objectUrl)
+      }
+    })()
+  }, [watchPlasticImageUrl])
+
+  /**
+   * フォームでキーキャップ画像が選択された時に、その画像をプレビュー表示するためにBase64形式に変換してStateに保存する
+   */
+  useEffect(() => {
+    ;(async () => {
+      if (watchKeycapImageUrl === undefined || watchKeycapImageUrl.length === 0) {
+        return
+      } else {
+        const objectUrl = await readAsDataURL(watchKeycapImageUrl[0])
+        setKeycapImageObjectUrl(objectUrl)
+      }
+    })()
+  }, [watchKeycapImageUrl])
 
   /**
    * 設定温度を入力するフォームで数字以外の入力を弾くためのフィルタリング処理
@@ -116,13 +162,22 @@ export const Register: NextPage<Props> = (_) => {
 
   // バリデーションした結果、各入力項目にエラーがあった場合はここでフロントに表示させるエラーメッセージを設定する
   const errorsPresented = {
-    plasticImage: dirtyFields.plasticImage === true ? errors.plasticImage?.message || null : null,
-    keycapImage: dirtyFields.keycapImage === true ? errors.keycapImage?.message || null : null,
-    materialName: dirtyFields.materialName === true ? errors.materialName?.message || null : null,
-    hexColor: dirtyFields.hexColor === true ? errors.hexColor?.message || null : null,
-    plasticType: dirtyFields.plasticType === true ? errors.plasticType?.message || null : null,
-    celsius: dirtyFields.celsius === true ? errors.celsius?.message || null : null,
-    note: dirtyFields.note === true ? errors.note?.message || null : null,
+    plasticImage:
+      isSubmitted || dirtyFields.plasticImage === true
+        ? errors.plasticImage?.message || null
+        : null,
+    keycapImage:
+      isSubmitted || dirtyFields.keycapImage === true ? errors.keycapImage?.message || null : null,
+    materialName:
+      isSubmitted || dirtyFields.materialName === true
+        ? errors.materialName?.message || null
+        : null,
+    hexColor:
+      isSubmitted || dirtyFields.hexColor === true ? errors.hexColor?.message || null : null,
+    plasticType:
+      isSubmitted || dirtyFields.plasticType === true ? errors.plasticType?.message || null : null,
+    celsius: isSubmitted || dirtyFields.celsius === true ? errors.celsius?.message || null : null,
+    note: isSubmitted || dirtyFields.note === true ? errors.note?.message || null : null,
   }
 
   // 送信ボタンを押せるかどうか（入力にエラーが残っている場合は押せなくする）
@@ -151,6 +206,10 @@ export const Register: NextPage<Props> = (_) => {
           <Editor
             inputTagAttributes={inputTagAttributes}
             errorMessage={errorsPresented}
+            previews={{
+              plasticImage: plasticImageObjectUrl,
+              keycapImage: keycapImageObjectUrl,
+            }}
             /* handleSubmitでバリデーションを行った後、エラーが無ければexecuteSubmitが実行される */
             onClickSubmit={handleSubmit(executeSubmit)}
             canSubmit={canSubmit}
