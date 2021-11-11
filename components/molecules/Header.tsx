@@ -4,7 +4,7 @@ import styled from '@emotion/styled'
 import { color, font, media, zIndex } from '../../styles'
 import { User } from 'firebase/auth'
 import { AuthStatus } from '../../lib/auth'
-import { Link as Scroll } from 'react-scroll'
+import Scroll, { Link as ScrollableLink } from 'react-scroll'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'react-i18next'
@@ -20,6 +20,9 @@ export const Header: React.VFC<Props> = ({ currentUser, authState, onLoginFunc, 
   const [isLoginMenuOpen, setLoginMenuOpen] = useState(false)
   const [isMenuOpen, setMenuOpen] = useState(false)
   const { i18n } = useTranslation()
+  const router = useRouter()
+  const { pathname, asPath, query } = router
+
   const handleLoginMenuBlur = (e) => {
     // firefox onBlur issue workaround
     if (
@@ -49,8 +52,6 @@ export const Header: React.VFC<Props> = ({ currentUser, authState, onLoginFunc, 
       }, 100)
     }
   }
-  const router = useRouter()
-  const { pathname, asPath, query } = router
 
   const changeLanguage = (nextLanguage: string) => {
     router.push({ pathname, query }, asPath, { locale: nextLanguage, scroll: false })
@@ -60,22 +61,25 @@ export const Header: React.VFC<Props> = ({ currentUser, authState, onLoginFunc, 
     <Wrap>
       <Container>
         <Left>
-          <Logo to='hero' smooth={true} duration={500}></Logo>
+          {pathname === '/' && (
+            <Logo
+              onClick={() => Scroll.scroller.scrollTo('hero', { smooth: true, duration: 500 })}
+            />
+          )}
+          {pathname !== '/' && (
+            <Link href='/' passHref={true}>
+              <Logo
+                onClick={() => Scroll.scroller.scrollTo('hero', { smooth: true, duration: 500 })}
+              />
+            </Link>
+          )}
           <PageLinks>
-            <PageLink to='workshop' smooth={true} duration={500} offset={72}>
-              Workshop
-            </PageLink>
-            <PageLink to='mold' smooth={true} duration={500} offset={72}>
-              Mold
-            </PageLink>
-            <PageLink to='aboutus' smooth={true} duration={500} offset={72}>
-              AboutUs
-            </PageLink>
-            <PageLink to='library' smooth={true} duration={500} offset={72}>
-              Library
-            </PageLink>
+            <HeaderLinkItem destination='workshop'>Workshop</HeaderLinkItem>
+            <HeaderLinkItem destination='mold'>Mold</HeaderLinkItem>
+            <HeaderLinkItem destination='aboutus'>AboutUs</HeaderLinkItem>
+            <HeaderLinkItem destination='library'>Library</HeaderLinkItem>
             <Link passHref href={'https://www.instagram.com/vernacular_cookbook/'}>
-              <Insta target='_blank'></Insta>
+              <Insta target='_blank' />
             </Link>
           </PageLinks>
         </Left>
@@ -128,6 +132,26 @@ export const Header: React.VFC<Props> = ({ currentUser, authState, onLoginFunc, 
   )
 }
 
+const HeaderLinkItem: React.FC<{ destination: string }> = ({ children, destination }) => {
+  const { pathname } = useRouter()
+
+  // トップページではページ内スクロールとして機能し、トップページ以外ではページ遷移として機能する
+  return (
+    <>
+      {pathname === '/' && (
+        <ScrollLink to={destination} smooth={true} duration={500} offset={72}>
+          {children}
+        </ScrollLink>
+      )}
+      {pathname !== '/' && (
+        <Link href={`/?to=${destination}`} passHref={true}>
+          <PageLink>{children}</PageLink>
+        </Link>
+      )}
+    </>
+  )
+}
+
 const Wrap = styled.div`
   position: fixed;
   right: 0;
@@ -173,7 +197,7 @@ const Left = styled.div`
   }
 `
 
-const Logo = styled(Scroll)`
+const Logo = styled.a`
   width: 56px;
   height: 56px;
   background-image: url('/images/logo.svg');
@@ -194,7 +218,7 @@ const PageLinks = styled.div`
   }
 `
 
-const PageLink = styled(Scroll)`
+const ScrollLink = styled(ScrollableLink)`
   transform: rotate(-90deg);
   ${font.courier.subtitle1};
   cursor: pointer;
@@ -202,6 +226,16 @@ const PageLink = styled(Scroll)`
   background-repeat: no-repeat;
   background-position: center;
 `
+const PageLink = styled.a`
+  transform: rotate(-90deg);
+  ${font.courier.subtitle1};
+  cursor: pointer;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  text-decoration: none;
+`
+
 const Insta = styled.a`
   width: 24px;
   height: 24px;
@@ -319,6 +353,6 @@ const MenuLists = styled.ul`
   border-radius: 4px;
   ${font.courier.subtitle2};
 `
-const MenuList = styled(Scroll)`
+const MenuList = styled(ScrollableLink)`
   padding: 8px 0px;
 `
