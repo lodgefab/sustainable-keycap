@@ -111,13 +111,13 @@ export const Home: React.VFC<Props> = ({
     gsap.set('.headline_why', { ...animationFromHeading }) //Workshopセクション
     ScrollTrigger.batch('.headline_why', {
       onEnter: (batch) => gsap.to(batch, { ...animationToHeading }),
-      start: 'top 50%',
+      start: 'top 90%',
       once: true, //この指定によって１度だけアニメーションされる
     })
     gsap.set('.headline_workshop', { ...animationFromHeading }) //Workshopセクション
     ScrollTrigger.batch('.headline_workshop', {
       onEnter: (batch) => gsap.to(batch, { ...animationToHeading }),
-      start: 'top 50%',
+      start: 'top 90%',
       once: true, //この指定によって１度だけアニメーションされる
     })
     gsap.set('.headline_making', { ...animationFromHeading }) //Makingセクション
@@ -165,7 +165,7 @@ export const Home: React.VFC<Props> = ({
         opacity: 0,
       })
     gsap
-      .timeline({ defaults: { duration: 0.1, ease: 'expo', delay: 3 } })
+      .timeline({ defaults: { duration: 0.1, ease: 'expo', delay: 1.6 } })
       .from('.loader', {
         display: 'flex',
       })

@@ -7,6 +7,7 @@ import { AuthStatus } from '../../lib/auth'
 import { Link as Scroll } from 'react-scroll'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useTranslation } from 'react-i18next'
 
 interface Props {
   currentUser: User | null
@@ -18,7 +19,7 @@ interface Props {
 export const Header: React.VFC<Props> = ({ currentUser, authState, onLoginFunc, onLogoutFunc }) => {
   const [isLoginMenuOpen, setLoginMenuOpen] = useState(false)
   const [isMenuOpen, setMenuOpen] = useState(false)
-  const [isJa, setLocale] = useState(true)
+  const { i18n } = useTranslation()
   const handleLoginMenuBlur = (e) => {
     // firefox onBlur issue workaround
     if (
@@ -80,11 +81,9 @@ export const Header: React.VFC<Props> = ({ currentUser, authState, onLoginFunc, 
         </Left>
         <Right>
           <TranslateButton
-            isJa={isJa}
+            isJa={i18n.language == 'ja'}
             onClick={() => {
-              isJa
-                ? (changeLanguage('en'), setLocale(false))
-                : (changeLanguage('ja'), setLocale(true))
+              i18n.language == 'ja' ? changeLanguage('en') : changeLanguage('ja')
             }}
           />
 
