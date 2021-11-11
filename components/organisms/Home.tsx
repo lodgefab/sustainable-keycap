@@ -14,10 +14,12 @@ import { useWindowSize } from '../../utils/useWindowSize'
 import { Footer } from '../molecules/Footer'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
+import { Loader } from '../molecules/Loader'
 
 gsap.registerPlugin(ScrollTrigger)
 import { getAuth } from 'firebase/auth'
 import { useTranslation } from 'next-i18next'
+import { UsePageLoadEventContext } from '../../utils/pageLoadEventContext'
 
 type Props = {
   materials: Material[]
@@ -36,6 +38,10 @@ export const Home: React.VFC<Props> = ({
 }) => {
   const authStatus = useContext(AuthContext)
   const { currentUser } = getAuth()
+
+  const usePageLoadEvent = useContext(UsePageLoadEventContext)
+
+  //▼▼▼▼▼▼▼▼演出処理開始 ▼▼▼▼▼▼▼//
   const sliderSettings = {
     dots: true,
     infinite: true,
@@ -43,11 +49,9 @@ export const Home: React.VFC<Props> = ({
     slidesToShow: 1,
     slidesToScroll: 1,
   }
-
   // containerRef : ヌルッとスクロールアニメーション
   // その他のRef : スクロール連動アニメーション
   const containerRef = useRef<HTMLDivElement>(null)
-
   const conceptImgRef = useRef<HTMLDivElement>(null)
 
   const size = useWindowSize()
@@ -69,36 +73,144 @@ export const Home: React.VFC<Props> = ({
     data.curr = window.scrollY
     data.prev += (data.curr - data.prev) * data.ease
     data.rounded = Math.round(data.prev * 100) / 100
-    containerRef.current.style.transform = `translateY(-${data.rounded}px)`
+    if (containerRef.current !== null) {
+      containerRef.current!.style.transform = `translateY(-${data.rounded}px)`
+    }
     requestAnimationFrame(() => smoothScroll())
   }, [data])
 
   const setAnimation = () => {
-    const animationObj = {
-      duration: 0.8,
-      y: -80,
-      opacity: 0,
+    const animationFromHeading = {
+      y: '150%',
+      rotate: 15,
     }
-
-    gsap.from(conceptImgRef.current, {
-      scrollTrigger: {
-        trigger: conceptImgRef.current!,
-        start: 'bottom 90%',
-        scrub: true,
-        // onEnter: () => {}, //スクロールイン時
-        // onEnterBack: () => {}, //スクロールバック時
-        // markers: true // マーカー表示
+    const animationToHeading = {
+      y: '0%',
+      rotate: 0,
+      stagger: 0.04,
+    }
+    gsap.fromTo(
+      conceptImgRef.current,
+      {
+        autoAlpha: 0,
+        y: 80,
       },
-      ...animationObj,
+      {
+        autoAlpha: 1,
+        y: 0,
+        scrollTrigger: {
+          trigger: conceptImgRef.current!,
+          start: 'top center',
+          // onEnter: () => {}, //スクロールイン時
+          // onEnterBack: () => {}, //スクロールバック時
+          // markers: true // マーカー表示
+        },
+      }
+    )
+
+    gsap.set('.headline_why', { ...animationFromHeading }) //Workshopセクション
+    ScrollTrigger.batch('.headline_why', {
+      onEnter: (batch) => gsap.to(batch, { ...animationToHeading }),
+      start: 'top 90%',
+      once: true, //この指定によって１度だけアニメーションされる
     })
+    gsap.set('.headline_workshop', { ...animationFromHeading }) //Workshopセクション
+    ScrollTrigger.batch('.headline_workshop', {
+      onEnter: (batch) => gsap.to(batch, { ...animationToHeading }),
+      start: 'top 90%',
+      once: true, //この指定によって１度だけアニメーションされる
+    })
+    gsap.set('.headline_making', { ...animationFromHeading }) //Makingセクション
+    ScrollTrigger.batch('.headline_making', {
+      onEnter: (batch) => gsap.to(batch, { ...animationToHeading }),
+      start: 'top 50%',
+      once: true, //この指定によって１度だけアニメーションされる
+    })
+    gsap.set('.headline_mold', { ...animationFromHeading }) //Moldセクション
+    ScrollTrigger.batch('.headline_mold', {
+      onEnter: (batch) => gsap.to(batch, { ...animationToHeading }),
+      start: 'top 50%',
+      once: true, //この指定によって１度だけアニメーションされる
+    })
+    gsap.set('.headline_about', { ...animationFromHeading }) //AboutUsセクション
+    ScrollTrigger.batch('.headline_about', {
+      onEnter: (batch) => gsap.to(batch, { ...animationToHeading }),
+      start: 'top 50%',
+      once: true, //この指定によって１度だけアニメーションされる
+    })
+    gsap.set('.headline_library', { ...animationFromHeading }) //Libraryセクション
+    ScrollTrigger.batch('.headline_library', {
+      onEnter: (batch) => gsap.to(batch, { ...animationToHeading }),
+      start: 'top 50%',
+      once: true, //この指定によって１度だけアニメーションされる
+    })
+
+    // gsap.to(".parallax", { //パララックスコード
+    //   scrollTrigger: {
+    //     scrub: true
+    //   },
+    //   y: (i, target) => -ScrollTrigger.maxScroll(window) * target.dataset.speed,
+    //   ease: "none"
+    // });
   }
 
-  useEffect(() => {
+  const StartOnLoadAnimation = () => {
+    //読み込み完了時にLoaderをフェードアウト
+    gsap
+      .timeline({ defaults: { duration: 1.6, ease: 'expo' } })
+      .from('.loader', {
+        opacity: 1,
+      })
+      .to('.loader', {
+        opacity: 0,
+      })
+    gsap
+      .timeline({ defaults: { duration: 0.1, ease: 'expo', delay: 1.6 } })
+      .from('.loader', {
+        display: 'flex',
+      })
+      .to('.loader', {
+        display: 'none',
+      })
+    //ロード時にキーキャップが出現する
+    gsap
+      .timeline({ defaults: { duration: 0.8, ease: 'expo', delay: 1.0 } })
+      .set('.key', {
+        opacity: 0,
+        y: '150%',
+      })
+      .to('.key', {
+        opacity: 1,
+        y: '0%',
+        stagger: {
+          each: 0.08,
+          from: 'start',
+        },
+      })
+    //ロード時に文字が出現する
+    gsap.killTweensOf('.titleline')
+    gsap
+      .timeline({ defaults: { duration: 1.2, ease: 'expo', delay: 1.0 } })
+      .set('.titleline', {
+        y: '150%',
+        rotate: 15,
+      })
+      .to('.titleline', {
+        y: '0%',
+        rotate: 0,
+        stagger: 0.04,
+      })
+  }
+
+  usePageLoadEvent(() => {
     if (process.browser) {
+      setBodyHeight()
+      console.log('pageLoad')
       gsap.registerPlugin(ScrollTrigger)
       setAnimation()
+      StartOnLoadAnimation()
     }
-  }, [])
+  })
 
   useEffect(() => {
     requestAnimationFrame(() => smoothScroll())
@@ -107,6 +219,8 @@ export const Home: React.VFC<Props> = ({
   useEffect(() => {
     setBodyHeight()
   }, [size.height])
+
+  //▲▲▲▲▲▲▲▲▲▲▲ 演出処理終了 ▲▲▲▲▲▲▲▲▲▲▲//
 
   const [currentFilter, setCurrentFilter] = useState<CategorisedColorType | null>(null)
   const { t } = useTranslation('translation', { keyPrefix: 'home' })
@@ -117,8 +231,71 @@ export const Home: React.VFC<Props> = ({
 
   return (
     <AllWrap>
+      <Loader />
       <div ref={containerRef}>
         <Hero id='hero' color={'transparent'}>
+          <BGKeys className={'parallax'} data-speed='.4'>
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key001.jpg'}
+              gridRow={5}
+              gridColumn={40}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key002.jpg'}
+              gridRow={11}
+              gridColumn={48}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key003.jpg'}
+              gridRow={18}
+              gridColumn={-8}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key004.jpg'}
+              gridRow={25}
+              gridColumn={36}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key005.jpg'}
+              gridRow={29}
+              gridColumn={44}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key006.jpg'}
+              gridRow={30}
+              gridColumn={26}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key000.jpg'}
+              gridRow={7}
+              gridColumn={30}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key001.jpg'}
+              gridRow={40}
+              gridColumn={13}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key002.jpg'}
+              gridRow={24}
+              gridColumn={13}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key003.jpg'}
+              gridRow={32}
+              gridColumn={1}
+            />
+          </BGKeys>
           <VideoWrap>
             <VideoPlayer>
               <iframe
@@ -139,18 +316,21 @@ export const Home: React.VFC<Props> = ({
             />
           </VideoWrap>
           <Title>
-            プラゴミから
-            <DesktopBr />
-            キーキャップを
-            <DesktopBr />
-            作ろう
+            <span>
+              <h1 className={'titleline'}>プラゴミから</h1>
+            </span>
+            <span>
+              <h1 className={'titleline'}>キーキャップを</h1>
+            </span>
+            <span>
+              <h1 className={'titleline'}>作ろう</h1>
+            </span>
           </Title>
         </Hero>
         <ConceptSection id='concept' color={'transparent'}>
           <Wrap>
             <Message>
               #ANYCAPは、廃棄プラスチックを使ってキーキャップを自作するオープンソースコミュニティです。
-              <br />
               <br />
               家庭やオフィスで出るプラゴミを原材料としたキーキャップを製作し、手法やデータを公開することを通じて、仲間の輪を広げる活動を行なっています。
             </Message>
@@ -166,8 +346,14 @@ export const Home: React.VFC<Props> = ({
         <WHYSection id='why' color={'transparent'}>
           <WHYWrap>
             <SectionTitleGroup>
-              <SectionTitle>Why #ANYCAP ?</SectionTitle>
-              <SectionSubTitle>{t('whyAnycap.subtitle')}</SectionSubTitle>
+              <span>
+                <SectionTitle className={'headline_why'}>Why #ANYCAP ?</SectionTitle>
+              </span>
+              <span>
+                <SectionSubTitle className={'headline_why'}>
+                  {t('whyAnycap.subtitle')}
+                </SectionSubTitle>
+              </span>
             </SectionTitleGroup>
             <WhyKeys>
               <WhyKey>
@@ -202,8 +388,12 @@ export const Home: React.VFC<Props> = ({
               <WorkShopImg src='/images/photos/006.jpg' />
             </WorkShopImgWrap>
             <WorkShopSectionTitle>
-              <SectionTitle>Workshop</SectionTitle>
-              <SectionSubTitle>ワークショップ</SectionSubTitle>
+              <span>
+                <SectionTitle className={'headline_workshop'}>Workshop</SectionTitle>
+              </span>
+              <span>
+                <SectionSubTitle className={'headline_workshop'}>ワークショップ</SectionSubTitle>
+              </span>
             </WorkShopSectionTitle>
             <WorkShopSectionContents>
               <WorkshopDesc>
@@ -237,8 +427,14 @@ export const Home: React.VFC<Props> = ({
         <MakingSection id='making' color={'transparent'}>
           <MakingWrap>
             <SectionTitleGroup>
-              <SectionTitle>Making #ANYCAP</SectionTitle>
-              <SectionSubTitle>廃プラキーキャップができるまで</SectionSubTitle>
+              <span>
+                <SectionTitle className={'headline_making'}>Making #ANYCAP</SectionTitle>
+              </span>
+              <span>
+                <SectionSubTitle className={'headline_making'}>
+                  廃プラキーキャップができるまで
+                </SectionSubTitle>
+              </span>
             </SectionTitleGroup>
             <MakingScrollWrap>
               <MakingScrollContents>
@@ -293,8 +489,12 @@ export const Home: React.VFC<Props> = ({
               </MoldSlider>
             </MoldSliderWrap>
             <MoldTitleWrap>
-              <SectionTitle>Mold</SectionTitle>
-              <SectionSubTitle>金型</SectionSubTitle>
+              <span>
+                <SectionTitle className={'headline_mold'}>Mold</SectionTitle>
+              </span>
+              <span>
+                <SectionSubTitle className={'headline_mold'}>金型</SectionSubTitle>
+              </span>
             </MoldTitleWrap>
             <MoldContentsWrap>
               <MoldDesc>
@@ -312,8 +512,12 @@ export const Home: React.VFC<Props> = ({
         <AboutSection id='aboutus' color={'transparent '}>
           <AboutWrap>
             <AboutTitleWrap>
-              <SectionTitle>About Us</SectionTitle>
-              <SectionSubTitle>わたしたちについて</SectionSubTitle>
+              <span>
+                <SectionTitle className={'headline_about'}>About Us</SectionTitle>
+              </span>
+              <span>
+                <SectionSubTitle className={'headline_about'}>わたしたちについて</SectionSubTitle>
+              </span>
             </AboutTitleWrap>
             <AboutContentsWrap>
               <p>
@@ -338,8 +542,12 @@ export const Home: React.VFC<Props> = ({
         <LibrarySection id='library' color={'transparent'}>
           <LibraryWrap>
             <SectionTitleGroup>
-              <SectionTitle>Library</SectionTitle>
-              <SectionSubTitle>ライブラリ</SectionSubTitle>
+              <span>
+                <SectionTitle className={'headline_library'}>Library</SectionTitle>
+              </span>
+              <span>
+                <SectionSubTitle className={'headline_library'}>ライブラリ</SectionSubTitle>
+              </span>
             </SectionTitleGroup>
             <LibraryDesc>
               みんなが見つけたキーキャップに使えそうな素材とそのレポートです。実際に作ってみたものがあればどんどう投稿していってみましょう！いいねの多い人気素材は実際に販売されることがあるかも...?!
@@ -431,6 +639,7 @@ const AllWrap = styled.main`
   height: 100%;
   width: 100%;
   overflow: hidden;
+  z-index: ${zIndex.base};
 `
 
 const Section = styled.section<{ color: string }>`
@@ -472,19 +681,29 @@ const SectionTitleGroup = styled.div`
   ${media.mdsp} {
     margin: 0 0 64px 0;
   }
+
+  span {
+    overflow: hidden;
+    display: block;
+    line-height: 1;
+  }
 `
 
 const SectionTitle = styled.h3`
+  display: inline-block;
   ${font.courier.h2};
   color: ${color.content.dark};
   text-align: left;
   margin: 0 0 8px 0;
+  transform-origin: 0% 50%;
 `
 
 const SectionSubTitle = styled.p`
+  display: inline-block;
   ${font.inter.label};
   color: ${color.content.dark};
   text-align: left;
+  transform-origin: 0% 50%;
 `
 
 const Hero = styled(Section)`
@@ -497,27 +716,42 @@ const Hero = styled(Section)`
     padding: 56px 0 0 0;
   }
 `
-const Title = styled.h1`
+const Title = styled.div`
   position: absolute;
   left: calc(100vw * 2 / 3);
-  top: 30%;
+  top: 36%;
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(1, 1fr);
+  grid-template-rows: repeat(3, 1fr);
   ${font.inter.h1};
   font-weight: bold;
-  line-height: 200%;
+  line-height: 180%;
+
   ${media.mdsp} {
     position: relative;
     left: 0;
     top: 0;
     margin: 32px 0 0 32px;
-
     max-width: 990px;
     ${font.inter.h2};
     line-height: 150%;
   }
   ${media.md} {
-    margin: 128px auto 0;
+    margin: 64px auto 0;
     padding: 0 32px;
     ${font.inter.h1};
+  }
+
+  h1 {
+    display: inline-block;
+    transform-origin: 0% 50%;
+  }
+
+  span {
+    display: block;
+    line-height: 1;
+    overflow: hidden;
   }
 `
 
@@ -529,6 +763,7 @@ const VideoWrap = styled.div`
   height: calc(100vw * 2 / 3);
   background-color: ${color.background.white};
   overflow: hidden;
+  z-index: ${zIndex.behind};
   ${media.sp} {
     position: relative;
     width: calc(100vw - 32px);
@@ -557,8 +792,9 @@ const VideoMask = styled.div`
 const VideoPlayer = styled.div`
   position: relative;
   height: 100%;
-  background: #333333;
+  background: #ffffff;
   overflow: hidden;
+
   ${media.mdsp} {
     display: none;
   }
@@ -576,8 +812,38 @@ const VideoPlayer = styled.div`
     }
   }
 `
+
+const BGKeys = styled.div`
+  position: absolute;
+  width: 100vw;
+  height: 100vw;
+  top: 0%;
+  left: 10%;
+  display: grid;
+  grid-template-columns: repeat(50, 2%);
+  grid-template-rows: repeat(50, 2%);
+  --grid-row: 1;
+  --grid-column: 1;
+  transform: rotate3d(0, 0, 1, -20deg);
+  opacity: 1;
+  z-index: ${zIndex.base};
+  ${media.mdsp} {
+    display: none;
+  }
+`
+
+const BGKey = styled.div<{ src: string; gridRow: number; gridColumn }>`
+  grid-area: ${(props) => props.gridRow} / ${(props) => props.gridColumn} / span 12 / span 5;
+  will-change: transform;
+  width: 120px;
+  height: 120px;
+  background-image: url(${(props) => props.src});
+  background-size: cover;
+`
+
 const ConceptSection = styled(Section)`
   padding: 0 0 128px 0;
+  overflow: hidden;
   ${media.mdsp} {
     padding: 32px 0px 128px 0px;
   }
@@ -587,6 +853,7 @@ const Message = styled.h2`
   ${font.inter.h3}
   line-height:200%;
   text-align: left;
+  z-index: ${zIndex.default};
   ${media.mdsp} {
     ${font.inter.subtitle1};
     line-height: 200%;
@@ -603,17 +870,19 @@ const ConceptPhotos = styled.div`
   grid-template-columns: repeat(5, 1fr);
   grid-template-rows: auto;
   width: 100%;
-  overflow: auto;
+  overflow: visible;
   padding: 0 32px;
 `
 
-const ConceptPhoto = styled.img`
-  width: auto;
+const ConceptPhoto = styled.div<{ src: string }>`
+  width: 640px;
   height: 480px;
+  background-image: url(${(props) => props.src});
+  background-size: cover;
   ${media.mdsp} {
     width: 315px;
     height: 420px;
-    object-fit: cover;
+    background-size: cover;
   }
 `
 

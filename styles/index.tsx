@@ -103,6 +103,7 @@ export const zIndex = {
   base: 0,
   default: 1,
   header: 10,
+  loader: 15,
   behind: -1,
   back: -2,
 } as const
