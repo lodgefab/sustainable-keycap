@@ -1,7 +1,6 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import styled from '@emotion/styled'
 import { color, font, media, zIndex } from '../../styles'
-import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '../atoms/Button'
 import { CategorisedColorType, Material } from '../../types'
@@ -27,7 +26,7 @@ type Props = {
   materials: Material[]
   setGoodCount: (materialId: string, count: number) => void
   canUpvote: boolean
-  upvotedMaterialsId: string[]
+  upvotedMaterialsId: string[] | 'initializing' | null
   upvote: Function
 }
 
@@ -627,7 +626,7 @@ export const Home: React.VFC<Props> = ({
                         goodCount={material.goodCount}
                         upvoteButtonState={
                           canUpvote
-                            ? upvotedMaterialsId.includes(material.id)
+                            ? upvotedMaterialsId!.includes(material.id)
                               ? 'UPVOTED'
                               : 'NOT_UPVOTED'
                             : 'NOT_PERMITTED'

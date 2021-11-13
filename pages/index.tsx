@@ -1,35 +1,23 @@
 import Head from 'next/head'
 import { InferGetStaticPropsType, NextPage } from 'next'
 import { Home } from '../components/organisms/Home'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { Material } from '../types'
 import axios from 'axios'
-import { AuthContext } from '../lib/auth'
-import { fetchMaterialsWithAuth, upvoteMaterial } from '../lib/helper'
-import { MaterialsApiResponse } from './api/materials'
 import Axios from 'axios'
+import { AuthContext, firebaseClientApp } from '../lib/auth'
+import { MaterialsApiResponse } from './api/materials'
 import { UpvoteApiResponse } from './api/upvote'
 import { getAuth } from 'firebase/auth'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { DispatchPageReadyContext } from '../utils/pageLoadEventContext'
+import { doc, getDoc, getFirestore } from 'firebase/firestore'
 
 /**
  * 素材データを取得するカスタムフック
- * materials: 投稿された素材データの配列
- * upvotedMaterialIds: いいねされた素材のIDの配列
- * setGoodCount: いいね時に素材のいいね数を更新するための関数
- * addUpvotedIds: いいね操作時にupvotedMaterialIdsに要素を追加するための関数
+ * 投稿された素材データの配列といいね時に素材のいいね数を更新するための関数を返します。
  */
-const useMaterialData = (): [
-  { materials: Material[]; upvotedMaterialIds: string[] },
-  {
-    setGoodCount: (materialId: string, newCount: number) => void
-    addUpvotedIds: (upvotedMaterialIds: string) => void
-  }
-] => {
-  const authState = useContext(AuthContext)
-  const currentUser = getAuth().currentUser
-  const [upvotedMaterialIds, setUpvotedMaterialIds] = useState<string[]>([])
+const useMaterialData = (): [Material[], (materialId: string, newCount: number) => void] => {
   const [materials, setMaterials] = useState<Material[]>([])
 
   /**
@@ -48,46 +36,64 @@ const useMaterialData = (): [
     )
   }
 
-  const addUpvotedIds = (upvotedMaterialId: string) => {
-    setUpvotedMaterialIds([upvotedMaterialId, ...upvotedMaterialIds])
-  }
-
-  // 認証の初期化が完了し、ログイン状態が変化した時にキーキャップ素材データを取得する処理
+  // キーキャップ素材データを取得する処理
   useEffect(() => {
     ;(async () => {
       let data: Material[]
-      if (authState === 'LOGGED_IN' && currentUser) {
-        const fetchResult = await fetchMaterialsWithAuth()
-        setMaterials(fetchResult.materials)
-        setUpvotedMaterialIds(
-          fetchResult.materials
-            .filter((material) => fetchResult.alreadyUpvoted.includes(material.id))
-            .map((material) => material.id)
-        )
-      } else if (authState === 'NOT_LOGIN') {
-        try {
-          const response = await axios
-            .get<MaterialsApiResponse>('/api/materials')
-            .then((res) => res.data)
-          data = response.materials!
-          setMaterials(data)
-          setUpvotedMaterialIds([])
-        } catch (e) {
-          if (Axios.isAxiosError(e) && e.response) {
-            console.log(e)
-          }
+      try {
+        const response = await axios
+          .get<MaterialsApiResponse>('/api/materials')
+          .then((res) => res.data)
+        data = response.materials!
+        setMaterials(data)
+      } catch (e) {
+        if (Axios.isAxiosError(e) && e.response) {
           console.log(e)
         }
-      } else {
-        return
+        console.log(e)
       }
     })()
-  }, [currentUser, authState])
+  }, [])
 
-  return [
-    { materials, upvotedMaterialIds },
-    { setGoodCount, addUpvotedIds },
-  ]
+  return [materials, setGoodCount]
+}
+
+const useUpvotedMaterialIds = (): [
+  string[] | 'initializing' | null,
+  (upvotedMaterialId: string) => void
+] => {
+  const authState = useContext(AuthContext)
+  const currentUser = getAuth().currentUser
+
+  const [upvotedMaterialIds, setUpvotedMaterialIds] = useState<string[] | 'initializing' | null>(
+    'initializing'
+  )
+
+  const addUpvotedMaterialId = (upvotedMaterialId: string) => {
+    if (upvotedMaterialIds instanceof Array) {
+      setUpvotedMaterialIds([upvotedMaterialId, ...upvotedMaterialIds])
+    } else {
+      throw new Error(
+        'Failed to add upvoted Material because the app is initializing or you are not logged in.'
+      )
+    }
+  }
+
+  useMemo(() => {
+    ;(async () => {
+      if (authState === 'LOGGED_IN' && currentUser) {
+        const app = getFirestore(firebaseClientApp)
+        const upvotesQuerySnapshot = await getDoc(doc(app, 'upvotes', currentUser.uid))
+        if (upvotesQuerySnapshot.exists()) {
+          setUpvotedMaterialIds(upvotesQuerySnapshot.data().materials)
+        }
+      } else if (authState !== 'INITIALIZING') {
+        setUpvotedMaterialIds(null)
+      }
+    })()
+  }, [authState, currentUser])
+
+  return [upvotedMaterialIds, addUpvotedMaterialId]
 }
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
@@ -103,11 +109,13 @@ export const getStaticProps = async ({ locale }) => {
 export const Index: NextPage<Props> = (_) => {
   const authState = useContext(AuthContext)
   const currentUser = getAuth().currentUser
-  const [{ materials, upvotedMaterialIds }, { setGoodCount, addUpvotedIds }] = useMaterialData()
+  const [materials, setGoodCount] = useMaterialData()
+  const [upvotedMaterialIds, addUpvotedMaterialId] = useUpvotedMaterialIds()
   const dispatchPageReady = useContext(DispatchPageReadyContext)
 
   // 素材データの読み込みが完了してかどうかを表すboolean
   const isPageLoaded = materials.length > 0
+  console.log(isPageLoaded)
 
   // 素材データの読み込みが完了してページの表示に必要なデータが揃った時の処理
   useEffect(() => {
@@ -121,17 +129,17 @@ export const Index: NextPage<Props> = (_) => {
    * @param materialId いいねを増やすキーキャップ素材のID
    */
   const upvote = async (materialId: string) => {
+    // 未ログイン状態もしくは初期化中の送信は禁止
+    if (!currentUser || upvotedMaterialIds === 'initializing' || upvotedMaterialIds === null) {
+      return
+    }
+
     // 二重送信・既にUpvote済みの素材に対する再送信の防止
     if (upvotedMaterialIds.includes(materialId)) {
       return
     }
 
-    // 未ログイン状態での送信は禁止
-    if (!currentUser) {
-      return
-    }
-
-    addUpvotedIds(materialId)
+    addUpvotedMaterialId(materialId)
 
     const idToken = await currentUser.getIdToken(true)
 
@@ -170,7 +178,7 @@ export const Index: NextPage<Props> = (_) => {
       <Home
         materials={materials || []}
         setGoodCount={setGoodCount}
-        canUpvote={authState === 'LOGGED_IN'}
+        canUpvote={authState === 'LOGGED_IN' && upvotedMaterialIds instanceof Array}
         upvotedMaterialsId={upvotedMaterialIds}
         upvote={upvote}
       />
