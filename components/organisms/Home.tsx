@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import styled from '@emotion/styled'
 import { color, font, media, zIndex } from '../../styles'
 import Link from 'next/link'
@@ -68,12 +68,15 @@ export const Home: React.VFC<Props> = ({
   }, [])
 
   const size = useWindowSize()
-  const data = {
-    ease: 0.1,
-    curr: 0,
-    prev: 0,
-    rounded: 0,
-  }
+  const data = useMemo(
+    () => ({
+      ease: 0.1,
+      curr: 0,
+      prev: 0,
+      rounded: 0,
+    }),
+    []
+  )
   const setBodyHeight = () => {
     document.body.style.height = `${containerRef.current?.getBoundingClientRect().height}px`
   }
