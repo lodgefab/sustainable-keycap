@@ -56,6 +56,17 @@ export const Home: React.VFC<Props> = ({
   const containerRef = useRef<HTMLDivElement>(null)
   const conceptImgRef = useRef<HTMLDivElement>(null)
 
+  // ページの内容が変化して縦幅が変化した時にそれを検知してbody.heightに反映する
+  useEffect(() => {
+    const observer = new ResizeObserver((entries) => {
+      document.body.style.height = `${entries[0].contentRect.height}px`
+    })
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current)
+    }
+  }, [])
+
   const size = useWindowSize()
   const data = {
     ease: 0.1,
