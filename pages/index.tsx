@@ -1,100 +1,15 @@
 import Head from 'next/head'
 import { InferGetStaticPropsType, NextPage } from 'next'
 import { Home } from '../components/organisms/Home'
-import React, { useContext, useEffect, useMemo, useState } from 'react'
-import { Material } from '../types'
+import React, { useContext, useEffect } from 'react'
 import axios from 'axios'
-import Axios from 'axios'
-import { AuthContext, firebaseClientApp } from '../lib/auth'
-import { MaterialsApiResponse } from './api/materials'
+import { AuthContext } from '../lib/auth'
 import { UpvoteApiResponse } from './api/upvote'
 import { getAuth } from 'firebase/auth'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { DispatchPageReadyContext } from '../utils/pageLoadEventContext'
-import { doc, getDoc, getFirestore } from 'firebase/firestore'
-
-/**
- * 素材データを取得するカスタムフック
- * 投稿された素材データの配列といいね時に素材のいいね数を更新するための関数を返します。
- */
-const useMaterialData = (): [Material[], (materialId: string, newCount: number) => void] => {
-  const [materials, setMaterials] = useState<Material[]>([])
-
-  /**
-   * いいねの数を変更する
-   * @param materialId 変更するキーキャップ素材のID
-   * @param newCount 変更後のいいねの数
-   */
-  const setGoodCount = async (materialId: string, newCount: number) => {
-    await setMaterials(
-      materials.map((material) => {
-        if (material.id === materialId) {
-          material.goodCount = newCount
-        }
-        return material
-      })
-    )
-  }
-
-  // キーキャップ素材データを取得する処理
-  useEffect(() => {
-    ;(async () => {
-      let data: Material[]
-      try {
-        const response = await axios
-          .get<MaterialsApiResponse>('/api/materials')
-          .then((res) => res.data)
-        data = response.materials!
-        setMaterials(data)
-      } catch (e) {
-        if (Axios.isAxiosError(e) && e.response) {
-          console.log(e)
-        }
-        console.log(e)
-      }
-    })()
-  }, [])
-
-  return [materials, setGoodCount]
-}
-
-const useUpvotedMaterialIds = (): [
-  string[] | 'initializing' | null,
-  (upvotedMaterialId: string) => void
-] => {
-  const authState = useContext(AuthContext)
-  const currentUser = getAuth().currentUser
-
-  const [upvotedMaterialIds, setUpvotedMaterialIds] = useState<string[] | 'initializing' | null>(
-    'initializing'
-  )
-
-  const addUpvotedMaterialId = (upvotedMaterialId: string) => {
-    if (upvotedMaterialIds instanceof Array) {
-      setUpvotedMaterialIds([upvotedMaterialId, ...upvotedMaterialIds])
-    } else {
-      throw new Error(
-        'Failed to add upvoted Material because the app is initializing or you are not logged in.'
-      )
-    }
-  }
-
-  useMemo(() => {
-    ;(async () => {
-      if (authState === 'LOGGED_IN' && currentUser) {
-        const app = getFirestore(firebaseClientApp)
-        const upvotesQuerySnapshot = await getDoc(doc(app, 'upvotes', currentUser.uid))
-        if (upvotesQuerySnapshot.exists()) {
-          setUpvotedMaterialIds(upvotesQuerySnapshot.data().materials)
-        }
-      } else if (authState !== 'INITIALIZING') {
-        setUpvotedMaterialIds(null)
-      }
-    })()
-  }, [authState, currentUser])
-
-  return [upvotedMaterialIds, addUpvotedMaterialId]
-}
+import useMaterialData from '../utils/useMaterialData'
+import useUpvotedMaterialIds from '../utils/useUpvotedMaterialIds'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 
@@ -115,7 +30,6 @@ export const Index: NextPage<Props> = (_) => {
 
   // 素材データの読み込みが完了してかどうかを表すboolean
   const isPageLoaded = materials.length > 0
-  console.log(isPageLoaded)
 
   // 素材データの読み込みが完了してページの表示に必要なデータが揃った時の処理
   useEffect(() => {
@@ -130,7 +44,7 @@ export const Index: NextPage<Props> = (_) => {
    */
   const upvote = async (materialId: string) => {
     // 未ログイン状態もしくは初期化中の送信は禁止
-    if (!currentUser || upvotedMaterialIds === 'initializing' || upvotedMaterialIds === null) {
+    if (!currentUser || !upvotedMaterialIds) {
       return
     }
 
