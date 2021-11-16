@@ -5,7 +5,7 @@ import { Header } from './molecules/Header'
 import { AuthContext, login, logout } from '../lib/auth'
 import { getAuth } from 'firebase/auth'
 import { useWindowSize } from '../utils/useWindowSize'
-import CookieConsent from './organisms/CookieConsent'
+// import CookieConsent from './organisms/CookieConsent'
 
 type Props = {
   children?: ReactNode
@@ -24,7 +24,7 @@ const Layout = ({ children }: Props) => {
         onLogoutFunc={logout}
       />
       {children}
-      <CookieConsent />
+      {/* <CookieConsent /> */}
     </Container>
   )
 }

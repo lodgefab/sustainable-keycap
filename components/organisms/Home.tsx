@@ -305,7 +305,7 @@ export const Home: React.VFC<Props> = ({
           <VideoWrap>
             <VideoPlayer>
               <iframe
-                src='https://www.youtube.com/embed/bfleByM49CM?autoplay=1&mute=1&playsinline=1&loop=1&playlist=bfleByM49CM&controls=0&disablekb=1'
+                src='https://www.youtube.com/embed/KZNBwN5GpZ0?autoplay=1&mute=1&playsinline=1&loop=1&playlist=KZNBwN5GpZ0&controls=0&disablekb=1'
                 frameBorder='0'
                 allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture'
                 allowFullScreen
@@ -422,10 +422,10 @@ export const Home: React.VFC<Props> = ({
               </Program>
               <Divider />
               <WorkshopInfo>
-                <Price>
+                {/* <Price>
                   1200円<span>（材料費・実費）</span>
-                </Price>
-                <Button label={'参加する'} />
+                </Price> */}
+                <Button label={'参加する'} href={'https://anycap-workshop.peatix.com'} />
               </WorkshopInfo>
             </WorkShopSectionContents>
           </WorkshopWrap>
@@ -532,7 +532,7 @@ export const Home: React.VFC<Props> = ({
                 #ANYCAPプロジェクトは、協業いただける企業・団体・個人のみなさまをお待ちしております。
               </p>
               <AboutDivider />
-              <Button label={'お問合わせ'} />
+              <Button label={'お問い合わせ'} href={'https://forms.gle/beWyuZMBuo2zrEZP8'} />
             </AboutContentsWrap>
             <AboutImageWrap>
               <Image
