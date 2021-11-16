@@ -305,7 +305,7 @@ export const Home: React.VFC<Props> = ({
           <VideoWrap>
             <VideoPlayer>
               <iframe
-                src='https://www.youtube.com/embed/bfleByM49CM?autoplay=1&mute=1&playsinline=1&loop=1&playlist=bfleByM49CM&controls=0&disablekb=1'
+                src='https://www.youtube.com/embed/KZNBwN5GpZ0?autoplay=1&mute=1&playsinline=1&loop=1&playlist=KZNBwN5GpZ0&controls=0&disablekb=1'
                 frameBorder='0'
                 allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture'
                 allowFullScreen
