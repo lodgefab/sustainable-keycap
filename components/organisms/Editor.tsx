@@ -90,10 +90,18 @@ export const Editor: React.VFC<Props> = ({
       </FormHeading>
       <Form onClick={onColorFormBeInActive} onFocus={onColorFormBeInActive}>
         <MaterialWrap
-          isFilled={false}
+          isFilled={currentPlasticImage?.length > 0}
           bgURL={`${previews.plasticImage || inputTagAttributes.plasticImage}`}
         >
-          <label htmlFor='plastic-image'></label>
+          <label
+            htmlFor='plastic-image'
+            onClick={(e) => {
+              if (currentPlasticImage?.length > 0) {
+                e.preventDefault()
+                resetImage('plasticImage')
+              }
+            }}
+          />
           <input
             type='file'
             id='plastic-image'
@@ -101,18 +109,23 @@ export const Editor: React.VFC<Props> = ({
             required
             {...inputTagAttributes.plasticImage}
           />
-          {currentPlasticImage?.length > 0 && (
-            <button onClick={() => resetImage('plasticImage')}>x</button>
-          )}
           {errorMessage.plasticImage && (
             <ErrorMessage key='plasticImage-error'>{errorMessage.plasticImage}</ErrorMessage>
           )}
         </MaterialWrap>
         <KeyUploadWrap
-          isFilled={true}
+          isFilled={currentKeycapImage?.length > 0}
           imgURL={`${previews.keycapImage || '/images/icons/image.svg'}`}
         >
-          <label htmlFor='keycap-image'></label>
+          <label
+            htmlFor='keycap-image'
+            onClick={(e) => {
+              if (currentKeycapImage?.length > 0) {
+                e.preventDefault()
+                resetImage('keycapImage')
+              }
+            }}
+          />
           <input
             type='file'
             id='keycap-image'
@@ -120,9 +133,6 @@ export const Editor: React.VFC<Props> = ({
             required
             {...inputTagAttributes.keycapImage}
           />
-          {currentKeycapImage?.length > 0 && (
-            <button onClick={() => resetImage('keycapImage')}>x</button>
-          )}
           {errorMessage.keycapImage && (
             <ErrorMessage key='keycapImage-error'>{errorMessage.keycapImage}</ErrorMessage>
           )}
