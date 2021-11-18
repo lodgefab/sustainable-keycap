@@ -1,17 +1,15 @@
 import Head from 'next/head'
 import { InferGetStaticPropsType, NextPage } from 'next'
 import { Home } from '../components/organisms/Home'
-import React, { useContext, useEffect, useState } from 'react'
-import { Material } from '../types'
+import React, { useContext, useEffect } from 'react'
 import axios from 'axios'
 import { AuthContext } from '../lib/auth'
-import { fetchMaterialsWithAuth } from '../lib/helper'
-import { MaterialsApiResponse } from './api/materials'
-import Axios from 'axios'
 import { UpvoteApiResponse } from './api/upvote'
 import { getAuth } from 'firebase/auth'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { DispatchPageReadyContext } from '../utils/pageLoadEventContext'
+import useMaterialData from '../utils/useMaterialData'
+import useUpvotedMaterialIds from '../utils/useUpvotedMaterialIds'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 
@@ -26,46 +24,12 @@ export const getStaticProps = async ({ locale }) => {
 export const Index: NextPage<Props> = (_) => {
   const authState = useContext(AuthContext)
   const currentUser = getAuth().currentUser
-
-  const [upvotedMaterials, setUpvotedMaterials] = useState<string[]>([])
-  const [materials, setMaterials] = useState<Material[]>([])
-
+  const [materials, setGoodCount] = useMaterialData()
+  const [upvotedMaterialIds, addUpvotedMaterialId] = useUpvotedMaterialIds()
   const dispatchPageReady = useContext(DispatchPageReadyContext)
 
   // 素材データの読み込みが完了してかどうかを表すboolean
   const isPageLoaded = materials.length > 0
-
-  // 認証の初期化が完了し、ログイン状態が変化した時にキーキャップ素材データを取得する処理
-  useEffect(() => {
-    ;(async () => {
-      let data: Material[]
-      if (authState === 'LOGGED_IN' && currentUser) {
-        const fetchResult = await fetchMaterialsWithAuth()
-        setMaterials(fetchResult.materials)
-        setUpvotedMaterials(
-          fetchResult.materials
-            .filter((material) => fetchResult.alreadyUpvoted.includes(material.id))
-            .map((material) => material.id)
-        )
-      } else if (authState === 'NOT_LOGIN') {
-        try {
-          const response = await axios
-            .get<MaterialsApiResponse>('/api/materials')
-            .then((res) => res.data)
-          data = response.materials!
-          setMaterials(data)
-          setUpvotedMaterials([])
-        } catch (e) {
-          if (Axios.isAxiosError(e) && e.response) {
-            console.log(e)
-          }
-          console.log(e)
-        }
-      } else {
-        return
-      }
-    })()
-  }, [currentUser, authState])
 
   // 素材データの読み込みが完了してページの表示に必要なデータが揃った時の処理
   useEffect(() => {
@@ -75,37 +39,21 @@ export const Index: NextPage<Props> = (_) => {
   }, [dispatchPageReady, isPageLoaded])
 
   /**
-   * 表示されているいいねの数を変更する
-   * @param materialId 変更するキーキャップ素材のID
-   * @param count 変更後のいいねの数
-   */
-  const setGoodCount = async (materialId: string, count: number) => {
-    await setMaterials(
-      materials.map((material) => {
-        if (material.id === materialId) {
-          material.goodCount = count
-        }
-        return material
-      })
-    )
-  }
-
-  /**
    * いいねを増やす
    * @param materialId いいねを増やすキーキャップ素材のID
    */
   const upvote = async (materialId: string) => {
+    // 未ログイン状態もしくは初期化中の送信は禁止
+    if (!currentUser || !upvotedMaterialIds) {
+      return
+    }
+
     // 二重送信・既にUpvote済みの素材に対する再送信の防止
-    if (upvotedMaterials.includes(materialId)) {
+    if (upvotedMaterialIds.includes(materialId)) {
       return
     }
 
-    // 未ログイン状態での送信は禁止
-    if (!currentUser) {
-      return
-    }
-
-    setUpvotedMaterials([materialId, ...upvotedMaterials])
+    addUpvotedMaterialId(materialId)
 
     const idToken = await currentUser.getIdToken(true)
 
@@ -144,8 +92,8 @@ export const Index: NextPage<Props> = (_) => {
       <Home
         materials={materials || []}
         setGoodCount={setGoodCount}
-        canUpvote={authState === 'LOGGED_IN'}
-        upvotedMaterialsId={upvotedMaterials}
+        canUpvote={authState === 'LOGGED_IN' && upvotedMaterialIds instanceof Array}
+        upvotedMaterialsId={upvotedMaterialIds}
         upvote={upvote}
       />
     </>

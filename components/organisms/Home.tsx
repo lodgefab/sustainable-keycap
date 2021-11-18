@@ -1,7 +1,6 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import styled from '@emotion/styled'
 import { color, font, media, zIndex } from '../../styles'
-import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '../atoms/Button'
 import { CategorisedColorType, Material } from '../../types'
@@ -27,7 +26,7 @@ type Props = {
   materials: Material[]
   setGoodCount: (materialId: string, count: number) => void
   canUpvote: boolean
-  upvotedMaterialsId: string[]
+  upvotedMaterialsId: string[] | 'initializing' | null
   upvote: Function
 }
 
@@ -56,13 +55,27 @@ export const Home: React.VFC<Props> = ({
   const containerRef = useRef<HTMLDivElement>(null)
   const conceptImgRef = useRef<HTMLDivElement>(null)
 
+  // ページの内容が変化して縦幅が変化した時にそれを検知してbody.heightに反映する
+  useEffect(() => {
+    const observer = new ResizeObserver((entries) => {
+      document.body.style.height = `${entries[0].contentRect.height}px`
+    })
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current)
+    }
+  }, [])
+
   const size = useWindowSize()
-  const data = {
-    ease: 0.1,
-    curr: 0,
-    prev: 0,
-    rounded: 0,
-  }
+  const data = useMemo(
+    () => ({
+      ease: 0.1,
+      curr: 0,
+      prev: 0,
+      rounded: 0,
+    }),
+    []
+  )
   const setBodyHeight = () => {
     document.body.style.height = `${containerRef.current?.getBoundingClientRect().height}px`
   }
@@ -613,7 +626,7 @@ export const Home: React.VFC<Props> = ({
                         goodCount={material.goodCount}
                         upvoteButtonState={
                           canUpvote
-                            ? upvotedMaterialsId.includes(material.id)
+                            ? upvotedMaterialsId!.includes(material.id)
                               ? 'UPVOTED'
                               : 'NOT_UPVOTED'
                             : 'NOT_PERMITTED'
