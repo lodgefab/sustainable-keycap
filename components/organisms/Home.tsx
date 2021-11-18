@@ -69,7 +69,7 @@ export const Home: React.VFC<Props> = ({
   const size = useWindowSize()
   const data = useMemo(
     () => ({
-      ease: 0.1,
+      ease: 0.05,
       curr: 0,
       prev: 0,
       rounded: 0,
