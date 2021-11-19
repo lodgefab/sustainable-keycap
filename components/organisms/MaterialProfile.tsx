@@ -100,7 +100,7 @@ const FormHeading = styled.div`
   border-bottom: solid 0.5px ${color.content.light};
   padding: 0 32px;
   ${media.mdsp} {
-    padding: 56px 32px 0;
+    padding: 56px 16px 0;
     height: 112px;
   }
   p {
@@ -186,7 +186,7 @@ const DL = styled.dl`
 `
 
 const DT = styled.dt`
-  height: 44px;
+  min-height: 44px;
   width: 180px;
   ${font.inter.label};
   color: ${color.content.dark};
@@ -199,7 +199,7 @@ const DT = styled.dt`
 `
 const DD = styled.dd`
   width: calc(100% - 180px);
-  height: 44px;
+  min-height: 44px;
   border-bottom: 1px solid ${color.content.light};
   box-sizing: border-box;
   line-height: 44px;

@@ -208,7 +208,7 @@ const FormHeading = styled.div`
   border-bottom: solid 0.5px ${color.content.light};
   padding: 0 32px;
   ${media.mdsp} {
-    padding: 56px 32px 0;
+    padding: 56px 16px 0;
     height: 112px;
   }
   p {

@@ -524,7 +524,8 @@ export const Home: React.VFC<Props> = ({
                 ご興味のある方は、下記のコンタクトフォームよりお問い合わせください
               </MoldDesc>
               <Divider />
-              <Download href={'/'}>ダウンロードする</Download>
+              {/* <Download href={'/'}>ダウンロードする</Download> */}
+              <DownloadButton href={''} label={'ダウンロードする'} />
             </MoldContentsWrap>
           </MoldWrap>
         </MoldSection>
@@ -1151,6 +1152,10 @@ const Download = styled.a`
     background-image: url('/images/icons/openNew.svg');
     background-size: cover;
   }
+`
+
+const DownloadButton = styled(Button)`
+  margin: 32px 0 0 0;
 `
 
 const AboutSection = styled(Section)``

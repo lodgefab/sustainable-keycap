@@ -314,9 +314,9 @@ const LoggedOutIcon = styled.button`
   border: 2px solid ${color.primary};
   background-color: ${color.background.white};
   cursor: pointer;
-  background-image: url('/images/icons/login.svg');
+  background-image: url('/images/icons/user.svg');
   background-position: center;
-  background-size: 32px 32px;
+  background-size: 24px 24px;
   background-repeat: no-repeat;
   ${media.mdsp} {
     width: 32px;
