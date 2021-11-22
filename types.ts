@@ -24,7 +24,7 @@ export const hexColorTypeItems: ReadonlyArray<string> = [
 ] as const
 export type HexColorType = typeof hexColorTypeItems[number]
 
-export const categorisedColorTypeItems = ['red', 'blue', 'green', 'black', 'white'] as const
+export const categorisedColorTypeItems = ['red', 'green', 'blue', 'black', 'white'] as const
 export type CategorisedColorType = typeof categorisedColorTypeItems[number]
 
 export const plasticTypeItems: ReadonlyArray<string> = ['PP', 'PE', 'PS']

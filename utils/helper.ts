@@ -22,7 +22,6 @@ import {
 } from 'firebase/firestore'
 import { getDownloadURL, getStorage, listAll, ref } from 'firebase/storage'
 import { NextApiRequest, NextApiResponse } from 'next'
-import hexRgb from 'hex-rgb'
 
 export const getSampleMaterialData: () => Material[] = () => {
   return [
@@ -110,15 +109,45 @@ export const ensureRegisterRequestIsValid = (
   )
 }
 
+/**
+ * Hex形式のカラーコードの各要素を10進数に変換します。
+ * Convert hex format string to rgb format string.
+ * @param baseColorHex Hex形式のカラーコード
+ */
+export const convertHexToRgb = (
+  baseColorHex: string
+): { red: number; green: number; blue: number } => {
+  const match = baseColorHex.match(/^#([0-9A-F]{2})([0-9A-F]{2})([0-9A-F]{2})$/)
+  if (!match) {
+    throw new Error('カラーコードの形式がが正しくありません。"#"と16進数6桁で表現してください。')
+  }
+
+  // matchの中身の要素は、[1]がred、[2]がgreen、[3]がblueを表す16進数の文字列
+  const [hexRed, hexGreen, hexBlue] = match.slice(1, 4)
+
+  return {
+    red: parseInt(hexRed, 16),
+    green: parseInt(hexGreen, 16),
+    blue: parseInt(hexBlue, 16),
+  }
+}
+
+/**
+ * Hex形式のカラーコードを白、黒、赤、緑、青の5色の中から最も近い色に分類します。
+ * @param baseColorHex "#"から開始されるHex形式のカラーコード
+ * @return 分類した結果
+ */
 export const categoriseColor = (baseColorHex: string): CategorisedColorType => {
-  const baseColorRgb = hexRgb(baseColorHex)
+  const baseColorRgb = convertHexToRgb(baseColorHex)
+
+  // 色空間における赤、緑、青、黒、白からのユークリッド距離を算出する
   const distanceFrom = [
     // Distance from red
     (255 - baseColorRgb.red) ** 2 + (0 - baseColorRgb.green) ** 2 + (0 - baseColorRgb.blue) ** 2,
-    // Distance from blue
-    (0 - baseColorRgb.red) ** 2 + (0 - baseColorRgb.green) ** 2 + (255 - baseColorRgb.blue) ** 2,
     // Distance from green
     (0 - baseColorRgb.red) ** 2 + (255 - baseColorRgb.green) ** 2 + (0 - baseColorRgb.blue) ** 2,
+    // Distance from blue
+    (0 - baseColorRgb.red) ** 2 + (0 - baseColorRgb.green) ** 2 + (255 - baseColorRgb.blue) ** 2,
     // Distance from black
     (0 - baseColorRgb.red) ** 2 + (0 - baseColorRgb.green) ** 2 + (0 - baseColorRgb.blue) ** 2,
     // Distance from white
@@ -126,14 +155,8 @@ export const categoriseColor = (baseColorHex: string): CategorisedColorType => {
       (255 - baseColorRgb.green) ** 2 +
       (255 - baseColorRgb.blue) ** 2,
   ]
-  console.log(
-    baseColorHex,
-    baseColorRgb,
-    distanceFrom,
-    Math.min(...distanceFrom),
-    distanceFrom.indexOf(Math.min(...distanceFrom)),
-    categorisedColorTypeItems[distanceFrom.indexOf(Math.min(...distanceFrom))]
-  )
+
+  // 計算した5つの距離から一番値が小さいものに対応する色の名前を取り出して返す
   return categorisedColorTypeItems[distanceFrom.indexOf(Math.min(...distanceFrom))]
 }
 
