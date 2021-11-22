@@ -9,7 +9,7 @@ import {
   RegisterRequestFromClient,
   ResponseData,
 } from '../types'
-import { firebaseClientApp, getCurrentUser } from './auth'
+import { firebaseClientApp, getCurrentUser } from '../lib/auth'
 import {
   collection,
   doc,

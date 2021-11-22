@@ -13,7 +13,7 @@ import axios from 'axios'
 import { AuthContext } from '../../lib/auth'
 import { getAuth } from 'firebase/auth'
 import { MaterialApiResponse } from '../api/materials/[materialId]'
-import { fetchMaterialWithAuth } from '../../lib/helper'
+import { fetchMaterialWithAuth } from '../../utils/helper'
 import { UpvoteApiResponse } from '../api/upvote'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 

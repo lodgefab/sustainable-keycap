@@ -11,7 +11,7 @@ import { useRouter } from 'next/router'
 import { AuthContext, login } from '../lib/auth'
 import { getAuth } from 'firebase/auth'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { readAsDataURL } from '../lib/helper'
+import { readAsDataURL } from '../utils/helper'
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 

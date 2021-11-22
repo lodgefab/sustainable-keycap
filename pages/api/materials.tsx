@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { FirestoreMaterialDocument, HTTP_STATUS, Material } from '../../types'
-import { getSampleMaterialData } from '../../lib/helper'
+import { getSampleMaterialData } from '../../utils/helper'
 import { initAdminFirebase } from '../../lib/admin-firebase'
 import * as admin from 'firebase-admin'
 import dayjs from 'dayjs'
