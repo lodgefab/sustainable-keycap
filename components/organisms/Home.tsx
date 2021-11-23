@@ -19,6 +19,7 @@ import { getAuth } from 'firebase/auth'
 import { useTranslation } from 'next-i18next'
 import { UsePageLoadEventContext } from '../../utils/pageLoadEventContext'
 import { useRouter } from 'next/router'
+import useVisitHistory from '../../utils/useVisitHistory'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -39,6 +40,7 @@ export const Home: React.VFC<Props> = ({
 }) => {
   const authStatus = useContext(AuthContext)
   const usePageLoadEvent = useContext(UsePageLoadEventContext)
+  const isAlreadyVisited = useVisitHistory()
   const { query } = useRouter()
   const { currentUser } = getAuth()
 
@@ -256,7 +258,7 @@ export const Home: React.VFC<Props> = ({
 
   return (
     <AllWrap>
-      <Loader />
+      {!isAlreadyVisited && <Loader />}
       <div ref={containerRef}>
         <Hero id='hero' color={'transparent'}>
           <BGKeys className={'parallax'} data-speed='.4'>
