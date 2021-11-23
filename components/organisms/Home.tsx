@@ -20,6 +20,7 @@ import { useTranslation } from 'next-i18next'
 import { UsePageLoadEventContext } from '../../utils/pageLoadEventContext'
 import { useRouter } from 'next/router'
 import useVisitHistory from '../../utils/useVisitHistory'
+import LoginModal from '../molecules/LoginModal'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -41,6 +42,7 @@ export const Home: React.VFC<Props> = ({
   const authStatus = useContext(AuthContext)
   const usePageLoadEvent = useContext(UsePageLoadEventContext)
   const isAlreadyVisited = useVisitHistory()
+  const [isLoginModalActive, setLoginModalActive] = useState(false)
   const { query } = useRouter()
   const { currentUser } = getAuth()
 
@@ -261,6 +263,7 @@ export const Home: React.VFC<Props> = ({
   return (
     <AllWrap>
       {!isAlreadyVisited && <Loader />}
+      <LoginModal isActive={isLoginModalActive} deActivate={() => setLoginModalActive(false)} />
       <div ref={containerRef}>
         <Hero id='hero' color={'transparent'}>
           <BGKeys className={'parallax'} data-speed='.4'>
@@ -644,7 +647,12 @@ export const Home: React.VFC<Props> = ({
                 {authStatus === 'LOGGED_IN' && currentUser ? (
                   <Button label={'素材を追加する'} href='/register' />
                 ) : (
-                  <Button label={'ログインしてください'} disabled />
+                  <Button
+                    label={'素材を追加する'}
+                    onClick={() => {
+                      setLoginModalActive(true)
+                    }}
+                  />
                 )}
               </>
             )}
