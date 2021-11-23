@@ -172,23 +172,25 @@ export const Home: React.VFC<Props> = ({
   }
 
   const StartOnLoadAnimation = () => {
-    //読み込み完了時にLoaderをフェードアウト
-    gsap
-      .timeline({ defaults: { duration: 1.6, ease: 'expo' } })
-      .from('.loader', {
-        opacity: 1,
-      })
-      .to('.loader', {
-        opacity: 0,
-      })
-    gsap
-      .timeline({ defaults: { duration: 0.1, ease: 'expo', delay: 1.6 } })
-      .from('.loader', {
-        display: 'flex',
-      })
-      .to('.loader', {
-        display: 'none',
-      })
+    if (!isAlreadyVisited) {
+      //読み込み完了時にLoaderをフェードアウト
+      gsap
+        .timeline({ defaults: { duration: 1.6, ease: 'expo' } })
+        .from('.loader', {
+          opacity: 1,
+        })
+        .to('.loader', {
+          opacity: 0,
+        })
+      gsap
+        .timeline({ defaults: { duration: 0.1, ease: 'expo', delay: 1.6 } })
+        .from('.loader', {
+          display: 'flex',
+        })
+        .to('.loader', {
+          display: 'none',
+        })
+    }
     //ロード時にキーキャップが出現する
     gsap
       .timeline({ defaults: { duration: 0.8, ease: 'expo', delay: 1.0 } })
@@ -768,6 +770,7 @@ const Title = styled.div`
   h1 {
     display: inline-block;
     transform-origin: 0% 50%;
+    transform: translate(0, 150%);
   }
 
   span {
@@ -858,6 +861,7 @@ const BGKeys = styled.div`
 `
 
 const BGKey = styled.div<{ src: string; gridRow: number; gridColumn }>`
+  opacity: 0;
   grid-area: ${(props) => props.gridRow} / ${(props) => props.gridColumn} / span 12 / span 5;
   will-change: transform;
   width: 120px;
@@ -890,6 +894,7 @@ const Message = styled.h2`
 `
 
 const ConceptPhotos = styled.div`
+  opacity: 0;
   display: grid;
   gap: 32px;
   grid-template-columns: repeat(5, 1fr);
