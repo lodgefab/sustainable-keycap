@@ -31,7 +31,6 @@ export const plasticTypeItems: ReadonlyArray<string> = ['PP', 'PE', 'PS']
 export type PlasticType = typeof plasticTypeItems[number]
 
 export interface Material {
-  [x: string]: ReactNode
   id: string
   materialName: string
   hexColor: HexColorType

@@ -13,7 +13,6 @@ type Props = {
   keycapImageUrl: string
   id: string
   materialName: string
-  colorType: ReactNode
   plasticType: string
   celsius: number
   goodCount: number
@@ -26,7 +25,6 @@ export const MaterialItem: React.VFC<Props> = ({
   keycapImageUrl,
   id,
   materialName,
-  colorType,
   celsius,
   plasticType,
   goodCount,

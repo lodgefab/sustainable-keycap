@@ -625,7 +625,6 @@ export const Home: React.VFC<Props> = ({
                         keycapImageUrl={material.keycapImageUrl}
                         id={material.id}
                         materialName={material.materialName}
-                        colorType={material.colorType}
                         celsius={material.celsius}
                         plasticType={material.plasticType}
                         goodCount={material.goodCount}

@@ -28,7 +28,6 @@ export const MaterialProfile: React.VFC<Props> = ({ material, canUpvote, upvote 
     categorisedColor,
     plasticType,
     note,
-    upvoteButtonState,
   } = material
 
   return (
