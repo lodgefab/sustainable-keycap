@@ -150,8 +150,7 @@ export const MaterialDetailPage: NextPage<Props> = (_) => {
     return (
       <>
         <Head>
-          <title>{material.materialName} の詳細</title>
-          <link rel='icon' href='/favicon.ico' />
+          <title>{material.materialName} | #ANYCAP</title>
         </Head>
 
         <MaterialProfile material={material} canUpvote={canUpvote} upvote={upvote} />
