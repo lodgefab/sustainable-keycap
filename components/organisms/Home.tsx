@@ -816,6 +816,9 @@ const VideoPlayer = styled.div`
   height: 100%;
   background: #ffffff;
   overflow: hidden;
+  // 動画描画部分の右端・下端が微妙に見えてしまう現象への対応
+  border-right: 1px solid #ffffff;
+  border-bottom: 1px solid #ffffff;
 
   ${media.mdsp} {
     display: none;
