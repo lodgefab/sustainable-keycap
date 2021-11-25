@@ -19,7 +19,6 @@ import { getAuth } from 'firebase/auth'
 import { useTranslation } from 'next-i18next'
 import { UsePageLoadEventContext } from '../../utils/pageLoadEventContext'
 import { useRouter } from 'next/router'
-import useVisitHistory from '../../utils/useVisitHistory'
 import LoginModal from '../molecules/LoginModal'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -41,7 +40,6 @@ export const Home: React.VFC<Props> = ({
 }) => {
   const authStatus = useContext(AuthContext)
   const usePageLoadEvent = useContext(UsePageLoadEventContext)
-  const isAlreadyVisited = useVisitHistory()
   const [isLoginModalActive, setLoginModalActive] = useState(false)
   const { query } = useRouter()
   const { currentUser } = getAuth()
