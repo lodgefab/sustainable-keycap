@@ -13,9 +13,10 @@ import axios from 'axios'
 import { AuthContext } from '../../lib/auth'
 import { getAuth } from 'firebase/auth'
 import { MaterialApiResponse } from '../api/materials/[materialId]'
-import { fetchMaterialWithAuth } from '../../lib/helper'
+import { fetchMaterialWithAuth } from '../../utils/helper'
 import { UpvoteApiResponse } from '../api/upvote'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import useUpvotedMaterialIds from '../../utils/useUpvotedMaterialIds'
 
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>
 
@@ -37,6 +38,7 @@ export const MaterialDetailPage: NextPage<Props> = (_) => {
   const [material, setMaterial] = useState<Material | null>(null)
   const [canUpvote, setCanUpvote] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
+  const [upvotedMaterialIds, addUpvotedMaterialId] = useUpvotedMaterialIds()
 
   const { mid } = router.query
 
@@ -150,11 +152,21 @@ export const MaterialDetailPage: NextPage<Props> = (_) => {
     return (
       <>
         <Head>
-          <title>{material.materialName} の詳細</title>
-          <link rel='icon' href='/favicon.ico' />
+          <title>{material.materialName} | #ANYCAP</title>
         </Head>
 
-        <MaterialProfile material={material} canUpvote={canUpvote} upvote={upvote} />
+        <MaterialProfile
+          material={material}
+          canUpvote={canUpvote}
+          upvote={upvote}
+          upvoteButtonState={
+            canUpvote
+              ? upvotedMaterialIds?.includes(material.id)
+                ? 'UPVOTED'
+                : 'NOT_UPVOTED'
+              : 'NOT_PERMITTED'
+          }
+        />
 
         {router.query.action === 'register' && <p>投稿が完了しました</p>}
         {error && <p>{error}</p>}

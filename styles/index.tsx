@@ -63,23 +63,23 @@ export const font = {
     h3: 'font-family: Courier Prime, monospace, serif; font-weight: 400; font-size: 20px; line-height: 1.3;',
     h4: 'font-family: Courier Prime, monospace, serif; font-weight: 400; font-size: 18px; line-height: 1.3;',
     subtitle1:
-      'font-family: Courier Prime, monospace, serif; font-weight: 600; font-size: 16px; line-height: 1.3;',
+      'font-family: Courier Prime, monospace, serif; font-weight: 700; font-size: 16px; line-height: 1.3;',
     subtitle2:
-      'font-family: Courier Prime, monospace, serif; font-weight: 600; font-size: 14px; line-height: 1.3;',
+      'font-family: Courier Prime, monospace, serif; font-weight: 700; font-size: 14px; line-height: 1.3;',
     body1:
-      'font-family: Courier Prime, monospace, serif; font-weight: 500; font-size: 16px; line-height: 1.3;',
+      'font-family: Courier Prime, monospace, serif; font-weight: 400; font-size: 16px; line-height: 1.3;',
     body2:
-      'font-family: Courier Prime, monospace, serif; font-weight: 500; font-size: 14px; line-height: 1.3;',
+      'font-family: Courier Prime, monospace, serif; font-weight: 400; font-size: 14px; line-height: 1.3;',
     article1:
-      'font-family: Courier Prime, monospace, serif; font-weight: 500; font-size: 16px; line-height: 2.0;',
+      'font-family: Courier Prime, monospace, serif; font-weight: 400; font-size: 16px; line-height: 2.0;',
     article2:
-      'font-family: Courier Prime, monospace, serif; font-weight: 500; font-size: 14px; line-height: 2.0;',
+      'font-family: Courier Prime, monospace, serif; font-weight: 400; font-size: 14px; line-height: 2.0;',
     button:
       'font-family: Courier Prime, monospace, serif; font-weight: 700; font-size: 14px; line-height: 1.5;',
     caption:
       'font-family: Courier Prime, monospace, serif; font-weight: 400; font-size: 12px; line-height: 1.5;',
     label:
-      'font-family: Courier Prime, monospace, serif; font-weight: 600; font-size: 12px; line-height: 1.5;',
+      'font-family: Courier Prime, monospace, serif; font-weight: 700; font-size: 12px; line-height: 1.5;',
     overline:
       'font-family: Courier Prime, monospace, serif; font-weight: 400; font-size: 10px; line-height: 1.5;',
     unit: 'font-family: Courier Prime, monospace, serif; font-weight: 700; font-size: 10px; line-height: 1.3;',

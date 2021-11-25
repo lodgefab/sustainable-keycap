@@ -1,5 +1,5 @@
 import * as admin from 'firebase-admin'
-import { ensureEnvironmentVariable } from './helper'
+import { ensureEnvironmentVariable } from '../utils/helper'
 
 let db: admin.firestore.Firestore
 

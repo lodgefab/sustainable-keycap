@@ -5,7 +5,7 @@ import {
   ensureRequestIsAuthorized,
   isErrorResponse,
   respondAsInternalServerError,
-} from '../../lib/helper'
+} from '../../utils/helper'
 import multer from 'multer'
 import * as admin from 'firebase-admin'
 import { getAdminFirestoreDb, initAdminFirebase } from '../../lib/admin-firebase'

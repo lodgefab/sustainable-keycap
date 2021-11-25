@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { FirestoreMaterialDocument, HTTP_STATUS, Material } from '../../types'
-import { getSampleMaterialData } from '../../lib/helper'
+import { getSampleMaterialData } from '../../utils/helper'
 import { initAdminFirebase } from '../../lib/admin-firebase'
 import * as admin from 'firebase-admin'
 import dayjs from 'dayjs'
@@ -14,7 +14,10 @@ export interface MaterialsApiResponse {
  * トップページを開いた時にキーキャップ素材の一覧を取得するためのAPI
  * 頻繁に素材データが更新されることを想定していないので、Firebaseへのリクエスト数を減らすためにレスポンスは30秒間キャッシュする
  */
-export const handler = async (req: NextApiRequest, res: NextApiResponse<MaterialsApiResponse>) => {
+export const handleGetMaterials = async (
+  req: NextApiRequest,
+  res: NextApiResponse<MaterialsApiResponse>
+) => {
   // GETリクエスト以外は弾く
   if (req.method !== 'GET') {
     res.status(HTTP_STATUS.METHOD_NOT_ALLOWED).json({
@@ -108,4 +111,4 @@ const fetchMaterialData = async (): Promise<Material[]> => {
   return materials
 }
 
-export default handler
+export default handleGetMaterials

@@ -6,20 +6,23 @@ import Layout from '../components/Layout'
 import { AuthProvider } from '../lib/auth'
 import { appWithTranslation } from 'next-i18next'
 import { PageLoadEventProvider } from '../utils/pageLoadEventContext'
+import Head from 'next/head'
 
 function MyApp({ Component, pageProps }) {
   return (
     <PageLoadEventProvider>
       <AuthProvider>
+        <Head>
+          <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+        </Head>
         <Global
           styles={css`
+            @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Inter:wght@300;400;500;700&display=swap');
             ${emotionReset}
-            @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap');
             *,
             html,
             body {
-              font-family: 'Montserrat', sans-serif;
+              font-family: 'Inter', sans-serif;
               color: ${color.content.dark};
               overscroll-behavior-y: none;
             }

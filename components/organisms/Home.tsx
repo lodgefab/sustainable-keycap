@@ -19,6 +19,8 @@ import { getAuth } from 'firebase/auth'
 import { useTranslation } from 'next-i18next'
 import { UsePageLoadEventContext } from '../../utils/pageLoadEventContext'
 import { useRouter } from 'next/router'
+import useVisitHistory from '../../utils/useVisitHistory'
+import LoginModal from '../molecules/LoginModal'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -39,6 +41,8 @@ export const Home: React.VFC<Props> = ({
 }) => {
   const authStatus = useContext(AuthContext)
   const usePageLoadEvent = useContext(UsePageLoadEventContext)
+  const isAlreadyVisited = useVisitHistory()
+  const [isLoginModalActive, setLoginModalActive] = useState(false)
   const { query } = useRouter()
   const { currentUser } = getAuth()
 
@@ -69,7 +73,7 @@ export const Home: React.VFC<Props> = ({
   const size = useWindowSize()
   const data = useMemo(
     () => ({
-      ease: 0.1,
+      ease: 0.05,
       curr: 0,
       prev: 0,
       rounded: 0,
@@ -170,23 +174,25 @@ export const Home: React.VFC<Props> = ({
   }
 
   const StartOnLoadAnimation = () => {
-    //読み込み完了時にLoaderをフェードアウト
-    gsap
-      .timeline({ defaults: { duration: 1.6, ease: 'expo' } })
-      .from('.loader', {
-        opacity: 1,
-      })
-      .to('.loader', {
-        opacity: 0,
-      })
-    gsap
-      .timeline({ defaults: { duration: 0.1, ease: 'expo', delay: 1.6 } })
-      .from('.loader', {
-        display: 'flex',
-      })
-      .to('.loader', {
-        display: 'none',
-      })
+    if (!isAlreadyVisited) {
+      //読み込み完了時にLoaderをフェードアウト
+      gsap
+        .timeline({ defaults: { duration: 1.6, ease: 'expo' } })
+        .from('.loader', {
+          opacity: 1,
+        })
+        .to('.loader', {
+          opacity: 0,
+        })
+      gsap
+        .timeline({ defaults: { duration: 0.1, ease: 'expo', delay: 1.6 } })
+        .from('.loader', {
+          display: 'flex',
+        })
+        .to('.loader', {
+          display: 'none',
+        })
+    }
     //ロード時にキーキャップが出現する
     gsap
       .timeline({ defaults: { duration: 0.8, ease: 'expo', delay: 1.0 } })
@@ -256,7 +262,8 @@ export const Home: React.VFC<Props> = ({
 
   return (
     <AllWrap>
-      <Loader />
+      {!isAlreadyVisited && <Loader />}
+      <LoginModal isActive={isLoginModalActive} deActivate={() => setLoginModalActive(false)} />
       <div ref={containerRef}>
         <Hero id='hero' color={'transparent'}>
           <BGKeys className={'parallax'} data-speed='.4'>
@@ -318,7 +325,7 @@ export const Home: React.VFC<Props> = ({
           <VideoWrap>
             <VideoPlayer>
               <iframe
-                src='https://www.youtube.com/embed/KZNBwN5GpZ0?autoplay=1&mute=1&playsinline=1&loop=1&playlist=KZNBwN5GpZ0&controls=0&disablekb=1'
+                src='https://www.youtube.com/embed/gA8jTbitJ5E?autoplay=1&mute=1&playsinline=1&loop=1&playlist=gA8jTbitJ5E&controls=0&disablekb=1'
                 frameBorder='0'
                 allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture'
                 allowFullScreen
@@ -524,7 +531,8 @@ export const Home: React.VFC<Props> = ({
                 ご興味のある方は、下記のコンタクトフォームよりお問い合わせください
               </MoldDesc>
               <Divider />
-              <Download href={'/'}>ダウンロードする</Download>
+              {/* <Download href={'/'}>ダウンロードする</Download> */}
+              <DownloadButton href={''} label={'ダウンロードする'} />
             </MoldContentsWrap>
           </MoldWrap>
         </MoldSection>
@@ -620,7 +628,6 @@ export const Home: React.VFC<Props> = ({
                         keycapImageUrl={material.keycapImageUrl}
                         id={material.id}
                         materialName={material.materialName}
-                        colorType={material.colorType}
                         celsius={material.celsius}
                         plasticType={material.plasticType}
                         goodCount={material.goodCount}
@@ -640,7 +647,12 @@ export const Home: React.VFC<Props> = ({
                 {authStatus === 'LOGGED_IN' && currentUser ? (
                   <Button label={'素材を追加する'} href='/register' />
                 ) : (
-                  <Button label={'ログインしてください'} disabled />
+                  <Button
+                    label={'素材を追加する'}
+                    onClick={() => {
+                      setLoginModalActive(true)
+                    }}
+                  />
                 )}
               </>
             )}
@@ -765,6 +777,7 @@ const Title = styled.div`
   h1 {
     display: inline-block;
     transform-origin: 0% 50%;
+    transform: translate(0, 150%);
   }
 
   span {
@@ -813,6 +826,9 @@ const VideoPlayer = styled.div`
   height: 100%;
   background: #ffffff;
   overflow: hidden;
+  // 動画描画部分の右端・下端が微妙に見えてしまう現象への対応
+  border-right: 1px solid #ffffff;
+  border-bottom: 1px solid #ffffff;
 
   ${media.mdsp} {
     display: none;
@@ -852,6 +868,7 @@ const BGKeys = styled.div`
 `
 
 const BGKey = styled.div<{ src: string; gridRow: number; gridColumn }>`
+  opacity: 0;
   grid-area: ${(props) => props.gridRow} / ${(props) => props.gridColumn} / span 12 / span 5;
   will-change: transform;
   width: 120px;
@@ -884,6 +901,7 @@ const Message = styled.h2`
 `
 
 const ConceptPhotos = styled.div`
+  opacity: 0;
   display: grid;
   gap: 32px;
   grid-template-columns: repeat(5, 1fr);
@@ -1035,7 +1053,8 @@ const MakingWrap = styled(Wrap)`
 
 const MakingScrollWrap = styled.div`
   width: 100%;
-  overflow: auto;
+  overflow-y: hidden;
+  overflow-x: scroll;
   padding: 0 0 64px 0;
   ::-webkit-scrollbar {
     height: 5px;
@@ -1150,6 +1169,10 @@ const Download = styled.a`
     background-image: url('/images/icons/openNew.svg');
     background-size: cover;
   }
+`
+
+const DownloadButton = styled(Button)`
+  margin: 32px 0 0 0;
 `
 
 const AboutSection = styled(Section)``
