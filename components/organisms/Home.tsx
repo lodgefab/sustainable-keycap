@@ -528,7 +528,10 @@ export const Home: React.VFC<Props> = ({
               </MoldDesc>
               <Divider />
               {/* <Download href={'/'}>ダウンロードする</Download> */}
-              <DownloadButton href={''} label={'ダウンロードする'} />
+              <DownloadButton
+                href={'https://vernacular.booth.pm/items/3457801'}
+                label={'ダウンロードする'}
+              />
             </MoldContentsWrap>
           </MoldWrap>
         </MoldSection>
