@@ -174,25 +174,23 @@ export const Home: React.VFC<Props> = ({
   }
 
   const StartOnLoadAnimation = () => {
-    if (!isAlreadyVisited) {
-      //読み込み完了時にLoaderをフェードアウト
-      gsap
-        .timeline({ defaults: { duration: 1.6, ease: 'expo' } })
-        .from('.loader', {
-          opacity: 1,
-        })
-        .to('.loader', {
-          opacity: 0,
-        })
-      gsap
-        .timeline({ defaults: { duration: 0.1, ease: 'expo', delay: 1.6 } })
-        .from('.loader', {
-          display: 'flex',
-        })
-        .to('.loader', {
-          display: 'none',
-        })
-    }
+    //読み込み完了時にLoaderをフェードアウト
+    gsap
+      .timeline({ defaults: { duration: 1.6, ease: 'expo' } })
+      .from('.loader', {
+        opacity: 1,
+      })
+      .to('.loader', {
+        opacity: 0,
+      })
+    gsap
+      .timeline({ defaults: { duration: 0.1, ease: 'expo', delay: 1.6 } })
+      .from('.loader', {
+        display: 'flex',
+      })
+      .to('.loader', {
+        display: 'none',
+      })
     //ロード時にキーキャップが出現する
     gsap
       .timeline({ defaults: { duration: 0.8, ease: 'expo', delay: 1.0 } })
@@ -262,7 +260,7 @@ export const Home: React.VFC<Props> = ({
 
   return (
     <AllWrap>
-      {!isAlreadyVisited && <Loader />}
+      <Loader />
       <LoginModal isActive={isLoginModalActive} deActivate={() => setLoginModalActive(false)} />
       <div ref={containerRef}>
         <Hero id='hero' color={'transparent'}>
