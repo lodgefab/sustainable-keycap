@@ -7,13 +7,16 @@ import { AuthProvider } from '../lib/auth'
 import { appWithTranslation } from 'next-i18next'
 import { PageLoadEventProvider } from '../utils/pageLoadEventContext'
 import Head from 'next/head'
+import { GoogleAnalytics, usePageView } from '../lib/gtag'
 
 function MyApp({ Component, pageProps }) {
+  usePageView()
   return (
     <PageLoadEventProvider>
       <AuthProvider>
         <Head>
           <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+          <GoogleAnalytics />
         </Head>
         <Global
           styles={css`
