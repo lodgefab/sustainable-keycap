@@ -133,28 +133,73 @@ export const convertHexToRgb = (
 }
 
 /**
+ * RGB形式の色情報をHSV形式に変換します。
+ * @param rgb RGB形式の色情報
+ * @return HSV形式の色情報（Hは0~360, Sは0~100, Vは0~100）
+ */
+export const convertRgbToHsv = (rgb: {
+  red: number
+  green: number
+  blue: number
+}): { hue: number; saturation: number; value: number } => {
+  const { red, green, blue } = rgb
+  const max = Math.max(red, green, blue)
+  const min = Math.min(red, green, blue)
+  const delta = max - min
+
+  let hue = 0
+  let saturation = 0
+  let value = (max / 255) * 100
+
+  if (max !== 0) {
+    saturation = (delta / max) * 100
+  }
+
+  if (red === green && green === blue) {
+    hue = 0
+  } else if (max === red) {
+    hue = (60 * (green - blue)) / delta
+  } else if (max === green) {
+    hue = (60 * (blue - red)) / delta + 120
+  } else if (max === blue) {
+    hue = (60 * (red - green)) / delta + 240
+  }
+
+  if (hue < 0) {
+    hue += 360
+  }
+
+  return { hue, saturation, value }
+}
+
+/**
  * Hex形式のカラーコードを白、黒、赤、緑、青の5色の中から最も近い色に分類します。
  * @param baseColorHex "#"から開始されるHex形式のカラーコード
  * @return 分類した結果
  */
 export const categoriseColor = (baseColorHex: string): CategorisedColorType => {
-  const baseColorRgb = convertHexToRgb(baseColorHex)
+  const baseColorHsv = convertRgbToHsv(convertHexToRgb(baseColorHex))
 
-  // 色空間における赤、緑、青、黒、白からのユークリッド距離を算出する
-  const distanceFrom = [
-    // Distance from red
-    (255 - baseColorRgb.red) ** 2 + (0 - baseColorRgb.green) ** 2 + (0 - baseColorRgb.blue) ** 2,
-    // Distance from green
-    (0 - baseColorRgb.red) ** 2 + (255 - baseColorRgb.green) ** 2 + (0 - baseColorRgb.blue) ** 2,
-    // Distance from blue
-    (0 - baseColorRgb.red) ** 2 + (0 - baseColorRgb.green) ** 2 + (255 - baseColorRgb.blue) ** 2,
-    // Distance from black
-    (0 - baseColorRgb.red) ** 2 + (0 - baseColorRgb.green) ** 2 + (0 - baseColorRgb.blue) ** 2,
-    // Distance from white
-    (255 - baseColorRgb.red) ** 2 +
-      (255 - baseColorRgb.green) ** 2 +
-      (255 - baseColorRgb.blue) ** 2,
-  ]
+  const hsv = {
+    red: { hue: 0, saturation: 100, value: 100 },
+    green: { hue: 120, saturation: 100, value: 100 },
+    blue: { hue: 240, saturation: 100, value: 100 },
+    black: { hue: 0, saturation: 0, value: 0 },
+    white: { hue: 0, saturation: 0, value: 100 },
+  }
+
+  // HSV空間における赤、緑、青、黒、白からの距離を算出する
+  const distanceFrom = [hsv.red, hsv.green, hsv.blue, hsv.black, hsv.white].map(
+    (colorHsv) =>
+      (colorHsv.saturation * Math.cos((Math.PI * colorHsv.hue) / 180) -
+        baseColorHsv.saturation * Math.cos((Math.PI * baseColorHsv.hue) / 180)) **
+        2 +
+      (colorHsv.saturation * Math.sin((Math.PI * colorHsv.hue) / 180) -
+        baseColorHsv.saturation * Math.sin((Math.PI * baseColorHsv.hue) / 180)) **
+        2 *
+        2 +
+      (colorHsv.value - baseColorHsv.value) ** 2
+  )
 
   // 計算した5つの距離から一番値が小さいものに対応する色の名前を取り出して返す
   return categorisedColorTypeItems[distanceFrom.indexOf(Math.min(...distanceFrom))]
