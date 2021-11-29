@@ -265,57 +265,45 @@ export const Home: React.VFC<Props> = ({
           <BGKeys className={'parallax'} data-speed='.4'>
             <BGKey
               className={'key'}
-              src={'/images/photos/key001.jpg'}
-              gridRow={5}
-              gridColumn={40}
-            />
-            <BGKey
-              className={'key'}
-              src={'/images/photos/key002.jpg'}
-              gridRow={11}
-              gridColumn={48}
-            />
-            <BGKey
-              className={'key'}
-              src={'/images/photos/key003.jpg'}
-              gridRow={18}
-              gridColumn={-8}
-            />
-            <BGKey
-              className={'key'}
               src={'/images/photos/key004.jpg'}
-              gridRow={25}
-              gridColumn={36}
-            />
-            <BGKey
-              className={'key'}
-              src={'/images/photos/key005.jpg'}
-              gridRow={29}
-              gridColumn={44}
+              gridRow={7}
+              gridColumn={43}
             />
             <BGKey
               className={'key'}
               src={'/images/photos/key006.jpg'}
-              gridRow={30}
-              gridColumn={26}
-            />
-            <BGKey
-              className={'key'}
-              src={'/images/photos/key000.jpg'}
-              gridRow={7}
-              gridColumn={30}
-            />
-            <BGKey
-              className={'key'}
-              src={'/images/photos/key002.jpg'}
-              gridRow={24}
-              gridColumn={13}
+              gridRow={18}
+              gridColumn={-12}
             />
             <BGKey
               className={'key'}
               src={'/images/photos/key003.jpg'}
               gridRow={32}
-              gridColumn={1}
+              gridColumn={41}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key001.jpg'}
+              gridRow={27}
+              gridColumn={29}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key002.jpg'}
+              gridRow={1}
+              gridColumn={33}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key002.jpg'}
+              gridRow={30}
+              gridColumn={14}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key004.jpg'}
+              gridRow={44}
+              gridColumn={34}
             />
           </BGKeys>
           <VideoWrap>
@@ -960,10 +948,14 @@ const BGKey = styled.div<{ src: string; gridRow: number; gridColumn }>`
   height: 120px;
   background-image: url(${(props) => props.src});
   background-size: cover;
+  ${media.lg} {
+    width: 240px;
+    height: 240px;
+  }
 `
 
 const ConceptSection = styled(Section)`
-  padding: 0 0 128px 0;
+  padding: 128px 0 128px 0;
   overflow: hidden;
   ${media.mdsp} {
     padding: 32px 0px 128px 0px;
@@ -972,7 +964,8 @@ const ConceptSection = styled(Section)`
 
 const Message = styled.h2`
   ${font.inter.h3}
-  line-height:200%;
+  line-height:240%;
+  letter-spacing: 1px;
   text-align: left;
   z-index: ${zIndex.default};
   ${media.mdsp} {
