@@ -1,4 +1,5 @@
 import styled from '@emotion/styled'
+import { bgcolor } from '@mui/system'
 import Image from 'next/image'
 import React, { MouseEventHandler } from 'react'
 import { color, curve, font, zIndex } from '../../styles'
@@ -10,6 +11,8 @@ type Props = {
   className?: string
   onClick?: MouseEventHandler<HTMLButtonElement>
   href?: string
+  iconSize?: number
+  bgColor?: string
 }
 
 export const Button: React.FC<Props> = ({
@@ -19,6 +22,8 @@ export const Button: React.FC<Props> = ({
   className,
   disabled,
   href,
+  iconSize,
+  bgColor,
 }) => {
   if (disabled) {
     return (
@@ -31,36 +36,48 @@ export const Button: React.FC<Props> = ({
     /* hrefの有無によって、aタグとhrefタグを使い分ける */
   }
   return href ? (
-    <AnchorButton className={className} href={href}>
+    <AnchorButton className={className} href={href} target='_blank'>
       {iconPath && (
         <IconContainer>
-          <Image src={iconPath} layout={'fixed'} width={24} height={24} alt='icon' />
+          <Image
+            src={iconPath}
+            layout={'fixed'}
+            width={iconSize ? iconSize : 24}
+            height={iconSize ? iconSize : 24}
+            alt='icon'
+          />
         </IconContainer>
       )}
       {label}
-      <Front />
+      <Front bgColor={bgColor} />
       <Back />
     </AnchorButton>
   ) : (
     <ButtonBase type='button' onClick={onClick} className={className}>
       {iconPath && (
         <IconContainer>
-          <Image src={iconPath} layout={'fixed'} width={24} height={24} alt='icon' />
+          <Image
+            src={iconPath}
+            layout={'fixed'}
+            width={iconSize ? iconSize : 24}
+            height={iconSize ? iconSize : 24}
+            alt='icon'
+          />
         </IconContainer>
       )}
       {label}
-      <Front />
+      <Front bgColor={bgColor} />
       <Back />
     </ButtonBase>
   )
 }
-const Front = styled.span`
+const Front = styled.span<{ bgColor: string | undefined }>`
   position: absolute;
   display: block;
   width: 100%;
   height: 100%;
   border-radius: 4px;
-  background-color: ${color.subColor.blue};
+  background-color: ${(props) => (props.bgColor ? props.bgColor : color.subColor.blue)};
   border: 2px solid ${color.primary};
   z-index: ${zIndex.behind};
 `

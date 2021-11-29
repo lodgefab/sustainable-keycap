@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import styled from '@emotion/styled'
-import { color, font, media, zIndex } from '../../styles'
+import { color, curve, font, media, zIndex } from '../../styles'
 import Image from 'next/image'
 import { Button } from '../atoms/Button'
 import { CategorisedColorType, Material } from '../../types'
@@ -337,17 +337,43 @@ export const Home: React.VFC<Props> = ({
               layout='responsive'
             />
           </VideoWrap>
-          <Title>
-            <span>
-              <h1 className={'titleline'}>プラゴミから</h1>
-            </span>
-            <span>
-              <h1 className={'titleline'}>キーキャップを</h1>
-            </span>
-            <span>
-              <h1 className={'titleline'}>作ろう</h1>
-            </span>
-          </Title>
+          <TitleWrap>
+            <Title>
+              <span>
+                <h1 className={'titleline'}>{t('hero.title1')}</h1>
+              </span>
+              <span>
+                <h1 className={'titleline'}>{t('hero.title2')}</h1>
+              </span>
+              <span>
+                <h1 className={'titleline'}>{t('hero.title3')}</h1>
+              </span>
+            </Title>
+            <HeroButtonsWrap>
+              <span>
+                <HeroButton
+                  onClick={() => Scroll.scroller.scrollTo('shop', { smooth: true, duration: 500 })}
+                  className={'titleline'}
+                  label={t('hero.button1')}
+                  iconPath={'/images/icons/shop.svg'}
+                  iconSize={32}
+                  bgColor={'#ffffff'}
+                />
+              </span>
+              <span>
+                <HeroButton
+                  label={t('hero.button2')}
+                  onClick={() =>
+                    Scroll.scroller.scrollTo('workshop', { smooth: true, duration: 500 })
+                  }
+                  className={'titleline'}
+                  iconPath={'/images/icons/make.svg'}
+                  iconSize={32}
+                  bgColor={'#ffffff'}
+                />
+              </span>
+            </HeroButtonsWrap>
+          </TitleWrap>
         </Hero>
         <ConceptSection id='concept' color={'transparent'}>
           <Wrap>
@@ -404,6 +430,33 @@ export const Home: React.VFC<Props> = ({
             </WhyKeys>
           </WHYWrap>
         </WHYSection>
+        <ShopSection id='shop' color={'transparent'}>
+          <ShopWrap>
+            <WorkShopImgWrap>
+              <WorkShopImg src='/images/photos/013.jpg' />
+            </WorkShopImgWrap>
+            <WorkShopSectionTitle>
+              <span>
+                <SectionTitle className={'headline_Shop'}>Shop</SectionTitle>
+              </span>
+              <span>
+                <SectionSubTitle className={'headline_Shop'}>キーキャップを買う</SectionSubTitle>
+              </span>
+            </WorkShopSectionTitle>
+            <WorkShopSectionContents>
+              <WorkshopDesc>
+                単色のものからマーブル模様のものまで、様々な色を取り揃えています
+              </WorkshopDesc>
+              <Divider />
+              <WorkshopInfo>
+                <Price>
+                  <span>各色</span>500円<span>（送料別）</span>
+                </Price>
+                <Button label={'購入する'} href={'https://booth.pm/ja/items/3423801'} />
+              </WorkshopInfo>
+            </WorkShopSectionContents>
+          </ShopWrap>
+        </ShopSection>
         <WorkshopSection id='workshop' color={'transparent'}>
           <WorkshopWrap>
             <WorkShopImgWrap>
@@ -746,10 +799,23 @@ const Hero = styled(Section)`
     padding: 56px 0 0 0;
   }
 `
-const Title = styled.div`
+const TitleWrap = styled.div`
   position: absolute;
   left: calc(100vw * 2 / 3);
   top: 36%;
+  ${media.mdsp} {
+    position: relative;
+    left: 0;
+    top: 0;
+    margin: 32px 32px 0 32px;
+  }
+  ${media.md} {
+    margin: 64px auto 0;
+    padding: 0 32px;
+  }
+`
+
+const Title = styled.div`
   display: grid;
   gap: 24px;
   grid-template-columns: repeat(1, 1fr);
@@ -759,17 +825,11 @@ const Title = styled.div`
   line-height: 180%;
 
   ${media.mdsp} {
-    position: relative;
-    left: 0;
-    top: 0;
-    margin: 32px 0 0 32px;
     max-width: 990px;
     ${font.inter.h2};
     line-height: 150%;
   }
   ${media.md} {
-    margin: 64px auto 0;
-    padding: 0 32px;
     ${font.inter.h1};
   }
 
@@ -783,6 +843,32 @@ const Title = styled.div`
     display: block;
     line-height: 1;
     overflow: hidden;
+  }
+`
+const HeroButtonsWrap = styled.div`
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr 1fr;
+  margin: 64px 0 0;
+  ${media.sp} {
+    margin: 32px 0 0;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+  span {
+    display: block;
+    line-height: 1;
+    overflow: hidden;
+    padding: 0 16px 16px 0;
+  }
+`
+const HeroButton = styled(Button)`
+  transform-origin: 0% 50%;
+  transform: translate(0, 150%);
+  width: 100%;
+  padding: 0 16px 0 16px;
+  :last-child {
+    margin: 0 0 0 0;
   }
 `
 
@@ -959,6 +1045,24 @@ const WhyKey = styled.div`
   }
   p {
     ${font.inter.article2};
+  }
+`
+
+const ShopSection = styled(Section)``
+
+const ShopWrap = styled(Wrap)`
+  display: grid;
+  gap: 64px;
+  grid-template-areas:
+    'B A'
+    'C A';
+  grid-template-rows: auto 1fr;
+  ${media.mdsp} {
+    width: 100%;
+    grid-template-areas:
+      'B'
+      'A'
+      'C';
   }
 `
 
