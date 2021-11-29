@@ -16,7 +16,6 @@ function MyApp({ Component, pageProps }) {
       <AuthProvider>
         <Head>
           <meta name='viewport' content='width=device-width, initial-scale=1.0' />
-          <GoogleAnalytics />
         </Head>
         <Global
           styles={css`
@@ -39,6 +38,7 @@ function MyApp({ Component, pageProps }) {
             }
           `}
         />
+        <GoogleAnalytics />
         <Layout>
           <Component {...pageProps} />
         </Layout>
