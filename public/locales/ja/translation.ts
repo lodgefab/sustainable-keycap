@@ -7,6 +7,13 @@ module.exports = {
     },
   },
   home: {
+    hero: {
+      title1: '廃プラから',
+      title2: 'キーキャップを',
+      title3: '作ろう',
+      button1: '購入する',
+      button2: '自分でつくる',
+    },
     whyAnycap: {
       subtitle: '廃プラキーキャップのススメ',
     },

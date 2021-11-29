@@ -344,13 +344,13 @@ export const Home: React.VFC<Props> = ({
           <TitleWrap>
             <Title>
               <span>
-                <h1 className={'titleline'}>プラゴミから</h1>
+                <h1 className={'titleline'}>{t('hero.title1')}</h1>
               </span>
               <span>
-                <h1 className={'titleline'}>キーキャップを</h1>
+                <h1 className={'titleline'}>{t('hero.title2')}</h1>
               </span>
               <span>
-                <h1 className={'titleline'}>作ろう</h1>
+                <h1 className={'titleline'}>{t('hero.title3')}</h1>
               </span>
             </Title>
             <HeroButtonsWrap>
@@ -358,7 +358,7 @@ export const Home: React.VFC<Props> = ({
                 <HeroButton
                   onClick={() => Scroll.scroller.scrollTo('shop', { smooth: true, duration: 500 })}
                   className={'titleline'}
-                  label={'買う'}
+                  label={`${t('hero.button1')}`}
                   iconPath={'/images/icons/shop.svg'}
                   iconSize={32}
                   bgColor={'#ffffff'}
@@ -366,7 +366,7 @@ export const Home: React.VFC<Props> = ({
               </span>
               <span>
                 <HeroButton
-                  label={'自分でつくる'}
+                  label={`${t('hero.button2')}`}
                   onClick={() =>
                     Scroll.scroller.scrollTo('workshop', { smooth: true, duration: 500 })
                   }
@@ -454,7 +454,7 @@ export const Home: React.VFC<Props> = ({
               <Divider />
               <WorkshopInfo>
                 <Price>
-                  各色 500円<span>（送料別）</span>
+                  <span>各色</span>500円<span>（送料別）</span>
                 </Price>
                 <Button label={'購入する'} href={'https://booth.pm/ja/items/3423801'} />
               </WorkshopInfo>
@@ -870,6 +870,7 @@ const HeroButton = styled(Button)`
   transform-origin: 0% 50%;
   transform: translate(0, 150%);
   width: 100%;
+  padding: 0 16px 0 16px;
   :last-child {
     margin: 0 0 0 0;
   }
@@ -947,7 +948,7 @@ const BGKeys = styled.div`
   grid-template-rows: repeat(50, 2%);
   --grid-row: 1;
   --grid-column: 1;
-  transform: rotate3d(0, 0, 1, -20deg);
+  transform: rotate3d(0, 0, 1, -10deg);
   opacity: 1;
   z-index: ${zIndex.base};
   ${media.mdsp} {
