@@ -55,7 +55,6 @@ export const Home: React.VFC<Props> = ({
   // containerRef : ヌルッとスクロールアニメーション
   // その他のRef : スクロール連動アニメーション
   const containerRef = useRef<HTMLDivElement>(null)
-  const conceptImgRef = useRef<HTMLDivElement>(null)
 
   // ページの内容が変化して縦幅が変化した時にそれを検知してbody.heightに反映する
   useEffect(() => {
@@ -75,6 +74,9 @@ export const Home: React.VFC<Props> = ({
       curr: 0,
       prev: 0,
       rounded: 0,
+      difference: 0,
+      //
+      roundedConceptImg: 0,
     }),
     []
   )
@@ -89,6 +91,7 @@ export const Home: React.VFC<Props> = ({
 
     data.curr = window.scrollY
     data.prev += (data.curr - data.prev) * data.ease
+    data.difference = Math.round((data.curr - data.prev) * data.ease)
     data.rounded = Math.round(data.prev * 100) / 100
     if (containerRef.current !== null) {
       containerRef.current!.style.transform = `translateY(-${data.rounded}px)`
@@ -106,24 +109,6 @@ export const Home: React.VFC<Props> = ({
       rotate: 0,
       stagger: 0.04,
     }
-    gsap.fromTo(
-      conceptImgRef.current,
-      {
-        autoAlpha: 0,
-        y: 80,
-      },
-      {
-        autoAlpha: 1,
-        y: 0,
-        scrollTrigger: {
-          trigger: conceptImgRef.current!,
-          start: 'top center',
-          // onEnter: () => {}, //スクロールイン時
-          // onEnterBack: () => {}, //スクロールバック時
-          // markers: true // マーカー表示
-        },
-      }
-    )
 
     gsap.set('.headline_why', { ...animationFromHeading }) //Workshopセクション
     ScrollTrigger.batch('.headline_why', {
@@ -161,14 +146,20 @@ export const Home: React.VFC<Props> = ({
       start: 'top 50%',
       once: true, //この指定によって１度だけアニメーションされる
     })
-
-    // gsap.to(".parallax", { //パララックスコード
-    //   scrollTrigger: {
-    //     scrub: true
-    //   },
-    //   y: (i, target) => -ScrollTrigger.maxScroll(window) * target.dataset.speed,
-    //   ease: "none"
-    // });
+    gsap.to('.conceptImg', {
+      // xPercent: -100,
+      x: () => -1 * innerWidth,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.conceptImg',
+        start: 'top bottom',
+        end: '+=1500',
+        scrub: 1,
+        // pin: true,
+        // invalidateOnRefresh: true,
+        // anticipatePin: 1
+      },
+    })
   }
 
   const StartOnLoadAnimation = () => {
@@ -372,7 +363,7 @@ export const Home: React.VFC<Props> = ({
             </Message>
           </Wrap>
         </ConceptSection>
-        <ConceptPhotos ref={conceptImgRef}>
+        <ConceptPhotos className={'conceptImg'}>
           <ConceptPhoto src='/images/photos/001.jpg' />
           <ConceptPhoto src='/images/photos/002.jpg' />
           <ConceptPhoto src='/images/photos/003.jpg' />
@@ -979,7 +970,6 @@ const Message = styled.h2`
 `
 
 const ConceptPhotos = styled.div`
-  opacity: 0;
   display: grid;
   gap: 32px;
   grid-template-columns: repeat(5, 1fr);
