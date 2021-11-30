@@ -567,7 +567,7 @@ export const Home: React.VFC<Props> = ({
             </MoldContentsWrap>
           </MoldWrap>
         </MoldSection>
-        <AboutSection id='aboutus' color={'transparent '}>
+        {/* <AboutSection id='aboutus' color={'transparent '}>
           <AboutWrap>
             <AboutTitleWrap>
               <span>
@@ -596,7 +596,7 @@ export const Home: React.VFC<Props> = ({
               />
             </AboutImageWrap>
           </AboutWrap>
-        </AboutSection>
+        </AboutSection> */}
         <LibrarySection id='library' color={'transparent'}>
           <LibraryWrap>
             <SectionTitleGroup>
