@@ -55,7 +55,6 @@ export const Home: React.VFC<Props> = ({
   // containerRef : ヌルッとスクロールアニメーション
   // その他のRef : スクロール連動アニメーション
   const containerRef = useRef<HTMLDivElement>(null)
-  const conceptImgRef = useRef<HTMLDivElement>(null)
 
   // ページの内容が変化して縦幅が変化した時にそれを検知してbody.heightに反映する
   useEffect(() => {
@@ -75,6 +74,9 @@ export const Home: React.VFC<Props> = ({
       curr: 0,
       prev: 0,
       rounded: 0,
+      difference: 0,
+      //
+      roundedConceptImg: 0,
     }),
     []
   )
@@ -89,6 +91,7 @@ export const Home: React.VFC<Props> = ({
 
     data.curr = window.scrollY
     data.prev += (data.curr - data.prev) * data.ease
+    data.difference = Math.round((data.curr - data.prev) * data.ease)
     data.rounded = Math.round(data.prev * 100) / 100
     if (containerRef.current !== null) {
       containerRef.current!.style.transform = `translateY(-${data.rounded}px)`
@@ -106,24 +109,6 @@ export const Home: React.VFC<Props> = ({
       rotate: 0,
       stagger: 0.04,
     }
-    gsap.fromTo(
-      conceptImgRef.current,
-      {
-        autoAlpha: 0,
-        y: 80,
-      },
-      {
-        autoAlpha: 1,
-        y: 0,
-        scrollTrigger: {
-          trigger: conceptImgRef.current!,
-          start: 'top center',
-          // onEnter: () => {}, //スクロールイン時
-          // onEnterBack: () => {}, //スクロールバック時
-          // markers: true // マーカー表示
-        },
-      }
-    )
 
     gsap.set('.headline_why', { ...animationFromHeading }) //Workshopセクション
     ScrollTrigger.batch('.headline_why', {
@@ -161,14 +146,20 @@ export const Home: React.VFC<Props> = ({
       start: 'top 50%',
       once: true, //この指定によって１度だけアニメーションされる
     })
-
-    // gsap.to(".parallax", { //パララックスコード
-    //   scrollTrigger: {
-    //     scrub: true
-    //   },
-    //   y: (i, target) => -ScrollTrigger.maxScroll(window) * target.dataset.speed,
-    //   ease: "none"
-    // });
+    gsap.to('.conceptImg', {
+      // xPercent: -100,
+      x: () => -1 * innerWidth,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.conceptImg',
+        start: 'top bottom',
+        end: '+=1500',
+        scrub: 1,
+        // pin: true,
+        // invalidateOnRefresh: true,
+        // anticipatePin: 1
+      },
+    })
   }
 
   const StartOnLoadAnimation = () => {
@@ -265,57 +256,45 @@ export const Home: React.VFC<Props> = ({
           <BGKeys className={'parallax'} data-speed='.4'>
             <BGKey
               className={'key'}
-              src={'/images/photos/key001.jpg'}
-              gridRow={5}
-              gridColumn={40}
-            />
-            <BGKey
-              className={'key'}
-              src={'/images/photos/key002.jpg'}
-              gridRow={11}
-              gridColumn={48}
-            />
-            <BGKey
-              className={'key'}
-              src={'/images/photos/key003.jpg'}
-              gridRow={18}
-              gridColumn={-8}
-            />
-            <BGKey
-              className={'key'}
               src={'/images/photos/key004.jpg'}
-              gridRow={25}
-              gridColumn={36}
-            />
-            <BGKey
-              className={'key'}
-              src={'/images/photos/key005.jpg'}
-              gridRow={29}
-              gridColumn={44}
+              gridRow={7}
+              gridColumn={43}
             />
             <BGKey
               className={'key'}
               src={'/images/photos/key006.jpg'}
-              gridRow={30}
-              gridColumn={26}
-            />
-            <BGKey
-              className={'key'}
-              src={'/images/photos/key000.jpg'}
-              gridRow={7}
-              gridColumn={30}
-            />
-            <BGKey
-              className={'key'}
-              src={'/images/photos/key002.jpg'}
-              gridRow={24}
-              gridColumn={13}
+              gridRow={18}
+              gridColumn={-12}
             />
             <BGKey
               className={'key'}
               src={'/images/photos/key003.jpg'}
               gridRow={32}
-              gridColumn={1}
+              gridColumn={41}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key001.jpg'}
+              gridRow={27}
+              gridColumn={29}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key002.jpg'}
+              gridRow={1}
+              gridColumn={33}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key002.jpg'}
+              gridRow={30}
+              gridColumn={14}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key004.jpg'}
+              gridRow={44}
+              gridColumn={34}
             />
           </BGKeys>
           <VideoWrap>
@@ -354,7 +333,7 @@ export const Home: React.VFC<Props> = ({
                 <HeroButton
                   onClick={() => Scroll.scroller.scrollTo('shop', { smooth: true, duration: 500 })}
                   className={'titleline'}
-                  label={t('hero.button1')}
+                  label={`${t('hero.button1')}`}
                   iconPath={'/images/icons/shop.svg'}
                   iconSize={32}
                   bgColor={'#ffffff'}
@@ -362,7 +341,7 @@ export const Home: React.VFC<Props> = ({
               </span>
               <span>
                 <HeroButton
-                  label={t('hero.button2')}
+                  label={`${t('hero.button2')}`}
                   onClick={() =>
                     Scroll.scroller.scrollTo('workshop', { smooth: true, duration: 500 })
                   }
@@ -384,7 +363,7 @@ export const Home: React.VFC<Props> = ({
             </Message>
           </Wrap>
         </ConceptSection>
-        <ConceptPhotos ref={conceptImgRef}>
+        <ConceptPhotos className={'conceptImg'}>
           <ConceptPhoto src='/images/photos/001.jpg' />
           <ConceptPhoto src='/images/photos/002.jpg' />
           <ConceptPhoto src='/images/photos/003.jpg' />
@@ -588,7 +567,7 @@ export const Home: React.VFC<Props> = ({
             </MoldContentsWrap>
           </MoldWrap>
         </MoldSection>
-        <AboutSection id='aboutus' color={'transparent '}>
+        {/* <AboutSection id='aboutus' color={'transparent '}>
           <AboutWrap>
             <AboutTitleWrap>
               <span>
@@ -617,7 +596,7 @@ export const Home: React.VFC<Props> = ({
               />
             </AboutImageWrap>
           </AboutWrap>
-        </AboutSection>
+        </AboutSection> */}
         <LibrarySection id='library' color={'transparent'}>
           <LibraryWrap>
             <SectionTitleGroup>
@@ -944,7 +923,7 @@ const BGKeys = styled.div`
   grid-template-rows: repeat(50, 2%);
   --grid-row: 1;
   --grid-column: 1;
-  transform: rotate3d(0, 0, 1, -20deg);
+  transform: rotate3d(0, 0, 1, -10deg);
   opacity: 1;
   z-index: ${zIndex.base};
   ${media.mdsp} {
@@ -960,10 +939,14 @@ const BGKey = styled.div<{ src: string; gridRow: number; gridColumn }>`
   height: 120px;
   background-image: url(${(props) => props.src});
   background-size: cover;
+  ${media.lg} {
+    width: 240px;
+    height: 240px;
+  }
 `
 
 const ConceptSection = styled(Section)`
-  padding: 0 0 128px 0;
+  padding: 128px 0 128px 0;
   overflow: hidden;
   ${media.mdsp} {
     padding: 32px 0px 128px 0px;
@@ -972,7 +955,8 @@ const ConceptSection = styled(Section)`
 
 const Message = styled.h2`
   ${font.inter.h3}
-  line-height:200%;
+  line-height:240%;
+  letter-spacing: 1px;
   text-align: left;
   z-index: ${zIndex.default};
   ${media.mdsp} {
@@ -986,7 +970,6 @@ const Message = styled.h2`
 `
 
 const ConceptPhotos = styled.div`
-  opacity: 0;
   display: grid;
   gap: 32px;
   grid-template-columns: repeat(5, 1fr);
