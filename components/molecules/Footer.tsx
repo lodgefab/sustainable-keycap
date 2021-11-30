@@ -2,11 +2,13 @@ import React from 'react'
 import styled from '@emotion/styled'
 import { color } from '../../styles'
 
-type Props = {}
+type Props = {
+  className: string
+}
 
-export const Footer: React.VFC<Props> = ({}) => {
+export const Footer: React.VFC<Props> = ({ className }) => {
   return (
-    <Wrap>
+    <Wrap className={className}>
       <Container>
         <Copyright>Sponsored by LODGE</Copyright>
       </Container>
