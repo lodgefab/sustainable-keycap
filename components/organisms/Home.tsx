@@ -52,58 +52,28 @@ export const Home: React.VFC<Props> = ({
     slidesToShow: 1,
     slidesToScroll: 1,
   }
-  // containerRef : ヌルッとスクロールアニメーション
-  // その他のRef : スクロール連動アニメーション
-  // const containerRef = useRef<HTMLDivElement>(null)
-
-  // ページの内容が変化して縦幅が変化した時にそれを検知してbody.heightに反映する
+  const containerRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const observer = new ResizeObserver((entries) => {
       document.body.style.height = `${entries[0].contentRect.height}px`
     })
 
-    // if (containerRef.current) {
-    //   observer.observe(containerRef.current)
-    // }
+    if (containerRef.current) {
+      observer.observe(containerRef.current)
+    }
   }, [])
 
   const size = useWindowSize()
-  const data = useMemo(
-    () => ({
-      ease: 0.05,
-      curr: 0,
-      prev: 0,
-      rounded: 0,
-      difference: 0,
-      //
-      roundedConceptImg: 0,
-    }),
-    []
-  )
+
   const setBodyHeight = () => {
-    // document.body.style.height = `${containerRef.current?.getBoundingClientRect().height}px`
+    document.body.style.height = `${containerRef.current?.getBoundingClientRect().height}px`
   }
-
-  // prev と currentのスクロール量の差分を徐々に無くしていく
-  // const smoothScroll = useCallback(() => {
-  //   // next/linkでページ遷移を行う際、切り替え直前にcontainerRefがnullになるタイミングが発生するので条件分岐する
-  //   if (containerRef.current === null) return
-
-  //   data.curr = window.scrollY
-  //   data.prev += (data.curr - data.prev) * data.ease
-  //   data.difference = Math.round((data.curr - data.prev) * data.ease)
-  //   data.rounded = Math.round(data.prev * 100) / 100
-  //   if (containerRef.current !== null) {
-  //     // containerRef.current!.style.transform = `translateY(-${data.rounded}px)`
-  //   }
-  //   // requestAnimationFrame(() => smoothScroll())
-  // }, [data])
 
   const setAnimation = () => {
     // 各sectionをarray化
     let sections = gsap.utils.toArray('.section')
     // let container = document.querySelector(".container")
-
+    console.log(sections)
     // Heading Animationの動きをテンプレ化
     const animationFromHeading = {
       y: '150%',
@@ -115,17 +85,7 @@ export const Home: React.VFC<Props> = ({
       stagger: 0.04,
     }
 
-    gsap.to(sections, {
-      yPercent: -100 * (sections.length - 1),
-      ease: 'none',
-      scrollTrigger: {
-        trigger: '.allWrap',
-        pin: true,
-        scrub: 1,
-        // snap: 0,
-        end: () => '+=' + 3500,
-      },
-    })
+    smoothScroll('.content', '.allWrap', 1)
 
     gsap.set('.headline_why', { ...animationFromHeading }) //Workshopセクション
     ScrollTrigger.batch('.headline_why', {
@@ -170,7 +130,7 @@ export const Home: React.VFC<Props> = ({
       scrollTrigger: {
         trigger: '.conceptImg',
         start: 'top bottom',
-        end: '+=1500',
+        end: 'bottom top',
         scrub: 1,
         // pin: true,
         // invalidateOnRefresh: true,
@@ -247,9 +207,88 @@ export const Home: React.VFC<Props> = ({
     }
   })
 
-  // useEffect(() => {
-  //   requestAnimationFrame(() => smoothScroll())
-  // })
+  // this is the helper function that sets it all up. Pass in the content <div> and then the wrapping viewport <div> (can be the elements or selector text). It also sets the default "scroller" to the content so you don't have to do that on all your ScrollTriggers.
+  const smoothScroll = (content, viewport, smoothness) => {
+    content = gsap.utils.toArray(content)[0]
+    smoothness = smoothness || 1
+
+    gsap.set(viewport || content.parentNode, {
+      overflow: 'hidden',
+      position: 'fixed',
+      height: '100%',
+      width: '100%',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+    })
+    gsap.set(content, { overflow: 'visible', width: '100%' })
+
+    let getProp = gsap.getProperty(content),
+      setProp = gsap.quickSetter(content, 'y', 'px'),
+      setScroll = ScrollTrigger.getScrollFunc(window),
+      removeScroll = () => (content.style.overflow = 'visible'),
+      killScrub = (trigger) => {
+        let scrub = trigger.getTween ? trigger.getTween() : gsap.getTweensOf(trigger.animation)[0] // getTween() was added in 3.6.2
+        scrub && scrub.kill()
+        trigger.animation.progress(trigger.progress)
+      },
+      height,
+      isProxyScrolling
+
+    function refreshHeight() {
+      height = content.clientHeight
+      content.style.overflow = 'visible'
+      document.body.style.height = height + 'px'
+      return height - document.documentElement.clientHeight
+    }
+
+    ScrollTrigger.addEventListener('refresh', () => {
+      removeScroll()
+      requestAnimationFrame(removeScroll)
+    })
+    ScrollTrigger.defaults({ scroller: content })
+
+    ScrollTrigger.scrollerProxy(content, {
+      scrollTop(value) {
+        if (arguments.length && value) {
+          isProxyScrolling = true // otherwise, if snapping was applied (or anything that attempted to SET the scroll proxy's scroll position), we'd set the scroll here which would then (on the next tick) update the content tween/ScrollTrigger which would try to smoothly animate to that new value, thus the scrub tween would impede the progress. So we use this flag to respond accordingly in the ScrollTrigger's onUpdate and effectively force the scrub to its end immediately.
+          setProp(-value)
+          setScroll(value)
+          return
+        }
+        return -getProp('y')
+      },
+      getBoundingClientRect() {
+        return { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight }
+      },
+    })
+
+    return ScrollTrigger.create({
+      animation: gsap.fromTo(
+        content,
+        { y: 0 },
+        {
+          y: () => document.documentElement.clientHeight - height,
+          ease: 'none',
+          onUpdate: ScrollTrigger.update,
+        }
+      ),
+      scroller: window,
+      invalidateOnRefresh: true,
+      start: 0,
+      end: refreshHeight,
+      refreshPriority: -999,
+      scrub: smoothness,
+      onUpdate: (self) => {
+        if (isProxyScrolling) {
+          killScrub(self)
+          isProxyScrolling = false
+        }
+      },
+      onRefresh: killScrub, // when the screen resizes, we just want the animation to immediately go to the appropriate spot rather than animating there, so basically kill the scrub.
+    })
+  }
 
   useEffect(() => {
     setBodyHeight()
@@ -268,412 +307,446 @@ export const Home: React.VFC<Props> = ({
     <AllWrap className='allWrap'>
       <Loader />
       <LoginModal isActive={isLoginModalActive} deActivate={() => setLoginModalActive(false)} />
-
-      <Hero id='hero' color={'transparent'} className='section'>
-        <BGKeys className={'parallax'} data-speed='.4'>
-          <BGKey className={'key'} src={'/images/photos/key004.jpg'} gridRow={7} gridColumn={43} />
-          <BGKey
-            className={'key'}
-            src={'/images/photos/key006.jpg'}
-            gridRow={18}
-            gridColumn={-12}
-          />
-          <BGKey className={'key'} src={'/images/photos/key003.jpg'} gridRow={32} gridColumn={41} />
-          <BGKey className={'key'} src={'/images/photos/key001.jpg'} gridRow={27} gridColumn={29} />
-          <BGKey className={'key'} src={'/images/photos/key002.jpg'} gridRow={1} gridColumn={33} />
-          <BGKey className={'key'} src={'/images/photos/key002.jpg'} gridRow={30} gridColumn={14} />
-          <BGKey className={'key'} src={'/images/photos/key004.jpg'} gridRow={44} gridColumn={34} />
-        </BGKeys>
-        <VideoWrap>
-          <VideoPlayer>
-            <iframe
-              src='https://www.youtube.com/embed/gA8jTbitJ5E?autoplay=1&mute=1&playsinline=1&loop=1&playlist=gA8jTbitJ5E&controls=0&disablekb=1'
-              frameBorder='0'
-              allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture'
-              allowFullScreen
-            ></iframe>
-          </VideoPlayer>
-          <VideoMask></VideoMask>
-          <Image
-            src={'/images/photos/004.jpg'}
-            width={400}
-            height={400}
-            objectFit='cover'
-            objectPosition='center center'
-            layout='responsive'
-          />
-        </VideoWrap>
-        <TitleWrap>
-          <Title>
-            <span>
-              <h1 className={'titleline'}>{t('hero.title1')}</h1>
-            </span>
-            <span>
-              <h1 className={'titleline'}>{t('hero.title2')}</h1>
-            </span>
-            <span>
-              <h1 className={'titleline'}>{t('hero.title3')}</h1>
-            </span>
-          </Title>
-          <HeroButtonsWrap>
-            <span>
-              <HeroButton
-                onClick={() => Scroll.scroller.scrollTo('shop', { smooth: true, duration: 500 })}
-                className={'titleline'}
-                label={`${t('hero.button1')}`}
-                iconPath={'/images/icons/shop.svg'}
-                iconSize={32}
-                bgColor={'#ffffff'}
-              />
-            </span>
-            <span>
-              <HeroButton
-                label={`${t('hero.button2')}`}
-                onClick={() =>
-                  Scroll.scroller.scrollTo('workshop', { smooth: true, duration: 500 })
-                }
-                className={'titleline'}
-                iconPath={'/images/icons/make.svg'}
-                iconSize={32}
-                bgColor={'#ffffff'}
-              />
-            </span>
-          </HeroButtonsWrap>
-        </TitleWrap>
-      </Hero>
-      <ConceptSection id='concept' color={'transparent'} className='section'>
-        <Wrap>
-          <Message>
-            #ANYCAPは、廃棄プラスチックを使ってキーキャップを自作するオープンソースコミュニティです。
-            <br />
-            家庭やオフィスで出るプラゴミを原材料としたキーキャップを製作し、手法やデータを公開することを通じて、仲間の輪を広げる活動を行なっています。
-          </Message>
-        </Wrap>
-        <ConceptPhotos className={'conceptImg'}>
-          <ConceptPhoto src='/images/photos/001.jpg' />
-          <ConceptPhoto src='/images/photos/002.jpg' />
-          <ConceptPhoto src='/images/photos/003.jpg' />
-          <ConceptPhoto src='/images/photos/004.jpg' />
-          <ConceptPhoto src='/images/photos/005.jpg' />
-        </ConceptPhotos>
-      </ConceptSection>
-      <WHYSection id='why' color={'transparent'} className='section'>
-        <WHYWrap>
-          <SectionTitleGroup>
-            <span>
-              <SectionTitle className={'headline_why'}>Why #ANYCAP ?</SectionTitle>
-            </span>
-            <span>
-              <SectionSubTitle className={'headline_why'}>
-                {t('whyAnycap.subtitle')}
-              </SectionSubTitle>
-            </span>
-          </SectionTitleGroup>
-          <WhyKeys>
-            <WhyKey>
-              <img src='/images/icons/point001.svg' />
-              <h4>一般的なキーキャップ規格に準拠</h4>
-              <p>
-                Cherry,
-                DSAなど、一般的な自作キーボード規格に則ったキー形状のため、お使いのキーボードにそのまま組み込みやすいです
-              </p>
-            </WhyKey>
-            <WhyKey>
-              <img src='/images/icons/point002.svg' />
-              <h4>コスト抑えめ</h4>
-              <p>廃材を用いるので、原材料の費用が安く済みます</p>
-            </WhyKey>
-            <WhyKey>
-              <img src='/images/icons/point003.svg' />
-              <h4>自分の好きな色・素材にこだわれる</h4>
-              <p>自分が本当にキーボードに欲しい色、欲しい素材で作ることができます</p>
-            </WhyKey>
-            <WhyKey>
-              <img src='/images/icons/point004.svg' />
-              <h4>オープンソース</h4>
-              <p>金型や作り方の情報を公開しています</p>
-            </WhyKey>
-          </WhyKeys>
-        </WHYWrap>
-      </WHYSection>
-      <ShopSection id='shop' color={'transparent'} className='section'>
-        <ShopWrap>
-          <WorkShopImgWrap>
-            <WorkShopImg src='/images/photos/013.jpg' />
-          </WorkShopImgWrap>
-          <WorkShopSectionTitle>
-            <span>
-              <SectionTitle className={'headline_Shop'}>Shop</SectionTitle>
-            </span>
-            <span>
-              <SectionSubTitle className={'headline_Shop'}>キーキャップを買う</SectionSubTitle>
-            </span>
-          </WorkShopSectionTitle>
-          <WorkShopSectionContents>
-            <WorkshopDesc>
-              単色のものからマーブル模様のものまで、様々な色を取り揃えています
-            </WorkshopDesc>
-            <Divider />
-            <WorkshopInfo>
-              <Price>
-                <span>各色</span>500円<span>（送料別）</span>
-              </Price>
-              <Button label={'購入する'} href={'https://booth.pm/ja/items/3423801'} />
-            </WorkshopInfo>
-          </WorkShopSectionContents>
-        </ShopWrap>
-      </ShopSection>
-      <WorkshopSection id='workshop' color={'transparent'} className='section'>
-        <WorkshopWrap>
-          <WorkShopImgWrap>
-            <WorkShopImg src='/images/photos/006.jpg' />
-          </WorkShopImgWrap>
-          <WorkShopSectionTitle>
-            <span>
-              <SectionTitle className={'headline_workshop'}>Workshop</SectionTitle>
-            </span>
-            <span>
-              <SectionSubTitle className={'headline_workshop'}>ワークショップ</SectionSubTitle>
-            </span>
-          </WorkShopSectionTitle>
-          <WorkShopSectionContents>
-            <WorkshopDesc>
-              自分の好きな素材を持ち込んで、世界に１つだけの廃プラキーキャップを作るワークショップを開催しています。ご興味のある方は、下のボタンよりお申し込みください。
-            </WorkshopDesc>
-            <Program>
-              <ProgramLabel>プログラム例：</ProgramLabel>
-              <ProgramDesc>
-                10分 導入・作業説明
-                <br />
-                30分 素材の破砕作業
-                <br />
-                30分 射出成形
-                <br />
-                20分 まとめ・撮影タイム
-                <br />
-                <br />
-                場所：ガーデンテラス紀尾井町17F　ヤフーLODGE内
-              </ProgramDesc>
-            </Program>
-            <Divider />
-            <WorkshopInfo>
-              {/* <Price>
-                  1200円<span>（材料費・実費）</span>
-                </Price> */}
-              <Button label={'参加する'} href={'https://anycap-workshop.peatix.com'} />
-            </WorkshopInfo>
-          </WorkShopSectionContents>
-        </WorkshopWrap>
-      </WorkshopSection>
-      <MakingSection id='making' color={'transparent'} className='section'>
-        <MakingWrap>
-          <SectionTitleGroup>
-            <span>
-              <SectionTitle className={'headline_making'}>Making #ANYCAP</SectionTitle>
-            </span>
-            <span>
-              <SectionSubTitle className={'headline_making'}>
-                廃プラキーキャップができるまで
-              </SectionSubTitle>
-            </span>
-          </SectionTitleGroup>
-          <MakingScrollWrap>
-            <MakingScrollContents>
-              <MakingItem>
-                <MakingItemImg src={'/images/photos/007.jpg'} />
-                <h3>
-                  <span>01.</span>素材をさがす
-                </h3>
-                <p>
-                  キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
-                </p>
-              </MakingItem>
-              <MakingItem>
-                <MakingItemImg src={'/images/photos/008.jpg'} />
-                <h3>
-                  <span>02.</span>破砕する
-                </h3>
-                <p>集めた素材を砕いて、5mm角程度の大きさにします。</p>
-              </MakingItem>
-              <MakingItem>
-                <MakingItemImg src={'/images/photos/009.jpg'} />
-                <h3>
-                  <span>03.</span>金型を用意する
-                </h3>
-                <p>
-                  キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
-                </p>
-              </MakingItem>
-              <MakingItem>
-                <MakingItemImg src={'/images/photos/010.jpg'} />
-                <h3>
-                  <span>04.</span>金型を用意する
-                </h3>
-                <p>
-                  キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
-                </p>
-              </MakingItem>
-            </MakingScrollContents>
-          </MakingScrollWrap>
-        </MakingWrap>
-      </MakingSection>
-      <MoldSection id='mold' color={'transparent'} className='section'>
-        <MoldWrap>
-          <MoldSliderWrap>
-            <MoldSlider>
-              <Slider {...sliderSettings}>
-                <SlideImg src={'/images/photos/011.jpg'} />
-                <SlideImg src={'/images/photos/011.jpg'} />
-                <SlideImg src={'/images/photos/011.jpg'} />
-                <SlideImg src={'/images/photos/011.jpg'} />
-              </Slider>
-            </MoldSlider>
-          </MoldSliderWrap>
-          <MoldTitleWrap>
-            <span>
-              <SectionTitle className={'headline_mold'}>Mold</SectionTitle>
-            </span>
-            <span>
-              <SectionSubTitle className={'headline_mold'}>金型</SectionSubTitle>
-            </span>
-          </MoldTitleWrap>
-          <MoldContentsWrap>
-            <MoldDesc>
-              金型を用意し、家庭用の射出成形機（ORIGINALMIND社製のINARIなど）を使えば、ご自身でキーキャップを作ることも可能です。
-              <br />
-              より多くの方に活動に参加してもらいたいという思いから、金型の3Dデータを公開しています。
-              <br />
-              ご興味のある方は、下記のコンタクトフォームよりお問い合わせください
-            </MoldDesc>
-            <Divider />
-            {/* <Download href={'/'}>ダウンロードする</Download> */}
-            <DownloadButton
-              href={'https://vernacular.booth.pm/items/3457801'}
-              label={'ダウンロードする'}
+      <div className='content' ref={containerRef}>
+        <Hero id='hero' color={'transparent'} className='section hero'>
+          <BGKeys className={'parallax'} data-speed='.4'>
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key004.jpg'}
+              gridRow={7}
+              gridColumn={43}
             />
-          </MoldContentsWrap>
-        </MoldWrap>
-      </MoldSection>
-      <AboutSection id='aboutus' color={'transparent '} className='section'>
-        <AboutWrap>
-          <AboutTitleWrap>
-            <span>
-              <SectionTitle className={'headline_about'}>About Us</SectionTitle>
-            </span>
-            <span>
-              <SectionSubTitle className={'headline_about'}>わたしたちについて</SectionSubTitle>
-            </span>
-          </AboutTitleWrap>
-          <AboutContentsWrap>
-            <p>
-              #ANYCAPは、ヤフー社員の自主制作チームToasterによって運営されており、オープンコラボレーションハブLODGEを拠点に活動しています。
-              <br />
-              #ANYCAPプロジェクトは、協業いただける企業・団体・個人のみなさまをお待ちしております。
-            </p>
-            <AboutDivider />
-            <Button label={'お問い合わせ'} href={'https://forms.gle/beWyuZMBuo2zrEZP8'} />
-          </AboutContentsWrap>
-          <AboutImageWrap>
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key006.jpg'}
+              gridRow={18}
+              gridColumn={-12}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key003.jpg'}
+              gridRow={32}
+              gridColumn={41}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key001.jpg'}
+              gridRow={27}
+              gridColumn={29}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key002.jpg'}
+              gridRow={1}
+              gridColumn={33}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key002.jpg'}
+              gridRow={30}
+              gridColumn={14}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key004.jpg'}
+              gridRow={44}
+              gridColumn={34}
+            />
+          </BGKeys>
+          <VideoWrap>
+            <VideoPlayer>
+              <iframe
+                src='https://www.youtube.com/embed/gA8jTbitJ5E?autoplay=1&mute=1&playsinline=1&loop=1&playlist=gA8jTbitJ5E&controls=0&disablekb=1'
+                frameBorder='0'
+                allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture'
+                allowFullScreen
+              ></iframe>
+            </VideoPlayer>
+            <VideoMask></VideoMask>
             <Image
-              src='/images/photos/012.jpg'
-              alt={'Yahoo! LODGE'}
-              width={495}
-              height={360}
+              src={'/images/photos/004.jpg'}
+              width={400}
+              height={400}
+              objectFit='cover'
+              objectPosition='center center'
               layout='responsive'
             />
-          </AboutImageWrap>
-        </AboutWrap>
-      </AboutSection>
-      <LibrarySection id='library' color={'transparent'} className='section'>
-        <LibraryWrap>
-          <SectionTitleGroup>
-            <span>
-              <SectionTitle className={'headline_library'}>Library</SectionTitle>
-            </span>
-            <span>
-              <SectionSubTitle className={'headline_library'}>ライブラリ</SectionSubTitle>
-            </span>
-          </SectionTitleGroup>
-          <LibraryDesc>
-            みんなが見つけたキーキャップに使えそうな素材とそのレポートです。実際に作ってみたものがあればどんどう投稿していってみましょう！いいねの多い人気素材は実際に販売されることがあるかも...?!
-          </LibraryDesc>
-          {materials.length > 0 && ( // 何らかの理由で素材リストが取れなかった時はsection全体を非表示にする
-            <>
-              <Filters className='filter'>
-                <Filter isSelected={currentFilter === 'red'} onClick={() => updateFilter('red')}>
-                  <Palette isSelected={currentFilter === 'red'} color={color.subColor.red} />
-                  Red
-                </Filter>
-                <Filter isSelected={currentFilter === 'blue'} onClick={() => updateFilter('blue')}>
-                  <Palette isSelected={currentFilter === 'blue'} color={color.subColor.blue} />
-                  Blue
-                </Filter>
-                <Filter
-                  isSelected={currentFilter === 'green'}
-                  onClick={() => updateFilter('green')}
-                >
-                  <Palette isSelected={currentFilter === 'green'} color={color.subColor.green} />
-                  Green
-                </Filter>
-                <Filter
-                  isSelected={currentFilter === 'black'}
-                  onClick={() => updateFilter('black')}
-                >
-                  <Palette isSelected={currentFilter === 'black'} color={color.subColor.dark} />
-                  Black
-                </Filter>
-                <Filter
-                  isSelected={currentFilter === 'white'}
-                  onClick={() => updateFilter('white')}
-                >
-                  <Palette isSelected={currentFilter === 'white'} color={color.content.white} />
-                  White
-                </Filter>
-              </Filters>
-              <MaterialGrid>
-                {materials
-                  .filter(
-                    (material) =>
-                      currentFilter === null || material.categorisedColor === currentFilter
-                  )
-                  .map((material) => (
-                    <MaterialItem
-                      key={`material-${material.id}`}
-                      plasticImageUrl={material.plasticImageUrl}
-                      keycapImageUrl={material.keycapImageUrl}
-                      id={material.id}
-                      materialName={material.materialName}
-                      celsius={material.celsius}
-                      plasticType={material.plasticType}
-                      goodCount={material.goodCount}
-                      upvoteButtonState={
-                        canUpvote
-                          ? upvotedMaterialsId!.includes(material.id)
-                            ? 'UPVOTED'
-                            : 'NOT_UPVOTED'
-                          : 'NOT_PERMITTED'
-                      }
-                      upvote={upvote}
-                    />
-                  ))}
-              </MaterialGrid>
-
-              {/* 登録ページへのリンクはログイン中のみ有効にする */}
-              {authStatus === 'LOGGED_IN' && currentUser ? (
-                <Button label={'素材を追加する'} href='/register' />
-              ) : (
-                <Button
-                  label={'素材を追加する'}
-                  onClick={() => {
-                    setLoginModalActive(true)
-                  }}
+          </VideoWrap>
+          <TitleWrap>
+            <Title>
+              <span>
+                <h1 className={'titleline'}>{t('hero.title1')}</h1>
+              </span>
+              <span>
+                <h1 className={'titleline'}>{t('hero.title2')}</h1>
+              </span>
+              <span>
+                <h1 className={'titleline'}>{t('hero.title3')}</h1>
+              </span>
+            </Title>
+            <HeroButtonsWrap>
+              <span>
+                <HeroButton
+                  onClick={() => Scroll.scroller.scrollTo('shop', { smooth: true, duration: 500 })}
+                  className={'titleline'}
+                  label={`${t('hero.button1')}`}
+                  iconPath={'/images/icons/shop.svg'}
+                  iconSize={32}
+                  bgColor={'#ffffff'}
                 />
-              )}
-            </>
-          )}
-        </LibraryWrap>
-      </LibrarySection>
-      <Footer className='section' />
+              </span>
+              <span>
+                <HeroButton
+                  label={`${t('hero.button2')}`}
+                  onClick={() =>
+                    Scroll.scroller.scrollTo('workshop', { smooth: true, duration: 500 })
+                  }
+                  className={'titleline'}
+                  iconPath={'/images/icons/make.svg'}
+                  iconSize={32}
+                  bgColor={'#ffffff'}
+                />
+              </span>
+            </HeroButtonsWrap>
+          </TitleWrap>
+        </Hero>
+        <ConceptSection id='concept' color={'transparent'} className='section concept'>
+          <Wrap>
+            <Message>
+              #ANYCAPは、廃棄プラスチックを使ってキーキャップを自作するオープンソースコミュニティです。
+              <br />
+              家庭やオフィスで出るプラゴミを原材料としたキーキャップを製作し、手法やデータを公開することを通じて、仲間の輪を広げる活動を行なっています。
+            </Message>
+          </Wrap>
+          <ConceptPhotos className={'conceptImg'}>
+            <ConceptPhoto src='/images/photos/001.jpg' />
+            <ConceptPhoto src='/images/photos/002.jpg' />
+            <ConceptPhoto src='/images/photos/003.jpg' />
+            <ConceptPhoto src='/images/photos/004.jpg' />
+            <ConceptPhoto src='/images/photos/005.jpg' />
+          </ConceptPhotos>
+        </ConceptSection>
+        <WHYSection id='why' color={'transparent'} className='section why'>
+          <WHYWrap>
+            <SectionTitleGroup>
+              <span>
+                <SectionTitle className={'headline_why'}>Why #ANYCAP ?</SectionTitle>
+              </span>
+              <span>
+                <SectionSubTitle className={'headline_why'}>
+                  {t('whyAnycap.subtitle')}
+                </SectionSubTitle>
+              </span>
+            </SectionTitleGroup>
+            <WhyKeys>
+              <WhyKey>
+                <img src='/images/icons/point001.svg' />
+                <h4>一般的なキーキャップ規格に準拠</h4>
+                <p>
+                  Cherry,
+                  DSAなど、一般的な自作キーボード規格に則ったキー形状のため、お使いのキーボードにそのまま組み込みやすいです
+                </p>
+              </WhyKey>
+              <WhyKey>
+                <img src='/images/icons/point002.svg' />
+                <h4>コスト抑えめ</h4>
+                <p>廃材を用いるので、原材料の費用が安く済みます</p>
+              </WhyKey>
+              <WhyKey>
+                <img src='/images/icons/point003.svg' />
+                <h4>自分の好きな色・素材にこだわれる</h4>
+                <p>自分が本当にキーボードに欲しい色、欲しい素材で作ることができます</p>
+              </WhyKey>
+              <WhyKey>
+                <img src='/images/icons/point004.svg' />
+                <h4>オープンソース</h4>
+                <p>金型や作り方の情報を公開しています</p>
+              </WhyKey>
+            </WhyKeys>
+          </WHYWrap>
+        </WHYSection>
+        <ShopSection id='shop' color={'transparent'} className='section shop'>
+          <ShopWrap>
+            <WorkShopImgWrap>
+              <WorkShopImg src='/images/photos/013.jpg' />
+            </WorkShopImgWrap>
+            <WorkShopSectionTitle>
+              <span>
+                <SectionTitle className={'headline_Shop'}>Shop</SectionTitle>
+              </span>
+              <span>
+                <SectionSubTitle className={'headline_Shop'}>キーキャップを買う</SectionSubTitle>
+              </span>
+            </WorkShopSectionTitle>
+            <WorkShopSectionContents>
+              <WorkshopDesc>
+                単色のものからマーブル模様のものまで、様々な色を取り揃えています
+              </WorkshopDesc>
+              <Divider />
+              <WorkshopInfo>
+                <Price>
+                  <span>各色</span>500円<span>（送料別）</span>
+                </Price>
+                <Button label={'購入する'} href={'https://booth.pm/ja/items/3423801'} />
+              </WorkshopInfo>
+            </WorkShopSectionContents>
+          </ShopWrap>
+        </ShopSection>
+        <WorkshopSection id='workshop' color={'transparent'} className='section workshop'>
+          <WorkshopWrap>
+            <WorkShopImgWrap>
+              <WorkShopImg src='/images/photos/006.jpg' />
+            </WorkShopImgWrap>
+            <WorkShopSectionTitle>
+              <span>
+                <SectionTitle className={'headline_workshop'}>Workshop</SectionTitle>
+              </span>
+              <span>
+                <SectionSubTitle className={'headline_workshop'}>ワークショップ</SectionSubTitle>
+              </span>
+            </WorkShopSectionTitle>
+            <WorkShopSectionContents>
+              <WorkshopDesc>
+                自分の好きな素材を持ち込んで、世界に１つだけの廃プラキーキャップを作るワークショップを開催しています。ご興味のある方は、下のボタンよりお申し込みください。
+              </WorkshopDesc>
+              <Program>
+                <ProgramLabel>プログラム例：</ProgramLabel>
+                <ProgramDesc>
+                  10分 導入・作業説明
+                  <br />
+                  30分 素材の破砕作業
+                  <br />
+                  30分 射出成形
+                  <br />
+                  20分 まとめ・撮影タイム
+                  <br />
+                  <br />
+                  場所：ガーデンテラス紀尾井町17F　ヤフーLODGE内
+                </ProgramDesc>
+              </Program>
+              <Divider />
+              <WorkshopInfo>
+                {/* <Price>
+                  1200円<span>（材料費・実費）</span>
+                </Price> */}
+                <Button label={'参加する'} href={'https://anycap-workshop.peatix.com'} />
+              </WorkshopInfo>
+            </WorkShopSectionContents>
+          </WorkshopWrap>
+        </WorkshopSection>
+        <MakingSection id='making' color={'transparent'} className='section making'>
+          <MakingWrap>
+            <SectionTitleGroup>
+              <span>
+                <SectionTitle className={'headline_making'}>Making #ANYCAP</SectionTitle>
+              </span>
+              <span>
+                <SectionSubTitle className={'headline_making'}>
+                  廃プラキーキャップができるまで
+                </SectionSubTitle>
+              </span>
+            </SectionTitleGroup>
+            <MakingScrollWrap>
+              <MakingScrollContents>
+                <MakingItem>
+                  <MakingItemImg src={'/images/photos/007.jpg'} />
+                  <h3>
+                    <span>01.</span>素材をさがす
+                  </h3>
+                  <p>
+                    キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
+                  </p>
+                </MakingItem>
+                <MakingItem>
+                  <MakingItemImg src={'/images/photos/008.jpg'} />
+                  <h3>
+                    <span>02.</span>破砕する
+                  </h3>
+                  <p>集めた素材を砕いて、5mm角程度の大きさにします。</p>
+                </MakingItem>
+                <MakingItem>
+                  <MakingItemImg src={'/images/photos/009.jpg'} />
+                  <h3>
+                    <span>03.</span>金型を用意する
+                  </h3>
+                  <p>
+                    キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
+                  </p>
+                </MakingItem>
+                <MakingItem>
+                  <MakingItemImg src={'/images/photos/010.jpg'} />
+                  <h3>
+                    <span>04.</span>金型を用意する
+                  </h3>
+                  <p>
+                    キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
+                  </p>
+                </MakingItem>
+              </MakingScrollContents>
+            </MakingScrollWrap>
+          </MakingWrap>
+        </MakingSection>
+        <MoldSection id='mold' color={'transparent'} className='section mold'>
+          <MoldWrap>
+            <MoldSliderWrap>
+              <MoldSlider>
+                <Slider {...sliderSettings}>
+                  <SlideImg src={'/images/photos/011.jpg'} />
+                  <SlideImg src={'/images/photos/011.jpg'} />
+                  <SlideImg src={'/images/photos/011.jpg'} />
+                  <SlideImg src={'/images/photos/011.jpg'} />
+                </Slider>
+              </MoldSlider>
+            </MoldSliderWrap>
+            <MoldTitleWrap>
+              <span>
+                <SectionTitle className={'headline_mold'}>Mold</SectionTitle>
+              </span>
+              <span>
+                <SectionSubTitle className={'headline_mold'}>金型</SectionSubTitle>
+              </span>
+            </MoldTitleWrap>
+            <MoldContentsWrap>
+              <MoldDesc>
+                金型を用意し、家庭用の射出成形機（ORIGINALMIND社製のINARIなど）を使えば、ご自身でキーキャップを作ることも可能です。
+                <br />
+                より多くの方に活動に参加してもらいたいという思いから、金型の3Dデータを公開しています。
+                <br />
+                ご興味のある方は、下記のコンタクトフォームよりお問い合わせください
+              </MoldDesc>
+              <Divider />
+              {/* <Download href={'/'}>ダウンロードする</Download> */}
+              <DownloadButton
+                href={'https://vernacular.booth.pm/items/3457801'}
+                label={'ダウンロードする'}
+              />
+            </MoldContentsWrap>
+          </MoldWrap>
+        </MoldSection>
+        <AboutSection id='aboutus' color={'transparent '} className='section about'>
+          <AboutWrap>
+            <AboutTitleWrap>
+              <span>
+                <SectionTitle className={'headline_about'}>About Us</SectionTitle>
+              </span>
+              <span>
+                <SectionSubTitle className={'headline_about'}>わたしたちについて</SectionSubTitle>
+              </span>
+            </AboutTitleWrap>
+            <AboutContentsWrap>
+              <p>
+                #ANYCAPは、ヤフー社員の自主制作チームToasterによって運営されており、オープンコラボレーションハブLODGEを拠点に活動しています。
+                <br />
+                #ANYCAPプロジェクトは、協業いただける企業・団体・個人のみなさまをお待ちしております。
+              </p>
+              <AboutDivider />
+              <Button label={'お問い合わせ'} href={'https://forms.gle/beWyuZMBuo2zrEZP8'} />
+            </AboutContentsWrap>
+            <AboutImageWrap>
+              <Image
+                src='/images/photos/012.jpg'
+                alt={'Yahoo! LODGE'}
+                width={495}
+                height={360}
+                layout='responsive'
+              />
+            </AboutImageWrap>
+          </AboutWrap>
+        </AboutSection>
+        <LibrarySection id='library' color={'transparent'} className='section library'>
+          <LibraryWrap>
+            <SectionTitleGroup>
+              <span>
+                <SectionTitle className={'headline_library'}>Library</SectionTitle>
+              </span>
+              <span>
+                <SectionSubTitle className={'headline_library'}>ライブラリ</SectionSubTitle>
+              </span>
+            </SectionTitleGroup>
+            <LibraryDesc>
+              みんなが見つけたキーキャップに使えそうな素材とそのレポートです。実際に作ってみたものがあればどんどう投稿していってみましょう！いいねの多い人気素材は実際に販売されることがあるかも...?!
+            </LibraryDesc>
+            {materials.length > 0 && ( // 何らかの理由で素材リストが取れなかった時はsection全体を非表示にする
+              <>
+                <Filters className='filter'>
+                  <Filter isSelected={currentFilter === 'red'} onClick={() => updateFilter('red')}>
+                    <Palette isSelected={currentFilter === 'red'} color={color.subColor.red} />
+                    Red
+                  </Filter>
+                  <Filter
+                    isSelected={currentFilter === 'blue'}
+                    onClick={() => updateFilter('blue')}
+                  >
+                    <Palette isSelected={currentFilter === 'blue'} color={color.subColor.blue} />
+                    Blue
+                  </Filter>
+                  <Filter
+                    isSelected={currentFilter === 'green'}
+                    onClick={() => updateFilter('green')}
+                  >
+                    <Palette isSelected={currentFilter === 'green'} color={color.subColor.green} />
+                    Green
+                  </Filter>
+                  <Filter
+                    isSelected={currentFilter === 'black'}
+                    onClick={() => updateFilter('black')}
+                  >
+                    <Palette isSelected={currentFilter === 'black'} color={color.subColor.dark} />
+                    Black
+                  </Filter>
+                  <Filter
+                    isSelected={currentFilter === 'white'}
+                    onClick={() => updateFilter('white')}
+                  >
+                    <Palette isSelected={currentFilter === 'white'} color={color.content.white} />
+                    White
+                  </Filter>
+                </Filters>
+                <MaterialGrid>
+                  {materials
+                    .filter(
+                      (material) =>
+                        currentFilter === null || material.categorisedColor === currentFilter
+                    )
+                    .map((material) => (
+                      <MaterialItem
+                        key={`material-${material.id}`}
+                        plasticImageUrl={material.plasticImageUrl}
+                        keycapImageUrl={material.keycapImageUrl}
+                        id={material.id}
+                        materialName={material.materialName}
+                        celsius={material.celsius}
+                        plasticType={material.plasticType}
+                        goodCount={material.goodCount}
+                        upvoteButtonState={
+                          canUpvote
+                            ? upvotedMaterialsId!.includes(material.id)
+                              ? 'UPVOTED'
+                              : 'NOT_UPVOTED'
+                            : 'NOT_PERMITTED'
+                        }
+                        upvote={upvote}
+                      />
+                    ))}
+                </MaterialGrid>
+
+                {/* 登録ページへのリンクはログイン中のみ有効にする */}
+                {authStatus === 'LOGGED_IN' && currentUser ? (
+                  <Button label={'素材を追加する'} href='/register' />
+                ) : (
+                  <Button
+                    label={'素材を追加する'}
+                    onClick={() => {
+                      setLoginModalActive(true)
+                    }}
+                  />
+                )}
+              </>
+            )}
+          </LibraryWrap>
+        </LibrarySection>
+        <Footer className='section footer' />
+      </div>
     </AllWrap>
   )
 }
