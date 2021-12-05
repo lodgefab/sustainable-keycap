@@ -79,7 +79,7 @@ export const Header: React.VFC<Props> = ({ currentUser, authState, onLoginFunc, 
             <HeaderLinkItem destination='mold'>Mold</HeaderLinkItem>
             <HeaderLinkItem destination='aboutus'>AboutUs</HeaderLinkItem>
             <HeaderLinkItem destination='library'>Library</HeaderLinkItem>
-            <Link passHref href={'https://www.instagram.com/vernacular_cookbook/'}>
+            <Link passHref href={'https://www.instagram.com/toaster_zine/'}>
               <Insta target='_blank' />
             </Link>
           </PageLinks>
@@ -121,7 +121,7 @@ export const Header: React.VFC<Props> = ({ currentUser, authState, onLoginFunc, 
                 <MenuList to='library' smooth={true} duration={500} offset={72}>
                   Library
                 </MenuList>
-                <Link passHref href={'https://www.instagram.com/vernacular_cookbook/'}>
+                <Link passHref href={'https://www.instagram.com/toaster_zine/'}>
                   <Insta target='_blank'></Insta>
                 </Link>
               </MenuLists>

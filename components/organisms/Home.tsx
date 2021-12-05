@@ -74,6 +74,7 @@ export const Home: React.VFC<Props> = ({
     let sections = gsap.utils.toArray('.section')
     // let container = document.querySelector(".container")
     console.log(sections)
+
     // Heading Animationの動きをテンプレ化
     const animationFromHeading = {
       y: '150%',
@@ -123,20 +124,45 @@ export const Home: React.VFC<Props> = ({
       start: 'top 50%',
       once: true, //この指定によって１度だけアニメーションされる
     })
-    gsap.to('.conceptImg', {
-      // xPercent: -100,
-      x: () => -1 * innerWidth,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: '.conceptImg',
-        start: 'top bottom',
-        end: 'bottom top',
-        scrub: 1,
-        // pin: true,
-        // invalidateOnRefresh: true,
-        // anticipatePin: 1
-      },
-    })
+
+    gsap.fromTo(
+      '.conceptImg',
+      { x: 0 },
+      {
+        // xPercent: -100,
+        x: () => -1 * innerWidth,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.conceptImg',
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true,
+          // pin: true,
+          // invalidateOnRefresh: true,
+          // anticipatePin: 1
+        },
+      }
+    )
+
+    //makingセクション
+    const makingImg = gsap.utils.toArray('.makingItemImg')
+    for (const key of Object.keys(makingImg)) {
+      const img = makingImg[key]
+      gsap
+        .timeline({
+          defaults: { ease: 'none' },
+          scrollTrigger: {
+            scroller: img.closest('.makingItems'),
+            horizontal: true,
+            trigger: img.closest('.makingItem'),
+            start: 'left right',
+            end: 'left left',
+            scrub: true,
+          },
+        })
+        .fromTo(img, { x: 250 }, { x: -250 }, 0)
+        .from(img.nextElementSibling, { scale: 0.8 }, 0)
+    }
   }
 
   const StartOnLoadAnimation = () => {
@@ -422,8 +448,6 @@ export const Home: React.VFC<Props> = ({
             <ConceptPhoto src='/images/photos/001.jpg' />
             <ConceptPhoto src='/images/photos/002.jpg' />
             <ConceptPhoto src='/images/photos/003.jpg' />
-            <ConceptPhoto src='/images/photos/004.jpg' />
-            <ConceptPhoto src='/images/photos/005.jpg' />
           </ConceptPhotos>
         </ConceptSection>
         <WHYSection id='why' color={'transparent'} className='section why'>
@@ -534,6 +558,7 @@ export const Home: React.VFC<Props> = ({
             </WorkShopSectionContents>
           </WorkshopWrap>
         </WorkshopSection>
+
         <MakingSection id='making' color={'transparent'} className='section making'>
           <MakingWrap>
             <SectionTitleGroup>
@@ -547,42 +572,40 @@ export const Home: React.VFC<Props> = ({
               </span>
             </SectionTitleGroup>
             <MakingScrollWrap>
-              <MakingScrollContents>
-                <MakingItem>
-                  <MakingItemImg src={'/images/photos/007.jpg'} />
-                  <h3>
-                    <span>01.</span>素材をさがす
-                  </h3>
-                  <p>
-                    キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
-                  </p>
-                </MakingItem>
-                <MakingItem>
-                  <MakingItemImg src={'/images/photos/008.jpg'} />
-                  <h3>
-                    <span>02.</span>破砕する
-                  </h3>
-                  <p>集めた素材を砕いて、5mm角程度の大きさにします。</p>
-                </MakingItem>
-                <MakingItem>
-                  <MakingItemImg src={'/images/photos/009.jpg'} />
-                  <h3>
-                    <span>03.</span>金型を用意する
-                  </h3>
-                  <p>
-                    キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
-                  </p>
-                </MakingItem>
-                <MakingItem>
-                  <MakingItemImg src={'/images/photos/010.jpg'} />
-                  <h3>
-                    <span>04.</span>金型を用意する
-                  </h3>
-                  <p>
-                    キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
-                  </p>
-                </MakingItem>
-              </MakingScrollContents>
+              <MakingItem className='makingItem'>
+                <MakingItemImg className='makingItemImg' src={'/images/photos/007.jpg'} />
+                <h3>
+                  <span>01.</span>素材をさがす
+                </h3>
+                <p>
+                  キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
+                </p>
+              </MakingItem>
+              <MakingItem className='makingItem'>
+                <MakingItemImg className='makingItemImg' src={'/images/photos/008.jpg'} />
+                <h3>
+                  <span>02.</span>破砕する
+                </h3>
+                <p>集めた素材を砕いて、5mm角程度の大きさにします。</p>
+              </MakingItem>
+              <MakingItem className='makingItem'>
+                <MakingItemImg className='makingItemImg' src={'/images/photos/009.jpg'} />
+                <h3>
+                  <span>03.</span>金型を用意する
+                </h3>
+                <p>
+                  キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
+                </p>
+              </MakingItem>
+              <MakingItem className='makingItem'>
+                <MakingItemImg className='makingItemImg' src={'/images/photos/010.jpg'} />
+                <h3>
+                  <span>04.</span>金型を用意する
+                </h3>
+                <p>
+                  キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
+                </p>
+              </MakingItem>
             </MakingScrollWrap>
           </MakingWrap>
         </MakingSection>
@@ -754,6 +777,8 @@ const AllWrap = styled.main`
   position: fixed;
   top: 0;
   left: 0;
+  right: 0;
+  bottom: 0;
   height: 100%;
   width: 100%;
   overflow: hidden;
@@ -1030,9 +1055,9 @@ const ConceptPhotos = styled.div`
   gap: 32px;
   grid-template-columns: repeat(5, 1fr);
   grid-template-rows: auto;
-  width: 100%;
+  /* width: 100%; */
   overflow: visible;
-  padding: 0 32px;
+  padding: 128px 32px 0;
 `
 
 const ConceptPhoto = styled.div<{ src: string }>`
@@ -1194,10 +1219,13 @@ const MakingWrap = styled(Wrap)`
 `
 
 const MakingScrollWrap = styled.div`
+  position: relative;
   width: 100%;
-  overflow-y: hidden;
+  /* overflow-y: hidden; */
   overflow-x: scroll;
   padding: 0 0 64px 0;
+  white-space: nowrap;
+  overflow: auto;
   ::-webkit-scrollbar {
     height: 5px;
   }
@@ -1216,16 +1244,19 @@ const MakingScrollWrap = styled.div`
 `
 
 const MakingItem = styled.div`
+  position: relative;
   width: 360px;
   text-align: left;
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
   h3 {
     ${font.inter.h3};
     margin: 0 0 32px 0;
+    white-space: normal;
   }
   p {
     ${font.inter.body2};
+    white-space: normal;
   }
 `
 const MakingItemImg = styled.img`
@@ -1235,6 +1266,7 @@ const MakingItemImg = styled.img`
 `
 
 const MakingScrollContents = styled.div`
+  position: relative;
   display: grid;
   gap: 32px;
   grid-template-columns: repeat(4, auto);
