@@ -445,9 +445,11 @@ export const Home: React.VFC<Props> = ({
             </Message>
           </Wrap>
           <ConceptPhotos className={'conceptImg'}>
-            <ConceptPhoto src='/images/photos/001.jpg' />
-            <ConceptPhoto src='/images/photos/002.jpg' />
             <ConceptPhoto src='/images/photos/003.jpg' />
+            <ConceptPhoto src='/images/photos/002.jpg' />
+            <ConceptPhoto src='/images/photos/001.jpg' />
+            <ConceptPhoto src='/images/photos/004.jpg' />
+            <ConceptPhoto src='/images/photos/005.jpg' />
           </ConceptPhotos>
         </ConceptSection>
         <WHYSection id='why' color={'transparent'} className='section why'>
@@ -1016,13 +1018,13 @@ const BGKey = styled.div<{ src: string; gridRow: number; gridColumn }>`
   opacity: 0;
   grid-area: ${(props) => props.gridRow} / ${(props) => props.gridColumn} / span 12 / span 5;
   will-change: transform;
-  width: 120px;
-  height: 120px;
+  width: 160px;
+  height: 160px;
   background-image: url(${(props) => props.src});
   background-size: cover;
   ${media.lg} {
-    width: 240px;
-    height: 240px;
+    width: 320px;
+    height: 320px;
   }
 `
 
