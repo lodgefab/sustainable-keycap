@@ -26,6 +26,8 @@ function MyApp({ Component, pageProps }) {
             body {
               font-family: 'Inter', sans-serif;
               color: ${color.content.dark};
+            }
+            body {
               overscroll-behavior-y: none;
             }
             *,

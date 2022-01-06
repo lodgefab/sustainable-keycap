@@ -2,13 +2,20 @@ import React from 'react'
 import styled from '@emotion/styled'
 import { color } from '../../styles'
 
-type Props = {}
+type Props = {
+  className: string
+}
 
-export const Footer: React.VFC<Props> = ({}) => {
+export const Footer: React.VFC<Props> = ({ className }) => {
   return (
-    <Wrap>
+    <Wrap className={className}>
       <Container>
-        <Copyright>Sponsored by LODGE</Copyright>
+        <Copyright>
+          Powered by{' '}
+          <a href='https://www.instagram.com/toaster_zine/' rel='noreferrer' target='_blank'>
+            Toaster
+          </a>
+        </Copyright>
       </Container>
     </Wrap>
   )
@@ -16,6 +23,9 @@ export const Footer: React.VFC<Props> = ({}) => {
 
 const Copyright = styled.p`
   color: ${color.content.middle};
+  a {
+    color: ${color.content.middle};
+  }
 `
 
 const Wrap = styled.div`

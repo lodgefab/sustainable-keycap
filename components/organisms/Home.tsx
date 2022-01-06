@@ -52,12 +52,7 @@ export const Home: React.VFC<Props> = ({
     slidesToShow: 1,
     slidesToScroll: 1,
   }
-  // containerRef : ヌルッとスクロールアニメーション
-  // その他のRef : スクロール連動アニメーション
   const containerRef = useRef<HTMLDivElement>(null)
-  const conceptImgRef = useRef<HTMLDivElement>(null)
-
-  // ページの内容が変化して縦幅が変化した時にそれを検知してbody.heightに反映する
   useEffect(() => {
     const observer = new ResizeObserver((entries) => {
       document.body.style.height = `${entries[0].contentRect.height}px`
@@ -69,34 +64,18 @@ export const Home: React.VFC<Props> = ({
   }, [])
 
   const size = useWindowSize()
-  const data = useMemo(
-    () => ({
-      ease: 0.05,
-      curr: 0,
-      prev: 0,
-      rounded: 0,
-    }),
-    []
-  )
+
   const setBodyHeight = () => {
     document.body.style.height = `${containerRef.current?.getBoundingClientRect().height}px`
   }
 
-  // prev と currentのスクロール量の差分を徐々に無くしていく
-  const smoothScroll = useCallback(() => {
-    // next/linkでページ遷移を行う際、切り替え直前にcontainerRefがnullになるタイミングが発生するので条件分岐する
-    if (containerRef.current === null) return
-
-    data.curr = window.scrollY
-    data.prev += (data.curr - data.prev) * data.ease
-    data.rounded = Math.round(data.prev * 100) / 100
-    if (containerRef.current !== null) {
-      containerRef.current!.style.transform = `translateY(-${data.rounded}px)`
-    }
-    requestAnimationFrame(() => smoothScroll())
-  }, [data])
-
   const setAnimation = () => {
+    // 各sectionをarray化
+    let sections = gsap.utils.toArray('.section')
+    // let container = document.querySelector(".container")
+    console.log(sections)
+
+    // Heading Animationの動きをテンプレ化
     const animationFromHeading = {
       y: '150%',
       rotate: 15,
@@ -106,24 +85,8 @@ export const Home: React.VFC<Props> = ({
       rotate: 0,
       stagger: 0.04,
     }
-    gsap.fromTo(
-      conceptImgRef.current,
-      {
-        autoAlpha: 0,
-        y: 80,
-      },
-      {
-        autoAlpha: 1,
-        y: 0,
-        scrollTrigger: {
-          trigger: conceptImgRef.current!,
-          start: 'top center',
-          // onEnter: () => {}, //スクロールイン時
-          // onEnterBack: () => {}, //スクロールバック時
-          // markers: true // マーカー表示
-        },
-      }
-    )
+
+    smoothScroll('.content', '.allWrap', 1)
 
     gsap.set('.headline_why', { ...animationFromHeading }) //Workshopセクション
     ScrollTrigger.batch('.headline_why', {
@@ -162,13 +125,44 @@ export const Home: React.VFC<Props> = ({
       once: true, //この指定によって１度だけアニメーションされる
     })
 
-    // gsap.to(".parallax", { //パララックスコード
-    //   scrollTrigger: {
-    //     scrub: true
-    //   },
-    //   y: (i, target) => -ScrollTrigger.maxScroll(window) * target.dataset.speed,
-    //   ease: "none"
-    // });
+    gsap.fromTo(
+      '.conceptImg',
+      { x: 0 },
+      {
+        // xPercent: -100,
+        x: () => -1 * innerWidth,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.conceptImg',
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true,
+          // pin: true,
+          // invalidateOnRefresh: true,
+          // anticipatePin: 1
+        },
+      }
+    )
+
+    //makingセクション
+    // const makingImg = gsap.utils.toArray('.makingItemImg')
+    // for (const key of Object.keys(makingImg)) {
+    //   const img = makingImg[key]
+    //   gsap
+    //     .timeline({
+    //       defaults: { ease: 'none' },
+    //       scrollTrigger: {
+    //         scroller: img.closest('.makingItems'),
+    //         horizontal: true,
+    //         trigger: img.closest('.makingItem'),
+    //         start: 'left right',
+    //         end: 'left left',
+    //         scrub: true,
+    //       },
+    //     })
+    //     .fromTo(img, { x: 250 }, { x: -250 }, 0)
+    //     .from(img.nextElementSibling, { scale: 0.8 }, 0)
+    // }
   }
 
   const StartOnLoadAnimation = () => {
@@ -239,9 +233,88 @@ export const Home: React.VFC<Props> = ({
     }
   })
 
-  useEffect(() => {
-    requestAnimationFrame(() => smoothScroll())
-  })
+  // this is the helper function that sets it all up. Pass in the content <div> and then the wrapping viewport <div> (can be the elements or selector text). It also sets the default "scroller" to the content so you don't have to do that on all your ScrollTriggers.
+  const smoothScroll = (content, viewport, smoothness) => {
+    content = gsap.utils.toArray(content)[0]
+    smoothness = smoothness || 1
+
+    gsap.set(viewport || content.parentNode, {
+      overflow: 'hidden',
+      position: 'fixed',
+      height: '100%',
+      width: '100%',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+    })
+    gsap.set(content, { overflow: 'visible', width: '100%' })
+
+    let getProp = gsap.getProperty(content),
+      setProp = gsap.quickSetter(content, 'y', 'px'),
+      setScroll = ScrollTrigger.getScrollFunc(window),
+      removeScroll = () => (content.style.overflow = 'visible'),
+      killScrub = (trigger) => {
+        let scrub = trigger.getTween ? trigger.getTween() : gsap.getTweensOf(trigger.animation)[0] // getTween() was added in 3.6.2
+        scrub && scrub.kill()
+        trigger.animation.progress(trigger.progress)
+      },
+      height,
+      isProxyScrolling
+
+    function refreshHeight() {
+      height = content.clientHeight
+      content.style.overflow = 'visible'
+      document.body.style.height = height + 'px'
+      return height - document.documentElement.clientHeight
+    }
+
+    ScrollTrigger.addEventListener('refresh', () => {
+      removeScroll()
+      requestAnimationFrame(removeScroll)
+    })
+    ScrollTrigger.defaults({ scroller: content })
+
+    ScrollTrigger.scrollerProxy(content, {
+      scrollTop(value) {
+        if (arguments.length && value) {
+          isProxyScrolling = true // otherwise, if snapping was applied (or anything that attempted to SET the scroll proxy's scroll position), we'd set the scroll here which would then (on the next tick) update the content tween/ScrollTrigger which would try to smoothly animate to that new value, thus the scrub tween would impede the progress. So we use this flag to respond accordingly in the ScrollTrigger's onUpdate and effectively force the scrub to its end immediately.
+          setProp(-value)
+          setScroll(value)
+          return
+        }
+        return -getProp('y')
+      },
+      getBoundingClientRect() {
+        return { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight }
+      },
+    })
+
+    return ScrollTrigger.create({
+      animation: gsap.fromTo(
+        content,
+        { y: 0 },
+        {
+          y: () => document.documentElement.clientHeight - height,
+          ease: 'none',
+          onUpdate: ScrollTrigger.update,
+        }
+      ),
+      scroller: window,
+      invalidateOnRefresh: true,
+      start: 0,
+      end: refreshHeight,
+      refreshPriority: -999,
+      scrub: smoothness,
+      onUpdate: (self) => {
+        if (isProxyScrolling) {
+          killScrub(self)
+          isProxyScrolling = false
+        }
+      },
+      onRefresh: killScrub, // when the screen resizes, we just want the animation to immediately go to the appropriate spot rather than animating there, so basically kill the scrub.
+    })
+  }
 
   useEffect(() => {
     setBodyHeight()
@@ -257,65 +330,53 @@ export const Home: React.VFC<Props> = ({
   }
 
   return (
-    <AllWrap>
+    <AllWrap className='allWrap'>
       <Loader />
       <LoginModal isActive={isLoginModalActive} deActivate={() => setLoginModalActive(false)} />
-      <div ref={containerRef}>
-        <Hero id='hero' color={'transparent'}>
+      <div className='content' ref={containerRef}>
+        <Hero id='hero' color={'transparent'} className='section hero'>
           <BGKeys className={'parallax'} data-speed='.4'>
             <BGKey
               className={'key'}
-              src={'/images/photos/key001.jpg'}
-              gridRow={5}
-              gridColumn={40}
-            />
-            <BGKey
-              className={'key'}
-              src={'/images/photos/key002.jpg'}
-              gridRow={11}
-              gridColumn={48}
-            />
-            <BGKey
-              className={'key'}
-              src={'/images/photos/key003.jpg'}
-              gridRow={18}
-              gridColumn={-8}
-            />
-            <BGKey
-              className={'key'}
               src={'/images/photos/key004.jpg'}
-              gridRow={25}
-              gridColumn={36}
-            />
-            <BGKey
-              className={'key'}
-              src={'/images/photos/key005.jpg'}
-              gridRow={29}
-              gridColumn={44}
+              gridRow={7}
+              gridColumn={43}
             />
             <BGKey
               className={'key'}
               src={'/images/photos/key006.jpg'}
-              gridRow={30}
-              gridColumn={26}
-            />
-            <BGKey
-              className={'key'}
-              src={'/images/photos/key000.jpg'}
-              gridRow={7}
-              gridColumn={30}
-            />
-            <BGKey
-              className={'key'}
-              src={'/images/photos/key002.jpg'}
-              gridRow={24}
-              gridColumn={13}
+              gridRow={18}
+              gridColumn={-12}
             />
             <BGKey
               className={'key'}
               src={'/images/photos/key003.jpg'}
               gridRow={32}
-              gridColumn={1}
+              gridColumn={41}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key001.jpg'}
+              gridRow={27}
+              gridColumn={29}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key002.jpg'}
+              gridRow={1}
+              gridColumn={32}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key002.jpg'}
+              gridRow={30}
+              gridColumn={14}
+            />
+            <BGKey
+              className={'key'}
+              src={'/images/photos/key004.jpg'}
+              gridRow={44}
+              gridColumn={34}
             />
           </BGKeys>
           <VideoWrap>
@@ -329,7 +390,7 @@ export const Home: React.VFC<Props> = ({
             </VideoPlayer>
             <VideoMask></VideoMask>
             <Image
-              src={'/images/photos/004.jpg'}
+              src={'/images/photos/000.jpg'}
               width={400}
               height={400}
               objectFit='cover'
@@ -354,7 +415,7 @@ export const Home: React.VFC<Props> = ({
                 <HeroButton
                   onClick={() => Scroll.scroller.scrollTo('shop', { smooth: true, duration: 500 })}
                   className={'titleline'}
-                  label={t('hero.button1')}
+                  label={`${t('hero.button1')}`}
                   iconPath={'/images/icons/shop.svg'}
                   iconSize={32}
                   bgColor={'#ffffff'}
@@ -362,7 +423,7 @@ export const Home: React.VFC<Props> = ({
               </span>
               <span>
                 <HeroButton
-                  label={t('hero.button2')}
+                  label={`${t('hero.button2')}`}
                   onClick={() =>
                     Scroll.scroller.scrollTo('workshop', { smooth: true, duration: 500 })
                   }
@@ -375,7 +436,7 @@ export const Home: React.VFC<Props> = ({
             </HeroButtonsWrap>
           </TitleWrap>
         </Hero>
-        <ConceptSection id='concept' color={'transparent'}>
+        <ConceptSection id='concept' color={'transparent'} className='section concept'>
           <Wrap>
             <Message>
               #ANYCAPは、廃棄プラスチックを使ってキーキャップを自作するオープンソースコミュニティです。
@@ -383,15 +444,15 @@ export const Home: React.VFC<Props> = ({
               家庭やオフィスで出るプラゴミを原材料としたキーキャップを製作し、手法やデータを公開することを通じて、仲間の輪を広げる活動を行なっています。
             </Message>
           </Wrap>
+          <ConceptPhotos className={'conceptImg'}>
+            <ConceptPhoto src='/images/photos/003.jpg' />
+            <ConceptPhoto src='/images/photos/002.jpg' />
+            <ConceptPhoto src='/images/photos/001.jpg' />
+            <ConceptPhoto src='/images/photos/004.jpg' />
+            <ConceptPhoto src='/images/photos/005.jpg' />
+          </ConceptPhotos>
         </ConceptSection>
-        <ConceptPhotos ref={conceptImgRef}>
-          <ConceptPhoto src='/images/photos/001.jpg' />
-          <ConceptPhoto src='/images/photos/002.jpg' />
-          <ConceptPhoto src='/images/photos/003.jpg' />
-          <ConceptPhoto src='/images/photos/004.jpg' />
-          <ConceptPhoto src='/images/photos/005.jpg' />
-        </ConceptPhotos>
-        <WHYSection id='why' color={'transparent'}>
+        <WHYSection id='why' color={'transparent'} className='section why'>
           <WHYWrap>
             <SectionTitleGroup>
               <span>
@@ -430,7 +491,7 @@ export const Home: React.VFC<Props> = ({
             </WhyKeys>
           </WHYWrap>
         </WHYSection>
-        <ShopSection id='shop' color={'transparent'}>
+        <ShopSection id='shop' color={'transparent'} className='section shop'>
           <ShopWrap>
             <WorkShopImgWrap>
               <WorkShopImg src='/images/photos/013.jpg' />
@@ -457,7 +518,7 @@ export const Home: React.VFC<Props> = ({
             </WorkShopSectionContents>
           </ShopWrap>
         </ShopSection>
-        <WorkshopSection id='workshop' color={'transparent'}>
+        <WorkshopSection id='workshop' color={'transparent'} className='section workshop'>
           <WorkshopWrap>
             <WorkShopImgWrap>
               <WorkShopImg src='/images/photos/006.jpg' />
@@ -499,7 +560,8 @@ export const Home: React.VFC<Props> = ({
             </WorkShopSectionContents>
           </WorkshopWrap>
         </WorkshopSection>
-        <MakingSection id='making' color={'transparent'}>
+
+        <MakingSection id='making' color={'transparent'} className='section making'>
           <MakingWrap>
             <SectionTitleGroup>
               <span>
@@ -512,46 +574,44 @@ export const Home: React.VFC<Props> = ({
               </span>
             </SectionTitleGroup>
             <MakingScrollWrap>
-              <MakingScrollContents>
-                <MakingItem>
-                  <MakingItemImg src={'/images/photos/007.jpg'} />
-                  <h3>
-                    <span>01.</span>素材をさがす
-                  </h3>
-                  <p>
-                    キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
-                  </p>
-                </MakingItem>
-                <MakingItem>
-                  <MakingItemImg src={'/images/photos/008.jpg'} />
-                  <h3>
-                    <span>02.</span>破砕する
-                  </h3>
-                  <p>集めた素材を砕いて、5mm角程度の大きさにします。</p>
-                </MakingItem>
-                <MakingItem>
-                  <MakingItemImg src={'/images/photos/009.jpg'} />
-                  <h3>
-                    <span>03.</span>金型を用意する
-                  </h3>
-                  <p>
-                    キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
-                  </p>
-                </MakingItem>
-                <MakingItem>
-                  <MakingItemImg src={'/images/photos/010.jpg'} />
-                  <h3>
-                    <span>04.</span>金型を用意する
-                  </h3>
-                  <p>
-                    キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
-                  </p>
-                </MakingItem>
-              </MakingScrollContents>
+              <MakingItem className='makingItem'>
+                <MakingItemImg className='makingItemImg' src={'/images/photos/007.jpg'} />
+                <h3>
+                  <span>01.</span>素材をさがす
+                </h3>
+                <p>
+                  キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
+                </p>
+              </MakingItem>
+              <MakingItem className='makingItem'>
+                <MakingItemImg className='makingItemImg' src={'/images/photos/008.jpg'} />
+                <h3>
+                  <span>02.</span>破砕する
+                </h3>
+                <p>集めた素材を砕いて、5mm角程度の大きさにします。</p>
+              </MakingItem>
+              <MakingItem className='makingItem'>
+                <MakingItemImg className='makingItemImg' src={'/images/photos/009.jpg'} />
+                <h3>
+                  <span>03.</span>金型を用意する
+                </h3>
+                <p>
+                  キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
+                </p>
+              </MakingItem>
+              <MakingItem className='makingItem'>
+                <MakingItemImg className='makingItemImg' src={'/images/photos/010.jpg'} />
+                <h3>
+                  <span>04.</span>金型を用意する
+                </h3>
+                <p>
+                  キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
+                </p>
+              </MakingItem>
             </MakingScrollWrap>
           </MakingWrap>
         </MakingSection>
-        <MoldSection id='mold' color={'transparent'}>
+        <MoldSection id='mold' color={'transparent'} className='section mold'>
           <MoldWrap>
             <MoldSliderWrap>
               <MoldSlider>
@@ -588,7 +648,7 @@ export const Home: React.VFC<Props> = ({
             </MoldContentsWrap>
           </MoldWrap>
         </MoldSection>
-        <AboutSection id='aboutus' color={'transparent '}>
+        <AboutSection id='aboutus' color={'transparent '} className='section about'>
           <AboutWrap>
             <AboutTitleWrap>
               <span>
@@ -618,7 +678,7 @@ export const Home: React.VFC<Props> = ({
             </AboutImageWrap>
           </AboutWrap>
         </AboutSection>
-        <LibrarySection id='library' color={'transparent'}>
+        <LibrarySection id='library' color={'transparent'} className='section library'>
           <LibraryWrap>
             <SectionTitleGroup>
               <span>
@@ -710,7 +770,7 @@ export const Home: React.VFC<Props> = ({
             )}
           </LibraryWrap>
         </LibrarySection>
-        <Footer />
+        <Footer className='section footer' />
       </div>
     </AllWrap>
   )
@@ -719,6 +779,8 @@ const AllWrap = styled.main`
   position: fixed;
   top: 0;
   left: 0;
+  right: 0;
+  bottom: 0;
   height: 100%;
   width: 100%;
   overflow: hidden;
@@ -944,7 +1006,7 @@ const BGKeys = styled.div`
   grid-template-rows: repeat(50, 2%);
   --grid-row: 1;
   --grid-column: 1;
-  transform: rotate3d(0, 0, 1, -20deg);
+  transform: rotate3d(0, 0, 1, -10deg);
   opacity: 1;
   z-index: ${zIndex.base};
   ${media.mdsp} {
@@ -956,14 +1018,18 @@ const BGKey = styled.div<{ src: string; gridRow: number; gridColumn }>`
   opacity: 0;
   grid-area: ${(props) => props.gridRow} / ${(props) => props.gridColumn} / span 12 / span 5;
   will-change: transform;
-  width: 120px;
-  height: 120px;
+  width: 160px;
+  height: 160px;
   background-image: url(${(props) => props.src});
   background-size: cover;
+  ${media.lg} {
+    width: 320px;
+    height: 320px;
+  }
 `
 
 const ConceptSection = styled(Section)`
-  padding: 0 0 128px 0;
+  padding: 128px 0 128px 0;
   overflow: hidden;
   ${media.mdsp} {
     padding: 32px 0px 128px 0px;
@@ -972,7 +1038,8 @@ const ConceptSection = styled(Section)`
 
 const Message = styled.h2`
   ${font.inter.h3}
-  line-height:200%;
+  line-height:240%;
+  letter-spacing: 1px;
   text-align: left;
   z-index: ${zIndex.default};
   ${media.mdsp} {
@@ -986,14 +1053,13 @@ const Message = styled.h2`
 `
 
 const ConceptPhotos = styled.div`
-  opacity: 0;
   display: grid;
   gap: 32px;
   grid-template-columns: repeat(5, 1fr);
   grid-template-rows: auto;
-  width: 100%;
+  /* width: 100%; */
   overflow: visible;
-  padding: 0 32px;
+  padding: 128px 32px 0;
 `
 
 const ConceptPhoto = styled.div<{ src: string }>`
@@ -1155,10 +1221,13 @@ const MakingWrap = styled(Wrap)`
 `
 
 const MakingScrollWrap = styled.div`
+  position: relative;
   width: 100%;
-  overflow-y: hidden;
+  /* overflow-y: hidden; */
   overflow-x: scroll;
   padding: 0 0 64px 0;
+  white-space: nowrap;
+  overflow: auto;
   ::-webkit-scrollbar {
     height: 5px;
   }
@@ -1177,16 +1246,20 @@ const MakingScrollWrap = styled.div`
 `
 
 const MakingItem = styled.div`
+  position: relative;
   width: 360px;
+  margin: 0 32px 0 0;
   text-align: left;
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
   h3 {
     ${font.inter.h3};
     margin: 0 0 32px 0;
+    white-space: normal;
   }
   p {
     ${font.inter.body2};
+    white-space: normal;
   }
 `
 const MakingItemImg = styled.img`
@@ -1196,6 +1269,7 @@ const MakingItemImg = styled.img`
 `
 
 const MakingScrollContents = styled.div`
+  position: relative;
   display: grid;
   gap: 32px;
   grid-template-columns: repeat(4, auto);
