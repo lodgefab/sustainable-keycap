@@ -145,24 +145,24 @@ export const Home: React.VFC<Props> = ({
     )
 
     //makingセクション
-    const makingImg = gsap.utils.toArray('.makingItemImg')
-    for (const key of Object.keys(makingImg)) {
-      const img = makingImg[key]
-      gsap
-        .timeline({
-          defaults: { ease: 'none' },
-          scrollTrigger: {
-            scroller: img.closest('.makingItems'),
-            horizontal: true,
-            trigger: img.closest('.makingItem'),
-            start: 'left right',
-            end: 'left left',
-            scrub: true,
-          },
-        })
-        .fromTo(img, { x: 250 }, { x: -250 }, 0)
-        .from(img.nextElementSibling, { scale: 0.8 }, 0)
-    }
+    // const makingImg = gsap.utils.toArray('.makingItemImg')
+    // for (const key of Object.keys(makingImg)) {
+    //   const img = makingImg[key]
+    //   gsap
+    //     .timeline({
+    //       defaults: { ease: 'none' },
+    //       scrollTrigger: {
+    //         scroller: img.closest('.makingItems'),
+    //         horizontal: true,
+    //         trigger: img.closest('.makingItem'),
+    //         start: 'left right',
+    //         end: 'left left',
+    //         scrub: true,
+    //       },
+    //     })
+    //     .fromTo(img, { x: 250 }, { x: -250 }, 0)
+    //     .from(img.nextElementSibling, { scale: 0.8 }, 0)
+    // }
   }
 
   const StartOnLoadAnimation = () => {
@@ -364,7 +364,7 @@ export const Home: React.VFC<Props> = ({
               className={'key'}
               src={'/images/photos/key002.jpg'}
               gridRow={1}
-              gridColumn={33}
+              gridColumn={32}
             />
             <BGKey
               className={'key'}
@@ -390,7 +390,7 @@ export const Home: React.VFC<Props> = ({
             </VideoPlayer>
             <VideoMask></VideoMask>
             <Image
-              src={'/images/photos/004.jpg'}
+              src={'/images/photos/000.jpg'}
               width={400}
               height={400}
               objectFit='cover'
@@ -1248,6 +1248,7 @@ const MakingScrollWrap = styled.div`
 const MakingItem = styled.div`
   position: relative;
   width: 360px;
+  margin: 0 32px 0 0;
   text-align: left;
   display: inline-flex;
   flex-direction: column;
