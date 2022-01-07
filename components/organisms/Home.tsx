@@ -324,6 +324,8 @@ export const Home: React.VFC<Props> = ({
 
   const [currentFilter, setCurrentFilter] = useState<CategorisedColorType | null>(null)
   const { t } = useTranslation('translation', { keyPrefix: 'home' })
+  const { i18n } = useTranslation()
+  const isJa = i18n.language == 'ja'
 
   const updateFilter = (newFilter: CategorisedColorType) => {
     setCurrentFilter(currentFilter === newFilter ? null : newFilter)
@@ -438,11 +440,7 @@ export const Home: React.VFC<Props> = ({
         </Hero>
         <ConceptSection id='concept' color={'transparent'} className='section concept'>
           <Wrap>
-            <Message>
-              #ANYCAPは、廃棄プラスチックを使ってキーキャップを自作するオープンソースコミュニティです。
-              <br />
-              家庭やオフィスで出るプラゴミを原材料としたキーキャップを製作し、手法やデータを公開することを通じて、仲間の輪を広げる活動を行なっています。
-            </Message>
+            <Message>{t('concept.description')}</Message>
           </Wrap>
           <ConceptPhotos className={'conceptImg'}>
             <ConceptPhoto src='/images/photos/003.jpg' />
@@ -458,35 +456,34 @@ export const Home: React.VFC<Props> = ({
               <span>
                 <SectionTitle className={'headline_why'}>Why #ANYCAP ?</SectionTitle>
               </span>
-              <span>
-                <SectionSubTitle className={'headline_why'}>
-                  {t('whyAnycap.subtitle')}
-                </SectionSubTitle>
-              </span>
+              {isJa ? (
+                <span>
+                  <SectionSubTitle className={'headline_why'}>
+                    {t('whyAnycap.subtitle')}
+                  </SectionSubTitle>
+                </span>
+              ) : null}
             </SectionTitleGroup>
             <WhyKeys>
               <WhyKey>
                 <img src='/images/icons/point001.svg' />
-                <h4>一般的なキーキャップ規格に準拠</h4>
-                <p>
-                  Cherry,
-                  DSAなど、一般的な自作キーボード規格に則ったキー形状のため、お使いのキーボードにそのまま組み込みやすいです
-                </p>
+                <h4>{t('whyAnycap.section1.label')}</h4>
+                <p>{t('whyAnycap.section1.text')}</p>
               </WhyKey>
               <WhyKey>
                 <img src='/images/icons/point002.svg' />
-                <h4>コスト抑えめ</h4>
-                <p>廃材を用いるので、原材料の費用が安く済みます</p>
+                <h4>{t('whyAnycap.section2.label')}</h4>
+                <p>{t('whyAnycap.section2.text')}</p>
               </WhyKey>
               <WhyKey>
                 <img src='/images/icons/point003.svg' />
-                <h4>自分の好きな色・素材にこだわれる</h4>
-                <p>自分が本当にキーボードに欲しい色、欲しい素材で作ることができます</p>
+                <h4>{t('whyAnycap.section3.label')}</h4>
+                <p>{t('whyAnycap.section3.text')}</p>
               </WhyKey>
               <WhyKey>
                 <img src='/images/icons/point004.svg' />
-                <h4>オープンソース</h4>
-                <p>金型や作り方の情報を公開しています</p>
+                <h4>{t('whyAnycap.section4.label')}</h4>
+                <p>{t('whyAnycap.section4.text')}</p>
               </WhyKey>
             </WhyKeys>
           </WHYWrap>
@@ -500,20 +497,31 @@ export const Home: React.VFC<Props> = ({
               <span>
                 <SectionTitle className={'headline_Shop'}>Shop</SectionTitle>
               </span>
-              <span>
-                <SectionSubTitle className={'headline_Shop'}>キーキャップを買う</SectionSubTitle>
-              </span>
+              {isJa && (
+                <span>
+                  <SectionSubTitle className={'headline_Shop'}>
+                    {t('shop.subtitle')}
+                  </SectionSubTitle>
+                </span>
+              )}
             </WorkShopSectionTitle>
             <WorkShopSectionContents>
-              <WorkshopDesc>
-                単色のものからマーブル模様のものまで、様々な色を取り揃えています
-              </WorkshopDesc>
+              <WorkshopDesc>{t('shop.text')}</WorkshopDesc>
               <Divider />
               <WorkshopInfo>
                 <Price>
-                  <span>各色</span>500円<span>（送料別）</span>
+                  <span>{t('shop.color')}</span>
+                  {t('shop.price')}
+                  <span>{t('shop.shipping')}</span>
                 </Price>
-                <Button label={'購入する'} href={'https://booth.pm/ja/items/3423801'} />
+                <Button
+                  label={`${t('shop.button')}`}
+                  href={
+                    isJa
+                      ? 'https://booth.pm/ja/items/3423801'
+                      : 'https://bazar.preciousplastic.com/products/household/bottle-cap-keycap/'
+                  }
+                />
               </WorkshopInfo>
             </WorkShopSectionContents>
           </ShopWrap>
@@ -527,27 +535,29 @@ export const Home: React.VFC<Props> = ({
               <span>
                 <SectionTitle className={'headline_workshop'}>Workshop</SectionTitle>
               </span>
-              <span>
-                <SectionSubTitle className={'headline_workshop'}>ワークショップ</SectionSubTitle>
-              </span>
+              {isJa && (
+                <span>
+                  <SectionSubTitle className={'headline_workshop'}>
+                    {t('workshop.subtitle')}
+                  </SectionSubTitle>
+                </span>
+              )}
             </WorkShopSectionTitle>
             <WorkShopSectionContents>
-              <WorkshopDesc>
-                自分の好きな素材を持ち込んで、世界に１つだけの廃プラキーキャップを作るワークショップを開催しています。ご興味のある方は、下のボタンよりお申し込みください。
-              </WorkshopDesc>
+              <WorkshopDesc>{t('workshop.text')}</WorkshopDesc>
               <Program>
-                <ProgramLabel>プログラム例：</ProgramLabel>
+                <ProgramLabel>{t('workshop.programTitle')}</ProgramLabel>
                 <ProgramDesc>
-                  10分 導入・作業説明
+                  {t('workshop.programTimeline1')}
                   <br />
-                  30分 素材の破砕作業
+                  {t('workshop.programTimeline2')}
                   <br />
-                  30分 射出成形
+                  {t('workshop.programTimeline3')}
                   <br />
-                  20分 まとめ・撮影タイム
+                  {t('workshop.programTimeline4')}
                   <br />
                   <br />
-                  場所：ガーデンテラス紀尾井町17F　ヤフーLODGE内
+                  {t('workshop.programTimeline5')}
                 </ProgramDesc>
               </Program>
               <Divider />
@@ -555,7 +565,10 @@ export const Home: React.VFC<Props> = ({
                 {/* <Price>
                   1200円<span>（材料費・実費）</span>
                 </Price> */}
-                <Button label={'参加する'} href={'https://anycap-workshop.peatix.com'} />
+                <Button
+                  label={`${t('workshop.button')}`}
+                  href={'https://anycap-workshop.peatix.com'}
+                />
               </WorkshopInfo>
             </WorkShopSectionContents>
           </WorkshopWrap>
@@ -567,46 +580,46 @@ export const Home: React.VFC<Props> = ({
               <span>
                 <SectionTitle className={'headline_making'}>Making #ANYCAP</SectionTitle>
               </span>
-              <span>
-                <SectionSubTitle className={'headline_making'}>
-                  廃プラキーキャップができるまで
-                </SectionSubTitle>
-              </span>
+              {isJa && (
+                <span>
+                  <SectionSubTitle className={'headline_making'}>
+                    {t('making.subtitle')}
+                  </SectionSubTitle>
+                </span>
+              )}
             </SectionTitleGroup>
             <MakingScrollWrap>
               <MakingItem className='makingItem'>
                 <MakingItemImg className='makingItemImg' src={'/images/photos/007.jpg'} />
                 <h3>
-                  <span>01.</span>素材をさがす
+                  <span>01.</span>
+                  {t('making.step1Title')}
                 </h3>
-                <p>
-                  キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
-                </p>
+                <p>{t('making.step1Text')}</p>
               </MakingItem>
               <MakingItem className='makingItem'>
                 <MakingItemImg className='makingItemImg' src={'/images/photos/008.jpg'} />
                 <h3>
-                  <span>02.</span>破砕する
+                  <span>02.</span>
+                  {t('making.step2Title')}
                 </h3>
-                <p>集めた素材を砕いて、5mm角程度の大きさにします。</p>
+                <p>{t('making.step2Text')}</p>
               </MakingItem>
               <MakingItem className='makingItem'>
                 <MakingItemImg className='makingItemImg' src={'/images/photos/009.jpg'} />
                 <h3>
-                  <span>03.</span>金型を用意する
+                  <span>03.</span>
+                  {t('making.step3Title')}
                 </h3>
-                <p>
-                  キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
-                </p>
+                <p>{t('making.step3Text')}</p>
               </MakingItem>
               <MakingItem className='makingItem'>
                 <MakingItemImg className='makingItemImg' src={'/images/photos/010.jpg'} />
                 <h3>
-                  <span>04.</span>金型を用意する
+                  <span>04.</span>
+                  {t('making.step4Title')}
                 </h3>
-                <p>
-                  キーキャップの素材を探します。原材料を確認でき、溶かすことで有害物質が出ないものである必要があります。ペットボトルキャップなどは身近で使いやすい素材の１つです。
-                </p>
+                <p>{t('making.step4Text')}</p>
               </MakingItem>
             </MakingScrollWrap>
           </MakingWrap>
@@ -627,23 +640,27 @@ export const Home: React.VFC<Props> = ({
               <span>
                 <SectionTitle className={'headline_mold'}>Mold</SectionTitle>
               </span>
-              <span>
-                <SectionSubTitle className={'headline_mold'}>金型</SectionSubTitle>
-              </span>
+              {isJa && (
+                <span>
+                  <SectionSubTitle className={'headline_mold'}>
+                    {t('mold.subtitle')}
+                  </SectionSubTitle>
+                </span>
+              )}
             </MoldTitleWrap>
             <MoldContentsWrap>
               <MoldDesc>
-                金型を用意し、家庭用の射出成形機（ORIGINALMIND社製のINARIなど）を使えば、ご自身でキーキャップを作ることも可能です。
+                {t('mold.text1')}
                 <br />
-                より多くの方に活動に参加してもらいたいという思いから、金型の3Dデータを公開しています。
+                {t('mold.text2')}
                 <br />
-                ご興味のある方は、下記のコンタクトフォームよりお問い合わせください
+                {t('mold.text3')}
               </MoldDesc>
               <Divider />
               {/* <Download href={'/'}>ダウンロードする</Download> */}
               <DownloadButton
                 href={'https://vernacular.booth.pm/items/3457801'}
-                label={'ダウンロードする'}
+                label={`${t('mold.button')}`}
               />
             </MoldContentsWrap>
           </MoldWrap>
@@ -654,18 +671,29 @@ export const Home: React.VFC<Props> = ({
               <span>
                 <SectionTitle className={'headline_about'}>About Us</SectionTitle>
               </span>
-              <span>
-                <SectionSubTitle className={'headline_about'}>わたしたちについて</SectionSubTitle>
-              </span>
+              {isJa && (
+                <span>
+                  <SectionSubTitle className={'headline_about'}>
+                    {t('aboutUs.subtitle')}
+                  </SectionSubTitle>
+                </span>
+              )}
             </AboutTitleWrap>
             <AboutContentsWrap>
               <p>
-                #ANYCAPは、ヤフー社員の自主制作チームToasterによって運営されており、オープンコラボレーションハブLODGEを拠点に活動しています。
+                {t('aboutUs.text1')}
                 <br />
-                #ANYCAPプロジェクトは、協業いただける企業・団体・個人のみなさまをお待ちしております。
+                {t('aboutUs.text2')}
               </p>
               <AboutDivider />
-              <Button label={'お問い合わせ'} href={'https://forms.gle/beWyuZMBuo2zrEZP8'} />
+              <Button
+                label={`${t('aboutUs.button')}`}
+                href={
+                  isJa
+                    ? 'https://forms.gle/beWyuZMBuo2zrEZP8'
+                    : 'https://forms.gle/HWheDW8FM39EB1Su7'
+                }
+              />
             </AboutContentsWrap>
             <AboutImageWrap>
               <Image
@@ -684,13 +712,15 @@ export const Home: React.VFC<Props> = ({
               <span>
                 <SectionTitle className={'headline_library'}>Library</SectionTitle>
               </span>
-              <span>
-                <SectionSubTitle className={'headline_library'}>ライブラリ</SectionSubTitle>
-              </span>
+              {isJa && (
+                <span>
+                  <SectionSubTitle className={'headline_library'}>
+                    {t('library.subtitle')}
+                  </SectionSubTitle>
+                </span>
+              )}
             </SectionTitleGroup>
-            <LibraryDesc>
-              みんなが見つけたキーキャップに使えそうな素材とそのレポートです。実際に作ってみたものがあればどんどう投稿していってみましょう！いいねの多い人気素材は実際に販売されることがあるかも...?!
-            </LibraryDesc>
+            <LibraryDesc>{t('library.text')}</LibraryDesc>
             {materials.length > 0 && ( // 何らかの理由で素材リストが取れなかった時はsection全体を非表示にする
               <>
                 <Filters className='filter'>
@@ -757,10 +787,10 @@ export const Home: React.VFC<Props> = ({
 
                 {/* 登録ページへのリンクはログイン中のみ有効にする */}
                 {authStatus === 'LOGGED_IN' && currentUser ? (
-                  <Button label={'素材を追加する'} href='/register' />
+                  <Button label={`${t('library.button')}`} href='/register' />
                 ) : (
                   <Button
-                    label={'素材を追加する'}
+                    label={`${t('library.button')}`}
                     onClick={() => {
                       setLoginModalActive(true)
                     }}

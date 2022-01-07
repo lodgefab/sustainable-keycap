@@ -2,6 +2,7 @@ import React from 'react'
 import styled from '@emotion/styled'
 import { login } from '../../lib/auth'
 import GoogleSignInButton from '../atoms/GoogleSignInButton'
+import { useTranslation } from 'next-i18next'
 
 interface Props {
   isActive: boolean
@@ -9,6 +10,8 @@ interface Props {
 }
 
 const LoginModal: React.VFC<Props> = ({ isActive, deActivate }) => {
+  const { t } = useTranslation('translation', { keyPrefix: 'login' })
+
   return (
     <Wrapper isVisible={isActive} onClick={deActivate}>
       <Contents
@@ -16,7 +19,7 @@ const LoginModal: React.VFC<Props> = ({ isActive, deActivate }) => {
           e.stopPropagation()
         }}
       >
-        キーキャップ素材を投稿するにはログインが必要です。
+        {t('text')}
         <GoogleSignInButton onClick={login} />
       </Contents>
     </Wrapper>
