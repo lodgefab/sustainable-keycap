@@ -8,6 +8,7 @@ import Image from 'next/image'
 import { Button } from '../atoms/Button'
 import { useFormContext } from 'react-hook-form'
 import Link from 'next/link'
+import { useTranslation } from 'next-i18next'
 
 type InputTagAttributes<T extends React.HTMLAttributes<HTMLElement>> = T & {
   onChange: ChangeHandler
@@ -80,13 +81,15 @@ export const Editor: React.VFC<Props> = ({
    * 画像をアップした際にプレビューを表示する
    */
 
+  const { t } = useTranslation('translation', { keyPrefix: 'editor' })
+
   return (
     <>
       <FormHeading>
         <Link href='/' passHref={true}>
           <a />
         </Link>
-        <p>素材を追加する</p>
+        <p>{t('title.text')}</p>
       </FormHeading>
       <Form onClick={onColorFormBeInActive} onFocus={onColorFormBeInActive}>
         <MaterialWrap
@@ -139,7 +142,7 @@ export const Editor: React.VFC<Props> = ({
         </KeyUploadWrap>
         <InputWrap>
           <FormItem>
-            <Label htmlFor='material-name'>素材の名前</Label>
+            <Label htmlFor='material-name'>{t('form.name')}</Label>
             <Input type='text' id='material-name' required {...inputTagAttributes.materialName} />
             {errorMessage.materialName && (
               <ErrorMessage key='materialName-error'>{errorMessage.materialName}</ErrorMessage>
@@ -147,7 +150,7 @@ export const Editor: React.VFC<Props> = ({
           </FormItem>
 
           <FormItem onClick={onColorFormBeActive}>
-            <Label htmlFor='color-type'>色の系統</Label>
+            <Label htmlFor='color-type'>{t('form.color')}</Label>
             <ColorInput
               type='text'
               id='color-type'
@@ -165,12 +168,12 @@ export const Editor: React.VFC<Props> = ({
           </FormItem>
 
           <FormItem>
-            <Label htmlFor='plastic-type'>プラスチックの種類</Label>
+            <Label htmlFor='plastic-type'>{t('form.plastic')}</Label>
             <Select id='plastic-type' required {...inputTagAttributes.plasticType}>
-              <option value=''>選択してください</option>
-              <option value='PP'>PP（ポリプロピレン）</option>
-              <option value='PE'>PE（ポリエチレン）</option>
-              <option value='PS'>PS（ポリスチレン）</option>
+              <option value=''>{t('form.plasticOptionLabel')}</option>
+              <option value='PP'>{t('form.plasticOption1')}</option>
+              <option value='PE'>{t('form.plasticOption2')}</option>
+              <option value='PS'>{t('form.plasticOption3')}</option>
             </Select>
             {errorMessage.plasticType && (
               <ErrorMessage key='plasticType-error'>{errorMessage.plasticType}</ErrorMessage>
@@ -178,7 +181,7 @@ export const Editor: React.VFC<Props> = ({
           </FormItem>
 
           <FormItem>
-            <Label htmlFor='celsius'>設定温度</Label>
+            <Label htmlFor='celsius'>{t('form.temperature')}</Label>
             <Input type='text' id='celsius' required {...inputTagAttributes.celsius} />
             {errorMessage.celsius && (
               <ErrorMessage key='celsius-error'>{errorMessage.celsius}</ErrorMessage>
@@ -186,12 +189,12 @@ export const Editor: React.VFC<Props> = ({
           </FormItem>
 
           <FormItem>
-            <Label htmlFor='note'>備考（制作する際のポイントなど）</Label>
+            <Label htmlFor='note'>{t('form.note')}</Label>
             <Textarea id='note' {...inputTagAttributes.note} rows={5} />
             {errorMessage.note && <ErrorMessage key='note'>{errorMessage.note}</ErrorMessage>}
           </FormItem>
           <ButtonWrap>
-            <Button label='登録する' onClick={onClickSubmit} disabled={!canSubmit} />
+            <Button label={t('form.submit')} onClick={onClickSubmit} disabled={!canSubmit} />
           </ButtonWrap>
         </InputWrap>
       </Form>
